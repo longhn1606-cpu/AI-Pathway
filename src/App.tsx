@@ -185,6 +185,76 @@ function App() {
           </div>
         </section>
 
+        <section className="results-section" id="recommendations">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">BƯỚC 02</span>
+              <h2>Gợi ý dành cho bạn</h2>
+              <p>
+                Khám phá các chương trình đại học dựa trên hồ sơ,
+                sở thích và điều kiện học tập của bạn.
+              </p>
+            </div>
+            <span className="step-count">02 / 03</span>
+          </div>
+
+          <div className="empty-state">
+            <div className="empty-icon">✳</div>
+            <h3>Lộ trình của bạn sẽ xuất hiện tại đây</h3>
+            <p>
+              Sau khi kết nối dữ liệu tuyển sinh đã xác minh,
+              AI Pathway sẽ hiển thị các chương trình phù hợp,
+              học phí, phương thức xét tuyển và nguồn tham khảo.
+            </p>
+            <span className="status-pill">Đang chờ kết nối dữ liệu</span>
+          </div>
+        </section>
+
+        <section className="comparison-section" id="compare">
+          <div className="section-heading">
+            <div>
+              <span className="eyebrow">BƯỚC 03</span>
+              <h2>So sánh và điều chỉnh</h2>
+              <p>
+                Đặt các lựa chọn cạnh nhau để cân nhắc trước
+                khi đưa ra quyết định.
+              </p>
+            </div>
+          </div>
+
+          <div className="comparison-grid">
+            <article className="comparison-card">
+              <span className="comparison-symbol">↔</span>
+              <h3>So sánh chương trình</h3>
+              <p>
+                Đối chiếu ngành học, học phí, địa điểm và
+                phương thức xét tuyển.
+              </p>
+              <span className="card-status">Chờ dữ liệu chương trình</span>
+            </article>
+
+            <article className="comparison-card">
+              <span className="comparison-symbol">◎</span>
+              <h3>Mô phỏng lộ trình</h3>
+              <p>
+                Xem xét các kịch bản khi điểm dự kiến,
+                ngân sách hoặc khu vực mong muốn thay đổi.
+              </p>
+              <span className="card-status">Chờ tích hợp logic</span>
+            </article>
+
+            <article className="comparison-card">
+              <span className="comparison-symbol">✓</span>
+              <h3>Kiểm tra nguồn</h3>
+              <p>
+                Xem năm áp dụng, nguồn chính thức và trạng thái
+                xác minh của thông tin tuyển sinh.
+              </p>
+              <span className="card-status">Chờ tích hợp nguồn</span>
+            </article>
+          </div>
+        </section>
+
         <section className="how-section" id="how-it-works">
           <span className="eyebrow">TỪ THÔNG TIN ĐẾN LỰA CHỌN</span>
           <h2>Một lộ trình, ba bước</h2>
