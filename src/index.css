@@ -585,3 +585,16 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Khu vực gợi ý ngành và trường */
+.recommend-section {
+  padding: 76px 9%;
+  background: #f7f9fc;
+}
+
+/* Responsive cho điện thoại */
+@media (max-width: 760px) {
+  .recommend-section {
+    padding: 55px 7%;
+  }
+}
