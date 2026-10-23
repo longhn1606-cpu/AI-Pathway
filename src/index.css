@@ -473,3 +473,115 @@ h3 {
     padding: 24px 7%;
   }
 }
+
+.results-section,
+.comparison-section {
+  padding: 76px 9%;
+}
+
+.results-section {
+  background: #f7f9fc;
+}
+
+.comparison-section {
+  background: #fff;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 52px 24px;
+  border: 1px dashed #cbd7eb;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.empty-icon {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 16px;
+  border-radius: 17px;
+  background: #eaf0ff;
+  color: #2455d6;
+  font-size: 28px;
+}
+
+.empty-state h3 {
+  margin-bottom: 10px;
+  font-size: 19px;
+}
+
+.empty-state p {
+  max-width: 510px;
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.status-pill,
+.card-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 10px;
+  border-radius: 20px;
+  background: #eef2f8;
+  color: #627185;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.comparison-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 25px;
+  border: 1px solid #e7ecf4;
+  border-radius: 15px;
+  background: #fff;
+}
+
+.comparison-symbol {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #eaf0ff;
+  color: #2455d6;
+  font-size: 23px;
+}
+
+.comparison-card h3 {
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.comparison-card p {
+  flex: 1;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+@media (max-width: 760px) {
+  .results-section,
+  .comparison-section {
+    padding: 55px 7%;
+  }
+
+  .comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
