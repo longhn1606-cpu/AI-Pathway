@@ -288,6 +288,25 @@ function App() {
             </article>
           </div>
         </section>
+        
+        <section className="recommend-section">
+          <div className="section-heading">
+            <p className="eyebrow">GỢI Ý DÀNH CHO BẠN</p>
+            <h2>Khám phá ngành học và trường đại học</h2>
+            <p>
+              Tìm hiểu các lựa chọn phù hợp với sở thích,
+              năng lực và ngân sách của bạn.
+            </p>
+          </div>
+
+          <div className="recommend-empty">
+            <h3>Không gian gợi ý trường đại học</h3>
+            <p>
+              Danh sách chương trình sẽ hiển thị tại đây
+              khi dữ liệu tuyển sinh được tích hợp.
+            </p>
+          </div>
+        </section>
 
         <footer className="footer">
           <span>AI Pathway · Định hướng, không quyết định thay bạn.</span>
