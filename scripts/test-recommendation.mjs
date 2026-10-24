@@ -75,7 +75,7 @@ test('thiếu điểm dự kiến không làm chương trình bị loại chỉ 
 test('thiếu học phí không bị coi là chi phí bằng 0 hoặc tự động phù hợp ngân sách', () => {
   const result = recommendPrograms(input({ interests: ['arts'], annualBudgetVnd: 10000000 }))
   assert.equal(result.results.length, 1)
-  assert.ok(result.results[0].warnings.some((warning) => warning.includes('Thiếu dữ liệu học phí')))
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('dữ liệu học phí') && warning.includes('đánh giá')))
 })
 
 test('ngân sách thấp hơn học phí tối thiểu loại chương trình và nêu rõ lý do', () => {
