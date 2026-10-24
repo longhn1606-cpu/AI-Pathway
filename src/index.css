@@ -324,3 +324,125 @@
     min-height: 50px;
   }
 }
+
+/* ===== AI Pathway: form sizing refinement ===== */
+
+/* Mo rong noi dung va tang kha nang doc */
+.explore-section .section-wrap {
+  width: min(100% - 48px, 1400px);
+  margin-inline: auto;
+}
+
+.explore-section .section-intro h2 {
+  font-size: clamp(34px, 3vw, 44px);
+  line-height: 1.25;
+}
+
+.explore-section .section-intro > p {
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* Tang kich thuoc khu vuc nhap ho so */
+.explore-section .form-layout {
+  grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.8fr);
+  gap: 24px;
+  align-items: stretch;
+}
+
+.explore-section .form-side-note {
+  padding: 32px;
+}
+
+.explore-section .form-side-note h3 {
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.explore-section .form-side-note p {
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.explore-section .form-card {
+  padding: clamp(24px, 3vw, 40px);
+}
+
+.explore-section .form-card-heading h3 {
+  font-size: 25px;
+  line-height: 1.4;
+}
+
+.explore-section .field-label {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.explore-section .input-wrap input,
+.explore-section .input-wrap select,
+.explore-section .input-wrap textarea {
+  min-height: 52px;
+  font-size: 16px;
+}
+
+.explore-section .form-actions {
+  gap: 20px;
+}
+
+.explore-section .form-actions p {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.explore-section .submit-button {
+  min-height: 50px;
+  padding: 14px 24px;
+  font-size: 15px;
+}
+
+/* May tinh bang va laptop nho */
+@media (max-width: 900px) {
+  .explore-section .form-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-section .form-side-note {
+    min-height: auto;
+  }
+}
+
+/* Dien thoai */
+@media (max-width: 640px) {
+  .explore-section .section-wrap {
+    width: calc(100% - 32px);
+  }
+
+  .explore-section .section-intro h2 {
+    font-size: 32px;
+  }
+
+  .explore-section .form-card {
+    padding: 22px 18px;
+  }
+
+  .explore-section .form-card-heading h3 {
+    font-size: 22px;
+  }
+
+  .explore-section .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .explore-section .field-full {
+    grid-column: auto;
+  }
+
+  .explore-section .form-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .explore-section .submit-button {
+    width: 100%;
+  }
+}
