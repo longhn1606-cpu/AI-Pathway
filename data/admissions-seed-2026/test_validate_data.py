@@ -1,4 +1,4 @@
-"Regression tests for AI Pathway seed data (standard library only)."
+# Regression tests for AI Pathway seed data (standard library only).
 import json
 import unittest
 from pathlib import Path
