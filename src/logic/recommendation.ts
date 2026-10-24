@@ -233,12 +233,29 @@ function evaluateProgram(
     }
   }
 
+  const hasMissingSourceCoverage =
+    university.sources.length === 0 ||
+    program.sources.length === 0 ||
+    program.admissionMethods.some((method) =>
+      method.sourceIds.length === 0 ||
+      method.sourceIds.some((sourceId) =>
+        !program.sources.some((source) => source.title === sourceId),
+      ),
+    )
+
+  if (hasMissingSourceCoverage) {
+    warnings.push(
+      'Thiếu hoặc chưa liên kết đầy đủ nguồn dữ liệu của trường/chương trình/phương thức; cần rà soát nguồn chính thức.',
+    )
+  }
+
   const dataStatus = effectiveDataStatus([
     university.status,
     ...university.sources.map((source) => source.status),
     program.status,
     ...program.sources.map((source) => source.status),
     ...getMethodStatuses(program),
+    ...(hasMissingSourceCoverage ? ['needs_review' as const] : []),
   ])
 
   if (dataStatus === 'simulated') {
