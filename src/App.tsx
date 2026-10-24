@@ -1,27 +1,40 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import type { DataSource, DataStatus, University, UniversityProgram } from './types'
+import universitiesJson from '../data/admissions-seed-2026/universities.json'
+import programsJson from '../data/admissions-seed-2026/programs.json'
+import cutoffsJson from '../data/admissions-seed-2026/historical_cutoffs.json'
 
-type Interest = 'technology' | 'business' | 'health' | 'education' | 'arts' | 'other' | 'undecided'
+type Interest = 'technology' | 'undecided'
 type Region = 'north' | 'central' | 'south' | 'anywhere'
 type Budget = 'under20' | '20to40' | '40to70' | 'over70' | 'flexible'
 type Profile = { score: string; interest: Interest | ''; region: Region | ''; budget: Budget | ''; keywords: string }
-type DemoProgram = { id: string; school: string; program: string; group: Interest[]; region: Exclude<Region, 'anywhere'>; tags: string[]; description: string }
+type CutoffRecord = { id: string; programId: string; universityId: string; year: number; method: string; cutoffScore: number | null; scoreScale: number | null; sourceUrl: string; checkedAt: string; status: DataStatus; notes: string }
+type CutoffDataset = { title: string; years: number[]; checkedAt: string; scoringPolicy: string; records: CutoffRecord[] }
+type DemoProgram = { id: string; school: string; program: string; group: Interest[]; region: Exclude<Region, 'anywhere'>; tags: string[]; description: string; status: DataStatus; sources: DataSource[]; tuitionMinVndPerYear: number | null; tuitionMaxVndPerYear: number | null; admissionMethods: UniversityProgram['admissionMethods']; cutoffs: CutoffRecord[] }
 
 const initialProfile: Profile = { score: '', interest: '', region: '', budget: '', keywords: '' }
+const universities = universitiesJson as University[]
+const programs = programsJson as UniversityProgram[]
+const cutoffDataset = cutoffsJson as CutoffDataset
+const universityById = new Map(universities.map((university) => [university.id, university]))
+const methodLabels: Record<string, string> = { high_school_exam: 'Thi tốt nghiệp THPT', academic_record: 'Học bạ', competency_assessment: 'Đánh giá năng lực/tư duy', direct_admission: 'Xét tuyển thẳng', other: 'Phương thức khác' }
+const statusLabels: Record<DataStatus, string> = { verified: 'Đã xác minh', needs_review: 'Cần xác minh', simulated: 'Mô phỏng' }
 
-// Dữ liệu minh họa giao diện, KHÔNG phải dữ liệu tuyển sinh chính thức.
-const demoPrograms: DemoProgram[] = [
-  { id: 'demo-01', school: 'Trường đại học minh họa A', program: 'Công nghệ thông tin', group: ['technology'], region: 'north', tags: ['Công nghệ', 'Phân tích dữ liệu'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm công nghệ và kỹ thuật.' },
-  { id: 'demo-02', school: 'Trường đại học minh họa B', program: 'Quản trị kinh doanh', group: ['business'], region: 'south', tags: ['Kinh doanh', 'Quản lý'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm kinh tế và kinh doanh.' },
-  { id: 'demo-03', school: 'Trường đại học minh họa C', program: 'Thiết kế truyền thông', group: ['arts'], region: 'central', tags: ['Sáng tạo', 'Truyền thông'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm nghệ thuật và sáng tạo.' },
-  { id: 'demo-04', school: 'Trường đại học minh họa D', program: 'Giáo dục học', group: ['education'], region: 'north', tags: ['Giáo dục', 'Cộng đồng'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm giáo dục và xã hội.' },
-  { id: 'demo-05', school: 'Trường đại học minh họa E', program: 'Khoa học sức khỏe', group: ['health'], region: 'south', tags: ['Sức khỏe', 'Khoa học'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm y tế và sức khỏe.' },
-  { id: 'demo-06', school: 'Trường đại học minh họa F', program: 'Kỹ thuật ứng dụng', group: ['technology', 'other'], region: 'central', tags: ['Kỹ thuật', 'Thực hành'], description: 'Ví dụ giao diện cho chương trình thuộc nhóm kỹ thuật ứng dụng.' },
-]
-
-const interestLabels: Record<Interest, string> = {
-  technology: 'Công nghệ và kỹ thuật', business: 'Kinh tế và kinh doanh', health: 'Y tế và sức khỏe',
-  education: 'Giáo dục và xã hội', arts: 'Nghệ thuật và sáng tạo', other: 'Nhóm ngành khác', undecided: 'Chưa xác định',
-}
+// Dùng trực tiếp dữ liệu của repository; không tạo trường/ngành giả để làm đầy giao diện.
+const demoPrograms: DemoProgram[] = programs.map((program) => {
+  const university = universityById.get(program.universityId)
+  return {
+    id: program.id, school: university?.name ?? program.universityId, program: program.name,
+    group: ['technology'], region: university?.region ?? 'central',
+    tags: program.majorGroup === 'information_technology' ? ['Công nghệ thông tin', 'Máy tính'] : ['Kỹ thuật', 'Công nghệ'],
+    description: 'Thông tin chương trình được lấy từ bộ dữ liệu demo của dự án. Hãy mở nguồn chính thức và kiểm tra trạng thái trước khi sử dụng.',
+    status: program.status, sources: program.sources,
+    tuitionMinVndPerYear: program.tuitionMinVndPerYear, tuitionMaxVndPerYear: program.tuitionMaxVndPerYear,
+    admissionMethods: program.admissionMethods,
+    cutoffs: cutoffDataset.records.filter((record) => record.programId === program.id).sort((a, b) => b.year - a.year || a.method.localeCompare(b.method)),
+  }
+})
+const interestLabels: Record<Interest, string> = { technology: 'Công nghệ và kỹ thuật', undecided: 'Chưa xác định' }
 const regionLabels: Record<Region, string> = { north: 'Miền Bắc', central: 'Miền Trung', south: 'Miền Nam', anywhere: 'Toàn quốc' }
 const budgetLabels: Record<Budget, string> = { under20: 'Dưới 20 triệu/năm', '20to40': '20–40 triệu/năm', '40to70': '40–70 triệu/năm', over70: 'Trên 70 triệu/năm', flexible: 'Linh hoạt / cần tư vấn' }
 
@@ -40,7 +53,9 @@ function App() {
     return demoPrograms.filter((item) => {
       const interestMatches = !interest || interest === 'undecided' || item.group.includes(interest)
       const regionMatches = !region || region === 'anywhere' || item.region === region
-      const keywordMatches = !keyword || `${item.school} ${item.program} ${item.tags.join(' ')}`.toLocaleLowerCase('vi').includes(keyword)
+      const searchableText = [item.school, item.program, ...item.tags].join(' ').toLocaleLowerCase('vi')
+      const keywordMatches = !keyword || searchableText.includes(keyword)
+      // Tuition is unknown for these records, so budget is context only and never excludes a program.
       return interestMatches && regionMatches && keywordMatches
     })
   }, [submittedProfile])
@@ -111,7 +126,7 @@ function App() {
               <form onSubmit={handleSubmit}>
                 <div className="form-grid">
                   <label className="field"><span className="field-label">Điểm dự kiến <span className="required-star">*</span></span><div className="input-wrap"><input type="number" min="0" max="30" step="0.1" inputMode="decimal" placeholder="Ví dụ: 24.5" value={profile.score} onChange={(event) => updateProfile('score', event.target.value)} required aria-describedby="score-hint" /><span className="input-suffix">/ 30</span></div><span className="field-hint" id="score-hint">Nhập điểm tham khảo trên thang 30. Chưa dùng để kết luận đỗ/trượt.</span></label>
-                  <label className="field"><span className="field-label">Nhóm ngành quan tâm <span className="required-star">*</span></span><select value={profile.interest} onChange={(event) => updateProfile('interest', event.target.value as Profile['interest'])} required><option value="">Chọn nhóm ngành</option><option value="technology">Công nghệ và kỹ thuật</option><option value="business">Kinh tế và kinh doanh</option><option value="health">Y tế và sức khỏe</option><option value="education">Giáo dục và xã hội</option><option value="arts">Nghệ thuật và sáng tạo</option><option value="other">Nhóm ngành khác</option><option value="undecided">Chưa xác định</option></select></label>
+                  <label className="field"><span className="field-label">Nhóm ngành quan tâm <span className="required-star">*</span></span><select value={profile.interest} onChange={(event) => updateProfile('interest', event.target.value as Profile['interest'])} required><option value="">Chọn nhóm ngành</option><option value="technology">Công nghệ và kỹ thuật</option><option value="undecided">Chưa xác định</option></select></label>
                   <label className="field"><span className="field-label">Khu vực mong muốn <span className="required-star">*</span></span><select value={profile.region} onChange={(event) => updateProfile('region', event.target.value as Profile['region'])} required><option value="">Chọn khu vực</option><option value="north">Miền Bắc</option><option value="central">Miền Trung</option><option value="south">Miền Nam</option><option value="anywhere">Toàn quốc</option></select></label>
                   <label className="field"><span className="field-label">Ngân sách học phí mỗi năm <span className="required-star">*</span></span><select value={profile.budget} onChange={(event) => updateProfile('budget', event.target.value as Profile['budget'])} required><option value="">Chọn mức ngân sách</option><option value="under20">Dưới 20 triệu đồng</option><option value="20to40">20–40 triệu đồng</option><option value="40to70">40–70 triệu đồng</option><option value="over70">Trên 70 triệu đồng</option><option value="flexible">Linh hoạt / cần tư vấn</option></select></label>
                   <label className="field field-full"><span className="field-label">Từ khóa bạn muốn tìm <span className="optional-label">Không bắt buộc</span></span><div className="input-wrap search-input"><span className="search-glyph" aria-hidden="true">⌕</span><input type="search" placeholder="Ví dụ: sáng tạo, dữ liệu, cộng đồng..." value={profile.keywords} onChange={(event) => updateProfile('keywords', event.target.value)} /></div></label>
@@ -127,12 +142,12 @@ function App() {
             {!submittedProfile ? <div className="results-empty"><div className="empty-illustration"><div className="empty-paper"><span>✳</span><i /><i /><i /></div><div className="empty-search">⌕</div></div><div className="empty-copy"><span className="empty-label">KHỞI ĐẦU HÀNH TRÌNH</span><h3>Gợi ý của bạn sẽ xuất hiện ở đây</h3><p>Hoàn thành hồ sơ định hướng để xem giao diện gợi ý ngành học theo sở thích và khu vực bạn chọn.</p><a className="text-link" href="#explore">Điền hồ sơ của bạn <span aria-hidden="true">↑</span></a></div></div> : <>
               <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>lựa chọn minh họa</span></span><p>Phù hợp với một số tiêu chí bạn đã chọn</p></div><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div>
               <div className="profile-summary"><span className="summary-label">HỒ SƠ ĐANG XEM</span><span className="summary-chip">Điểm: {profile.score}/30</span>{profile.interest && <span className="summary-chip">{interestLabels[profile.interest]}</span>}{profile.region && <span className="summary-chip">{regionLabels[profile.region]}</span>}{profile.budget && <span className="summary-chip">{budgetLabels[profile.budget]}</span>}</div>
-              <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Đây là dữ liệu minh họa giao diện.</strong> Tên trường và chương trình dưới đây không phải dữ liệu tuyển sinh thực tế. Chưa có kết luận về điểm chuẩn hoặc khả năng trúng tuyển.</p></div>
-              {visiblePrograms.length ? <div className="program-grid">{programsToShow.map((item, index) => <article className="program-card" key={item.id}><div className={`program-art program-art-${index % 3}`}><span className="program-art-label">HƯỚNG ĐI {String(index + 1).padStart(2, '0')}</span><span className="program-art-symbol">{index % 3 === 0 ? '✳' : index % 3 === 1 ? '↗' : '◇'}</span><span className="program-art-caption">AI PATHWAY <i>·</i> DEMO</span></div><div className="program-content"><div className="program-tags">{item.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><h3>{item.program}</h3><p className="program-school">{item.school}</p><p className="program-description">{item.description}</p><div className="program-meta"><span>⌖ {regionLabels[item.region]}</span><span className="demo-tag">Dữ liệu demo</span></div><button type="button" className="program-link" onClick={() => document.getElementById('data-note')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>Tìm hiểu tiêu chí <span aria-hidden="true">↗</span></button></div></article>)}</div> : <div className="no-results"><span>⌕</span><h3>Chưa có lựa chọn khớp với từ khóa</h3><p>Thử bỏ bớt từ khóa hoặc chọn “Toàn quốc” để mở rộng kết quả minh họa.</p><button className="button button-secondary" type="button" onClick={() => { updateProfile('keywords', ''); setSubmittedProfile({ ...profile, keywords: '' }) }}>Xóa từ khóa</button></div>}
+              <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Dữ liệu demo có nguồn và trạng thái riêng.</strong> Các chương trình lấy từ tệp dữ liệu của repository. Điểm chuẩn có thể là <em>đã xác minh</em> hoặc <em>mô phỏng</em>; điểm mô phỏng không phải số liệu chính thức. Học phí hiện chưa được xác minh. Điểm cá nhân không được dùng để dự đoán đỗ/trượt.</p></div>
+              {visiblePrograms.length ? <div className="program-grid">{programsToShow.map((item, index) => <article className="program-card" key={item.id}><div className={`program-art program-art-${index % 3}`}><span className="program-art-label">HƯỚNG ĐI {String(index + 1).padStart(2, '0')}</span><span className="program-art-symbol">{index % 3 === 0 ? '✳' : index % 3 === 1 ? '↗' : '◇'}</span><span className="program-art-caption">AI PATHWAY <i>·</i> DEMO</span></div><div className="program-content"><div className="program-tags">{item.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><h3>{item.program}</h3><p className="program-school">{item.school}</p><p className="program-description">{item.description}</p><p className="program-description"><strong>Học phí:</strong> {item.tuitionMinVndPerYear == null || item.tuitionMaxVndPerYear == null ? 'Chưa có dữ liệu đã xác minh' : item.tuitionMinVndPerYear.toLocaleString('vi-VN') + '–' + item.tuitionMaxVndPerYear.toLocaleString('vi-VN') + ' đồng/năm'}</p><p className="program-description"><strong>Điểm chuẩn lịch sử (demo):</strong> {item.cutoffs.slice(0, 3).map((cutoff) => cutoff.year + ' ' + (methodLabels[cutoff.method] ?? cutoff.method) + ': ' + (cutoff.cutoffScore == null ? 'chưa có điểm' : cutoff.cutoffScore + '/' + (cutoff.scoreScale ?? '?')) + ' [' + statusLabels[cutoff.status] + ']').join(' · ') || 'Chưa có bản ghi'}</p><div className="program-meta"><span>⌖ {regionLabels[item.region]}</span><span className="demo-tag">{statusLabels[item.status]}</span></div><a className="program-link" href={item.sources[0]?.url ?? '#data-note'} target="_blank" rel="noreferrer">Mở nguồn tham khảo <span aria-hidden="true">↗</span></a></div></article>)}</div> : <div className="no-results"><span>⌕</span><h3>Chưa có lựa chọn khớp với từ khóa</h3><p>Thử bỏ bớt từ khóa hoặc chọn “Toàn quốc” để mở rộng kết quả minh họa.</p><button className="button button-secondary" type="button" onClick={() => { updateProfile('keywords', ''); setSubmittedProfile({ ...profile, keywords: '' }) }}>Xóa từ khóa</button></div>}
               {visiblePrograms.length > 3 && <div className="show-more-wrap"><button className="button button-secondary" type="button" onClick={() => setShowAll((current) => !current)}>{showAll ? 'Thu gọn danh sách' : `Xem thêm ${visiblePrograms.length - 3} lựa chọn`} <span aria-hidden="true">{showAll ? '↑' : '↓'}</span></button></div>}
               <div className="save-profile"><div><span className="save-icon">✓</span><span><strong>Muốn tiếp tục tinh chỉnh?</strong><small>Hồ sơ hiện chỉ được giữ trong trạng thái trang khi bạn đang mở demo.</small></span></div><button className="button button-primary" type="button" onClick={saveProfile}>{saved ? 'Đã ghi nhận ✓' : 'Ghi nhận hồ sơ'}</button></div>{saved && <p className="save-confirmation" role="status">Đã ghi nhận hồ sơ trong giao diện demo. Thông tin chưa được gửi lên máy chủ.</p>}
             </>}
-            <div className="data-note" id="data-note"><span className="data-note-icon">i</span><div><strong>Minh bạch về dữ liệu</strong><p>Bản giao diện này dùng dữ liệu minh họa để kiểm tra trải nghiệm. Khi tích hợp dữ liệu thật, mỗi chương trình cần có nguồn chính thức, năm áp dụng và trạng thái xác minh. AI Pathway không cam kết kết quả tuyển sinh.</p></div></div>
+            <div className="data-note" id="data-note"><span className="data-note-icon">i</span><div><strong>Minh bạch về dữ liệu</strong><p>Bộ dữ liệu demo gồm các chương trình được chọn để thử nghiệm. Các điểm chuẩn có nhãn mô phỏng là số liệu giả lập; chỉ so sánh khi cùng chương trình, năm, phương thức và thang điểm. Nguồn, học phí và phương thức có thể còn cần xác minh. Không dùng bản demo này để quyết định tuyển sinh thực tế.</p></div></div>
           </div>
         </section>
 
