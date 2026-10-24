@@ -17,7 +17,7 @@ const universities = universitiesJson as unknown as University[]
 const programs = programsJson as unknown as UniversityProgram[]
 const cutoffDataset = cutoffsJson as unknown as CutoffDataset
 const universityById = new Map(universities.map((university) => [university.id, university] as const))
-const methodLabels: Record<string, string> = { high_school_exam: 'Thi tốt nghiệp THPT', academic_record: 'Học bạ', competency_assessment: 'Đánh giá năng lực/tư duy', direct_admission: 'Xét tuyển thẳng', other: 'Phương thức khác' }
+const methodLabels: Record<string, string> = { high_school_exam: 'Thi tốt nghiệp THPT', academic_record: 'Học bạ', competency_assessment: 'Đánh giá năng lực/tư duy', direct_admission: 'Xét tuyển thẳng', other: 'Xét tuyển tổng hợp / phương thức khác' }
 const statusLabels: Record<DataStatus, string> = { verified: 'Đã xác minh', needs_review: 'Cần xác minh', simulated: 'Mô phỏng' }
 
 // Dùng trực tiếp dữ liệu của repository; không tạo trường/ngành giả để làm đầy giao diện.
