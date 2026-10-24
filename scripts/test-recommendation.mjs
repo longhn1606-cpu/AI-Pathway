@@ -119,6 +119,74 @@ test('dữ liệu mô phỏng được gắn trạng thái và cảnh báo rõ r
   assert.ok(result.results.every((item) => item.warnings.some((warning) => warning.includes('dữ liệu mô phỏng'))))
 })
 
+test('thiếu nguồn của chương trình hạ trạng thái verified xuống needs_review', () => {
+  const university = {
+    ...universities[0],
+    status: 'verified',
+    sources: universities[0].sources.map((source) => ({ ...source, status: 'verified' })),
+  }
+  const program = {
+    ...programs[0],
+    universityId: university.id,
+    status: 'verified',
+    sources: [],
+    admissionMethods: programs[0].admissionMethods.map((method) => ({
+      ...method,
+      status: 'verified',
+      sourceIds: [],
+    })),
+  }
+  const result = recommendPrograms(input({}, [university], [program]))
+  assert.equal(result.results.length, 1)
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('Thiếu hoặc chưa liên kết đầy đủ nguồn dữ liệu')))
+})
+
+test('thiếu nguồn của trường hạ trạng thái verified xuống needs_review', () => {
+  const university = {
+    ...universities[0],
+    status: 'verified',
+    sources: [],
+  }
+  const program = {
+    ...programs[0],
+    universityId: university.id,
+    status: 'verified',
+    sources: programs[0].sources.map((source) => ({ ...source, status: 'verified' })),
+    admissionMethods: programs[0].admissionMethods.map((method) => ({
+      ...method,
+      status: 'verified',
+    })),
+  }
+  const result = recommendPrograms(input({}, [university], [program]))
+  assert.equal(result.results.length, 1)
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('Thiếu hoặc chưa liên kết đầy đủ nguồn dữ liệu')))
+})
+
+test('tham chiếu nguồn của phương thức không tồn tại khiến dữ liệu cần rà soát', () => {
+  const university = {
+    ...universities[0],
+    status: 'verified',
+    sources: universities[0].sources.map((source) => ({ ...source, status: 'verified' })),
+  }
+  const program = {
+    ...programs[0],
+    universityId: university.id,
+    status: 'verified',
+    sources: programs[0].sources.map((source) => ({ ...source, status: 'verified' })),
+    admissionMethods: programs[0].admissionMethods.map((method) => ({
+      ...method,
+      status: 'verified',
+      sourceIds: ['Nguồn không tồn tại'],
+    })),
+  }
+  const result = recommendPrograms(input({}, [university], [program]))
+  assert.equal(result.results.length, 1)
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('Thiếu hoặc chưa liên kết đầy đủ nguồn dữ liệu')))
+})
+
 test('so sánh trước/sau nhận diện chương trình thêm, bỏ và giữ lại', () => {
   const before = input({ preferredRegions: ['north'] })
   const after = input({ preferredRegions: ['south'] })
