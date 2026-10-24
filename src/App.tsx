@@ -13,9 +13,9 @@ type CutoffDataset = { title: string; years: number[]; checkedAt: string; scorin
 type DemoProgram = { id: string; school: string; program: string; group: Interest[]; region: Exclude<Region, 'anywhere'>; tags: string[]; description: string; status: DataStatus; sources: DataSource[]; tuitionMinVndPerYear: number | null; tuitionMaxVndPerYear: number | null; admissionMethods: UniversityProgram['admissionMethods']; cutoffs: CutoffRecord[] }
 
 const initialProfile: Profile = { score: '', interest: '', region: '', budget: '', keywords: '' }
-const universities = universitiesJson as University[]
-const programs = programsJson as UniversityProgram[]
-const cutoffDataset = cutoffsJson as CutoffDataset
+const universities = universitiesJson as unknown as University[]
+const programs = programsJson as unknown as UniversityProgram[]
+const cutoffDataset = cutoffsJson as unknown as CutoffDataset
 const universityById = new Map(universities.map((university) => [university.id, university]))
 const methodLabels: Record<string, string> = { high_school_exam: 'Thi tốt nghiệp THPT', academic_record: 'Học bạ', competency_assessment: 'Đánh giá năng lực/tư duy', direct_admission: 'Xét tuyển thẳng', other: 'Phương thức khác' }
 const statusLabels: Record<DataStatus, string> = { verified: 'Đã xác minh', needs_review: 'Cần xác minh', simulated: 'Mô phỏng' }
@@ -25,7 +25,7 @@ const demoPrograms: DemoProgram[] = programs.map((program) => {
   const university = universityById.get(program.universityId)
   return {
     id: program.id, school: university?.name ?? program.universityId, program: program.name,
-    group: ['technology'], region: university?.region ?? 'central',
+    group: ['technology'] as Interest[], region: university?.region ?? 'central',
     tags: program.majorGroup === 'information_technology' ? ['Công nghệ thông tin', 'Máy tính'] : ['Kỹ thuật', 'Công nghệ'],
     description: 'Thông tin chương trình được lấy từ bộ dữ liệu demo của dự án. Hãy mở nguồn chính thức và kiểm tra trạng thái trước khi sử dụng.',
     status: program.status, sources: program.sources,
