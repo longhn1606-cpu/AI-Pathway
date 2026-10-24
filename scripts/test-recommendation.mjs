@@ -97,8 +97,11 @@ test('phương thức tuyển sinh không khớp tạo cảnh báo, không tự 
   assert.ok(result.results.some((item) => item.warnings.some((warning) => warning.includes('không trùng lựa chọn ưu tiên'))))
 })
 
-test('khác thang điểm thì không so sánh trực tiếp', () => {
-  const result = recommendPrograms(input({ scoreScale: 100 }))
+test('khác thang điểm thì không so sánh trực tiếp khi đủ dữ liệu điểm chuẩn', () => {
+  const comparablePrograms = programs.filter((program) =>
+    program.historicalCutoff !== null && program.cutoffScale !== null && program.cutoffYear !== null)
+  const result = recommendPrograms(input({ scoreScale: 100 }, universities, comparablePrograms))
+  assert.ok(result.results.length > 0)
   assert.ok(result.results.every((item) => item.warnings.some((warning) => warning.includes('Không so sánh điểm trực tiếp'))))
 })
 
