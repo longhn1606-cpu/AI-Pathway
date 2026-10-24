@@ -94,7 +94,7 @@ test('khu vực ưu tiên loại chương trình ở khu vực khác', () => {
 test('phương thức tuyển sinh không khớp tạo cảnh báo, không tự loại chương trình', () => {
   const result = recommendPrograms(input({ preferredMethods: ['direct_admission'] }))
   assert.ok(result.results.length > 0)
-  assert.ok(result.results.some((item) => item.warnings.some((warning) => warning.includes('không trùng lựa chọn ưu tiên'))))
+  assert.ok(result.results.some((item) => item.warnings.some((warning) => warning.includes('nào trùng lựa chọn ưu tiên'))))
 })
 
 test('khác thang điểm thì không so sánh trực tiếp khi đủ dữ liệu điểm chuẩn', () => {
