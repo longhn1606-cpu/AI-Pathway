@@ -116,6 +116,33 @@ function effectiveDataStatus(statuses: Array<DataStatus | undefined>): DataStatu
   return 'verified'
 }
 
+/**
+ * Checks whether a source URL is structurally usable.
+ * This is syntax validation only; it does not fetch the URL or prove ownership.
+ */
+function isUsableSourceUrl(value: string): boolean {
+  if (!value.trim()) return false
+
+  try {
+    const url = new URL(value.trim())
+    if (!['http:', 'https:'].includes(url.protocol)) return false
+    if (!url.hostname || url.username || url.password) return false
+
+    const hostname = url.hostname.toLowerCase()
+    if (
+      hostname === 'example.com' ||
+      hostname === 'example.net' ||
+      hostname === 'example.org' ||
+      hostname.endsWith('.invalid') ||
+      hostname.endsWith('.example')
+    ) return false
+
+    return true
+  } catch {
+    return false
+  }
+}
+
 function formatVnd(value: number): string {
   return new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 0 }).format(value) + ' VND/năm'
 }
@@ -233,6 +260,7 @@ function evaluateProgram(
     }
   }
 
+  const allSources = [...university.sources, ...program.sources]
   const hasMissingSourceCoverage =
     university.sources.length === 0 ||
     program.sources.length === 0 ||
@@ -242,10 +270,16 @@ function evaluateProgram(
         !program.sources.some((source) => source.title === sourceId),
       ),
     )
+  const hasInvalidSourceUrl = allSources.some((source) => !isUsableSourceUrl(source.url))
 
   if (hasMissingSourceCoverage) {
     warnings.push(
       'Thiếu hoặc chưa liên kết đầy đủ nguồn dữ liệu của trường/chương trình/phương thức; cần rà soát nguồn chính thức.',
+    )
+  }
+  if (hasInvalidSourceUrl) {
+    warnings.push(
+      'Có URL nguồn dữ liệu trống hoặc không hợp lệ; trạng thái xác minh cần được rà soát.',
     )
   }
 
@@ -255,7 +289,7 @@ function evaluateProgram(
     program.status,
     ...program.sources.map((source) => source.status),
     ...getMethodStatuses(program),
-    ...(hasMissingSourceCoverage ? ['needs_review' as const] : []),
+    ...(hasMissingSourceCoverage || hasInvalidSourceUrl ? ['needs_review' as const] : []),
   ])
 
   if (dataStatus === 'simulated') {
