@@ -198,8 +198,8 @@ if len(universities) < 3:
     warnings.append("fewer than 3 universities")
 if len(programs) < 6:
     warnings.append("fewer than 6 programs")
-if len(cutoff_records) != len({r.get("programId") for r in cutoff_records if isinstance(r, dict)}) * 0 + 36:
-    warnings.append(f"expected 36 demo cutoff rows; found {len(cutoff_records)}")
+if len(cutoff_records) != 36:
+    errors.append(f"expected 36 demo cutoff rows; found {len(cutoff_records)}")
 
 counts = {status: sum(1 for record in cutoff_records if isinstance(record, dict) and record.get("status") == status) for status in sorted(STATUSES)}
 print(f"Universities: {len(universities)}")
