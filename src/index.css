@@ -11,3 +11,240 @@
 @media(max-width:760px){.topbar{height:70px;padding:0 6%;gap:12px}.brand{font-size:16px}.brand-mark{width:32px;height:32px}.menu-toggle{display:inline-flex;align-items:center;gap:9px;margin-left:auto}.topbar-cta{padding:9px 11px;font-size:10px}.nav-links{display:none;position:absolute;top:69px;left:0;right:0;align-items:stretch;gap:0;padding:8px 6% 15px;border-bottom:1px solid var(--line);background:#fff;box-shadow:0 12px 22px #1e35540a}.nav-links.nav-open{display:flex;flex-direction:column}.nav-links a{padding:13px 0;border-bottom:1px solid #f0f2f6}.nav-links a:last-child{border-bottom:0}.hero{grid-template-columns:1fr;gap:10px;padding:57px 7% 70px}.hero h1{font-size:clamp(43px,10vw,61px);letter-spacing:-2.6px}.hero-description{font-size:13px}.hero-art{min-height:300px;margin-top:10px}.art-glow{width:280px;height:250px}.orbit-a{width:285px;height:195px}.orbit-b{width:215px;height:285px}.art-center{width:150px;height:150px}.float-top{top:24px;right:0}.float-bottom{bottom:20px;left:0}.hero-bottom-note{left:7%;bottom:20px;font-size:8px}.section-wrap{padding-left:7%;padding-right:7%}.explore-section,.recommend-section,.how-section{padding-top:65px;padding-bottom:70px}.section-intro{grid-template-columns:1fr;gap:15px;margin-bottom:27px}.section-intro h2,.how-heading h2{font-size:35px;letter-spacing:-1.4px}.section-intro>p{max-width:500px;font-size:12px}.desktop-break{display:none}.form-layout{grid-template-columns:1fr;gap:14px}.form-side-note{min-height:0;padding:21px;display:grid;grid-template-columns:42px 1fr;column-gap:14px;align-items:start}.step-bubble{grid-row:span 2}.form-side-note h3{margin:0 0 7px;font-size:18px}.form-side-note h3 br{display:none}.form-side-note>p{max-width:none;margin:0}.form-side-note:after{right:-6px;bottom:-28px;font-size:100px}.side-note-bottom{grid-column:1/-1;margin-top:14px;padding-top:13px;border-top:1px solid #e1e8f8}.form-card{padding:22px 18px}.form-card-heading{align-items:flex-start}.form-card-heading h3{font-size:17px}.required-note{font-size:8px}.form-grid{gap:18px 12px}.field input,.field select{height:44px;font-size:11px}.form-actions{align-items:stretch;flex-direction:column}.form-actions>p{max-width:none}.submit-button{width:100%}.results-empty{grid-template-columns:1fr;gap:10px;padding:27px 22px;text-align:center}.empty-illustration{height:145px}.empty-copy h3{font-size:21px}.empty-copy p{margin-left:auto;margin-right:auto}.empty-copy .text-link{justify-content:center}.program-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.program-art{height:120px}.program-content{padding:13px}.program-card h3{font-size:14px}.program-description{font-size:9px;min-height:66px}.program-meta{align-items:flex-start;flex-direction:column}.results-toolbar{align-items:flex-start}.profile-summary{gap:6px}.summary-label{width:100%;margin-bottom:3px}.save-profile{align-items:stretch;flex-direction:column}.save-profile .button{width:100%}.steps-grid{grid-template-columns:1fr;gap:13px;margin-top:30px}.step-card{display:grid;grid-template-columns:1fr 1fr;column-gap:20px;padding:18px}.step-index{grid-column:1/-1}.step-graphic{grid-column:1;grid-row:2/5;height:130px;margin:15px 0 0}.step-card h3{align-self:end;margin:16px 0 8px}.step-card>p{align-self:start}.closing-cta{flex-wrap:wrap;padding:34px 7%;gap:15px}.closing-mark{flex-basis:42px;height:42px;font-size:24px}.closing-cta>div:nth-child(2){flex:1}.closing-cta .eyebrow{font-size:7px;letter-spacing:1px}.closing-cta h2{font-size:21px}.button-light{margin:5px 0 0;width:100%}.footer{flex-wrap:wrap;padding:22px 7%;gap:12px}.footer p{order:3;width:100%}}
 @media(max-width:430px){.topbar{gap:8px}.brand{gap:7px;font-size:14px}.brand-mark{width:29px;height:29px;border-radius:9px}.menu-toggle{padding:8px;font-size:10px}.topbar-cta{gap:6px;padding:8px;font-size:9px}.hero-actions{align-items:flex-start;flex-direction:column;gap:17px}.hero-art{min-height:270px}.orbit-a{width:250px;height:175px}.orbit-b{width:190px;height:255px}.floating-card{padding:9px 10px}.float-top{right:-3px}.float-bottom{left:-3px}.mini-icon{width:27px;height:27px}.floating-card strong{font-size:10px}.floating-card small{font-size:8px}.form-card-heading{flex-direction:column}.form-grid{grid-template-columns:1fr}.field-full{grid-column:auto}.program-grid{grid-template-columns:1fr}.program-art{height:145px}.program-description{min-height:0}.program-meta{align-items:center;flex-direction:row}.results-toolbar{flex-direction:column}.results-toolbar .button{width:100%}.step-card{grid-template-columns:1fr}.step-index,.step-graphic,.step-card h3,.step-card>p{grid-column:1;grid-row:auto}.step-graphic{height:115px;margin:14px 0}.step-card h3{margin:0 0 8px}.footer-copyright{width:100%}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+
+/* ===== AI Pathway: Responsive improvements ===== */
+
+/* Kich thuoc co ban, de doc tren desktop */
+:root {
+  font-size: 16px;
+}
+
+.app-shell {
+  width: 100%;
+  max-width: 1600px;
+  margin-inline: auto;
+}
+
+.topbar {
+  padding-left: clamp(20px, 5vw, 80px);
+  padding-right: clamp(20px, 5vw, 80px);
+}
+
+.nav-links {
+  font-size: 14px;
+  gap: clamp(18px, 2.5vw, 36px);
+}
+
+.topbar-cta {
+  font-size: 14px;
+}
+
+.hero {
+  padding-left: clamp(28px, 7vw, 112px);
+  padding-right: clamp(28px, 7vw, 112px);
+  gap: clamp(28px, 4vw, 64px);
+}
+
+.hero-copy {
+  max-width: 660px;
+}
+
+.hero h1 {
+  font-size: clamp(42px, 4.5vw, 68px);
+  letter-spacing: clamp(-3px, -0.2vw, -1px);
+}
+
+.hero-description {
+  font-size: clamp(15px, 1.1vw, 18px);
+}
+
+.eyebrow {
+  font-size: 11px;
+}
+
+.button,
+.text-link {
+  font-size: 14px;
+}
+
+.section,
+.profile-section,
+.results-section,
+.steps-section {
+  padding-left: clamp(22px, 6vw, 88px);
+  padding-right: clamp(22px, 6vw, 88px);
+}
+
+.form-card {
+  padding: clamp(22px, 3vw, 36px);
+}
+
+.form-card-heading h3 {
+  font-size: clamp(20px, 2vw, 26px);
+}
+
+.field label {
+  font-size: 14px;
+}
+
+.field input,
+.field select {
+  min-height: 48px;
+  font-size: 15px;
+}
+
+.program-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.program-content {
+  padding: 20px;
+}
+
+.program-card h3 {
+  font-size: 18px;
+}
+
+.program-description {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.program-meta {
+  font-size: 13px;
+}
+
+.step-card h3 {
+  font-size: 20px;
+}
+
+.step-card > p {
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* May tinh bang va laptop nho */
+@media (max-width: 1000px) {
+  .hero {
+    grid-template-columns: 1fr 0.8fr;
+    padding: 56px 32px;
+    gap: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 5vw, 54px);
+  }
+
+  .program-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .nav-links {
+    gap: 14px;
+  }
+}
+
+/* Dien thoai */
+@media (max-width: 640px) {
+  :root {
+    font-size: 15px;
+  }
+
+  .topbar {
+    min-height: 68px;
+    height: auto;
+    padding: 14px 18px;
+    gap: 10px;
+  }
+
+  .nav-links {
+    font-size: 12px;
+    gap: 12px;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    padding: 48px 22px 38px;
+    gap: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 9vw, 48px);
+    line-height: 1.12;
+    letter-spacing: -1.8px;
+  }
+
+  .hero-description {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .hero-art {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .section,
+  .profile-section,
+  .results-section,
+  .steps-section {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .form-card {
+    padding: 20px 16px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .field-full {
+    grid-column: auto;
+  }
+
+  .field input,
+  .field select {
+    width: 100%;
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .program-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .program-card h3 {
+    font-size: 18px;
+  }
+
+  .program-description {
+    font-size: 14px;
+    min-height: 0;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dien thoai rat nho */
+@media (max-width: 380px) {
+  .topbar {
+    flex-wrap: wrap;
+  }
+
+  .hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .hero h1 {
+    font-size: 34px;
+  }
+}
