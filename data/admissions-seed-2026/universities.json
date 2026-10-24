@@ -1,0 +1,77 @@
+[
+  {
+    "id": "hust",
+    "name": "Đại học Bách khoa Hà Nội",
+    "shortName": "HUST",
+    "province": "Hà Nội",
+    "region": "north",
+    "website": "https://www.hust.edu.vn/",
+    "sources": [
+      {
+        "title": "Thông tin tuyển sinh Đại học chính quy năm 2026 — Đại học Bách khoa Hà Nội",
+        "url": "https://ts.hust.edu.vn/tin-tuc/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "dut",
+    "name": "Trường Đại học Bách khoa – Đại học Đà Nẵng",
+    "shortName": "DUT",
+    "province": "Đà Nẵng",
+    "region": "central",
+    "website": "https://dut.udn.vn/",
+    "sources": [
+      {
+        "title": "Ngành và chỉ tiêu tuyển sinh — Đại học Bách khoa, Đại học Đà Nẵng",
+        "url": "https://tuyensinh.dut.udn.vn/nganh-va-chi-tieu-tuyen-sinh",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "needs_review"
+      },
+      {
+        "title": "Xét tuyển thẳng theo quy chế tuyển sinh năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-tuyen-thang-theo-quy-dinh-bo-GD",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      },
+      {
+        "title": "Xét tuyển kết quả thi Đánh giá tư duy năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-kq-thi-danh-gia-tu-duy",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      },
+      {
+        "title": "Xét tuyển kết quả thi tốt nghiệp THPT năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-kq-thi-tot-nghiep-thpt",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "hcmut",
+    "name": "Trường Đại học Bách khoa – Đại học Quốc gia TP.HCM",
+    "shortName": "HCMUT",
+    "province": "TP. Hồ Chí Minh",
+    "region": "south",
+    "website": "https://hcmut.edu.vn/",
+    "sources": [
+      {
+        "title": "Công bố thông tin tuyển sinh đại học chính quy năm 2026 — HCMUT",
+        "url": "https://hcmut.edu.vn/tintuc/cong-bo-thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  }
+]
