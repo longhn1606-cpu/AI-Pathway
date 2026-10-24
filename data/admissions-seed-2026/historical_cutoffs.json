@@ -1,12 +1,12 @@
 {
-  "title": "Historical admission cutoffs (2023-2025) — revised demo program selection",
+  "title": "Historical admission cutoffs (2023-2025) — demo dataset with explicit simulated values",
   "years": [
     2023,
     2024,
     2025
   ],
   "checkedAt": "2026-10-25",
-  "scoringPolicy": "Chỉ so sánh các điểm khi cùng trường, chương trình, năm, phương thức và thang điểm. null nghĩa là chưa xác minh được; không phải 0 và không có nghĩa là trường không tuyển sinh.",
+  "scoringPolicy": "Chỉ so sánh điểm khi cùng trường, chương trình, năm, phương thức và thang điểm. status=simulated là dữ liệu giả lập chỉ phục vụ demo, không phải điểm chuẩn chính thức. Không dùng simulated để tư vấn tuyển sinh thực tế.",
   "records": [
     {
       "id": "hust-it1-2023-high_school_exam",
@@ -92,12 +92,12 @@
       "universityId": "hust",
       "year": 2024,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 27.9,
+      "scoreScale": 30,
       "sourceUrl": "https://ts.hust.edu.vn/vi/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-2024-diem-thi-dgtd-cao-nhat-83-82-diem-thi-tot-nghiep-thpt-cao-nhat-28-53",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Chưa xác minh được điểm chính xác cho đúng chương trình, năm và phương thức từ bảng nguồn đã truy cập; không suy diễn từ điểm của chương trình khác."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hust-ee2-2024-competency_assessment",
@@ -105,12 +105,12 @@
       "universityId": "hust",
       "year": 2024,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 74.6,
+      "scoreScale": 100,
       "sourceUrl": "https://ts.hust.edu.vn/vi/tin-tuc/diem-chuan-dai-hoc-bach-khoa-ha-noi-2024-diem-thi-dgtd-cao-nhat-83-82-diem-thi-tot-nghiep-thpt-cao-nhat-28-53",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Chưa xác minh được điểm chính xác cho đúng chương trình, năm và phương thức từ bảng nguồn đã truy cập; không suy diễn từ điểm của chương trình khác."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hust-it1-2025-high_school_exam",
@@ -131,12 +131,12 @@
       "universityId": "hust",
       "year": 2025,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 86.1,
+      "scoreScale": 100,
       "sourceUrl": "https://ts.hust.edu.vn/en/tin-tuc/diem-chuan-cao-nhat-dh-bach-khoa-ha-noi-2025-29-39-diem-thpt-tuong-duong-93-96-diem-xttn-va-86-97-diem-tsa",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Chưa xác minh được điểm chính xác cho đúng chương trình, năm và phương thức từ bảng nguồn đã truy cập; không suy diễn từ điểm của chương trình khác."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hust-ee2-2025-high_school_exam",
@@ -157,12 +157,12 @@
       "universityId": "hust",
       "year": 2025,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 78.4,
+      "scoreScale": 100,
       "sourceUrl": "https://ts.hust.edu.vn/en/tin-tuc/diem-chuan-cao-nhat-dh-bach-khoa-ha-noi-2025-29-39-diem-thpt-tuong-duong-93-96-diem-xttn-va-86-97-diem-tsa",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Chưa xác minh được điểm chính xác cho đúng chương trình, năm và phương thức từ bảng nguồn đã truy cập; không suy diễn từ điểm của chương trình khác."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2023-high_school_exam",
@@ -170,12 +170,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 26.2,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2023-academic_record",
@@ -183,12 +183,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25.8,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2023-competency_assessment",
@@ -196,12 +196,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 82.4,
+      "scoreScale": 100,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2024-high_school_exam",
@@ -209,12 +209,12 @@
       "universityId": "dut",
       "year": 2024,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 26.1,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2024-academic_record",
@@ -222,12 +222,12 @@
       "universityId": "dut",
       "year": 2024,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 26,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2024-competency_assessment",
@@ -235,12 +235,12 @@
       "universityId": "dut",
       "year": 2024,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 83.2,
+      "scoreScale": 100,
       "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2025-high_school_exam",
@@ -248,12 +248,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25.7,
+      "scoreScale": 30,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2025-academic_record",
@@ -261,12 +261,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25.4,
+      "scoreScale": 30,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-cntt-2025-competency_assessment",
@@ -274,12 +274,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 84,
+      "scoreScale": 100,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2023-high_school_exam",
@@ -287,12 +287,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25.1,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2023-academic_record",
@@ -300,12 +300,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 24.8,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2023-competency_assessment",
@@ -313,12 +313,12 @@
       "universityId": "dut",
       "year": 2023,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 79.5,
+      "scoreScale": 100,
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2024-high_school_exam",
@@ -339,12 +339,12 @@
       "universityId": "dut",
       "year": 2024,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25,
+      "scoreScale": 30,
       "sourceUrl": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2024-competency_assessment",
@@ -352,12 +352,12 @@
       "universityId": "dut",
       "year": 2024,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 80.1,
+      "scoreScale": 100,
       "sourceUrl": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2025-high_school_exam",
@@ -365,12 +365,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 25.3,
+      "scoreScale": 30,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2025-academic_record",
@@ -378,12 +378,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "academic_record",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 24.9,
+      "scoreScale": 30,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "dut-ky-thuat-may-tinh-2025-competency_assessment",
@@ -391,12 +391,12 @@
       "universityId": "dut",
       "year": 2025,
       "method": "competency_assessment",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 81.2,
+      "scoreScale": 100,
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-khmt-2023-holistic_admission",
@@ -404,12 +404,12 @@
       "universityId": "hcmut",
       "year": 2023,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 82.7,
+      "scoreScale": 90,
       "sourceUrl": "https://mybk.hcmut.edu.vn/tuyensinh/search",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-khmt-2024-holistic_admission",
@@ -417,12 +417,12 @@
       "universityId": "hcmut",
       "year": 2024,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 84.16,
+      "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2024.html",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-khmt-2025-holistic_admission",
@@ -430,12 +430,12 @@
       "universityId": "hcmut",
       "year": 2025,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 85.41,
+      "scoreScale": 100,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2025.html",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2023-holistic_admission",
@@ -443,12 +443,12 @@
       "universityId": "hcmut",
       "year": 2023,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 78.9,
+      "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-2023-truong-dai-hoc-bach-khoa.html",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2024-holistic_admission",
@@ -456,12 +456,12 @@
       "universityId": "hcmut",
       "year": 2024,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 79.8,
+      "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2024.html",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2025-holistic_admission",
@@ -469,12 +469,12 @@
       "universityId": "hcmut",
       "year": 2025,
       "method": "holistic_admission",
-      "cutoffScore": null,
-      "scoreScale": null,
+      "cutoffScore": 81.6,
+      "scoreScale": 100,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2025.html",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
+      "status": "simulated",
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
     }
   ]
 }
