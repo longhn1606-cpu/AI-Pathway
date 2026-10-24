@@ -403,78 +403,78 @@
       "programId": "hcmut-khmt",
       "universityId": "hcmut",
       "year": 2023,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 82.7,
       "scoreScale": 90,
       "sourceUrl": "https://mybk.hcmut.edu.vn/tuyensinh/search",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     },
     {
       "id": "hcmut-khmt-2024-holistic_admission",
       "programId": "hcmut-khmt",
       "universityId": "hcmut",
       "year": 2024,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 84.16,
       "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2024.html",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     },
     {
       "id": "hcmut-khmt-2025-holistic_admission",
       "programId": "hcmut-khmt",
       "universityId": "hcmut",
       "year": 2025,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 85.41,
       "scoreScale": 100,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2025.html",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2023-holistic_admission",
       "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2023,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 78.9,
       "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-2023-truong-dai-hoc-bach-khoa.html",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2024-holistic_admission",
       "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2024,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 79.8,
       "scoreScale": 90,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2024.html",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     },
     {
       "id": "hcmut-ky-thuat-may-tinh-2025-holistic_admission",
       "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2025,
-      "method": "holistic_admission",
+      "method": "other",
       "cutoffScore": 81.6,
       "scoreScale": 100,
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2025.html",
       "checkedAt": "2026-10-24",
       "status": "simulated",
-      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising."
+      "notes": "SIMULATED FOR DEMO ONLY — not an official cutoff and not verified. The linked university page is contextual reference only and does not substantiate this numeric value. Replace with null/needs_review or a verified official value before any real advising. Shared-schema mapping: HCMUT holistic/combined admission is represented as method 'other' because the shared AdmissionMethod union has no 'holistic_admission' value."
     }
   ]
 }
