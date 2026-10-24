@@ -1,0 +1,44 @@
+name: Demo data and app checks
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build React app and type-check TypeScript
+        run: npm run build
+      - name: Smoke-test production preview
+        run: |
+          npm run preview -- --host 127.0.0.1 > /tmp/ai-pathway-preview.log 2>&1 &
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:4173/ > /tmp/ai-pathway-preview.html; then
+              grep -q "AI Pathway" /tmp/ai-pathway-preview.html
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/ai-pathway-preview.log
+          exit 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate dataset structure
+        run: python data/admissions-seed-2026/validate_data.py
+      - name: Run dataset regression tests
+        run: python -m unittest discover -s data/admissions-seed-2026 -p "test_*.py"

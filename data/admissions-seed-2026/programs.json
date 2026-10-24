@@ -1,0 +1,321 @@
+[
+  {
+    "id": "hust-it1",
+    "universityId": "hust",
+    "name": "CNTT: Khoa học Máy tính",
+    "majorGroup": "information_technology",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "other",
+        "description": "Xét tuyển tài năng; thông tin HUST mô tả các nhánh xét tuyển tài năng, bao gồm xét tuyển thẳng, chứng chỉ quốc tế và hồ sơ năng lực kết hợp phỏng vấn.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "competency_assessment",
+        "description": "Xét tuyển theo kết quả kỳ thi Đánh giá tư duy (TSA).",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "high_school_exam",
+        "description": "Xét tuyển theo điểm thi tốt nghiệp THPT.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "CNTT: Khoa học Máy tính — trang chương trình tuyển sinh HUST",
+        "url": "https://ts.hust.edu.vn/training-cate/nganh-dao-tao-dai-hoc/cntt-khoa-hoc-may-tinh",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "needs_review"
+      },
+      {
+        "title": "Thông tin tuyển sinh Đại học chính quy năm 2026 — Đại học Bách khoa Hà Nội",
+        "url": "https://ts.hust.edu.vn/tin-tuc/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "hust-ee2",
+    "universityId": "hust",
+    "name": "Kỹ thuật Điều khiển - Tự động hóa",
+    "majorGroup": "engineering",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "other",
+        "description": "Xét tuyển tài năng; thông tin HUST mô tả các nhánh xét tuyển tài năng, bao gồm xét tuyển thẳng, chứng chỉ quốc tế và hồ sơ năng lực kết hợp phỏng vấn.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "competency_assessment",
+        "description": "Xét tuyển theo kết quả kỳ thi Đánh giá tư duy (TSA).",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "high_school_exam",
+        "description": "Xét tuyển theo điểm thi tốt nghiệp THPT.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "Kỹ thuật Điều khiển - Tự động hóa — trang chương trình tuyển sinh HUST",
+        "url": "https://ts.hust.edu.vn/training-cate/nganh-dao-tao-dai-hoc/ky-thuat-dieu-khien-tu-dong-hoa",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "needs_review"
+      },
+      {
+        "title": "Thông tin tuyển sinh Đại học chính quy năm 2026 — Đại học Bách khoa Hà Nội",
+        "url": "https://ts.hust.edu.vn/tin-tuc/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "dut-cntt",
+    "universityId": "dut",
+    "name": "Công nghệ thông tin",
+    "majorGroup": "information_technology",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "direct_admission",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển thẳng theo quy chế tuyển sinh năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "competency_assessment",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển kết quả thi Đánh giá tư duy năm 2026 của Đại học Bách khoa Hà Nội.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "high_school_exam",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển kết quả thi tốt nghiệp THPT năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "Ngành và chỉ tiêu tuyển sinh — Đại học Bách khoa, Đại học Đà Nẵng",
+        "url": "https://tuyensinh.dut.udn.vn/nganh-va-chi-tieu-tuyen-sinh",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "needs_review"
+      },
+      {
+        "title": "Xét tuyển thẳng theo quy chế tuyển sinh năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-tuyen-thang-theo-quy-dinh-bo-GD",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      },
+      {
+        "title": "Xét tuyển kết quả thi Đánh giá tư duy năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-kq-thi-danh-gia-tu-duy",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      },
+      {
+        "title": "Xét tuyển kết quả thi tốt nghiệp THPT năm 2026 — DUT",
+        "url": "https://tuyensinh.dut.udn.vn/xet-kq-thi-tot-nghiep-thpt",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "dut-ky-thuat-may-tinh",
+    "universityId": "dut",
+    "name": "Kỹ thuật máy tính (mã ngành 7480106)",
+    "majorGroup": "information_technology",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "direct_admission",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển thẳng theo quy chế tuyển sinh năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "competency_assessment",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển kết quả thi Đánh giá tư duy năm 2026 của Đại học Bách khoa Hà Nội.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "high_school_exam",
+        "description": "Trang tuyển sinh DUT có thông báo xét tuyển kết quả thi tốt nghiệp THPT năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "Điểm chuẩn trúng tuyển DUT theo kết quả thi THPT năm 2024",
+        "url": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
+        "applicableYear": 2024,
+        "checkedAt": "2026-10-25",
+        "status": "verified"
+      },
+      {
+        "title": "Cổng tuyển sinh chính thức DUT",
+        "url": "https://tuyensinh2025.dut.udn.vn/",
+        "applicableYear": 2025,
+        "checkedAt": "2026-10-25",
+        "status": "needs_review"
+      },
+      {
+        "title": "Cổng tuyển sinh chính thức DUT năm 2026",
+        "url": "https://tuyensinh.dut.udn.vn/",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-25",
+        "status": "needs_review"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "hcmut-khmt",
+    "universityId": "hcmut",
+    "name": "Khoa học Máy tính",
+    "majorGroup": "information_technology",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "direct_admission",
+        "description": "Xét tuyển thẳng, ưu tiên xét tuyển thẳng theo quy chế tuyển sinh năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "other",
+        "description": "Xét tuyển Tổng hợp; phương thức chủ đạo theo thông báo tuyển sinh HCMUT năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "7480101 — Khoa học Máy tính, sổ tay chương trình năm 2026 — HCMUT",
+        "url": "https://hcmut.edu.vn/study/handbook/course/undergraduate/7480101?program=DHNB",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      },
+      {
+        "title": "Công bố thông tin tuyển sinh đại học chính quy năm 2026 — HCMUT",
+        "url": "https://hcmut.edu.vn/tintuc/cong-bo-thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-24",
+        "status": "verified"
+      }
+    ],
+    "status": "needs_review"
+  },
+  {
+    "id": "hcmut-ky-thuat-may-tinh",
+    "universityId": "hcmut",
+    "name": "Kỹ thuật Máy tính (mã tuyển sinh 107; mã ngành 7480106)",
+    "majorGroup": "engineering",
+    "tuitionMinVndPerYear": null,
+    "tuitionMaxVndPerYear": null,
+    "tuitionYear": null,
+    "admissionMethods": [
+      {
+        "method": "direct_admission",
+        "description": "Xét tuyển thẳng, ưu tiên xét tuyển thẳng theo quy chế tuyển sinh năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      },
+      {
+        "method": "other",
+        "description": "Xét tuyển Tổng hợp; phương thức chủ đạo theo thông báo tuyển sinh HCMUT năm 2026.",
+        "applicableYear": 2026,
+        "sourceIds": [],
+        "status": "needs_review"
+      }
+    ],
+    "historicalCutoff": null,
+    "cutoffYear": null,
+    "cutoffScale": null,
+    "sources": [
+      {
+        "title": "Thông tin tuyển sinh đại học chính quy 2023 — HCMUT; mã tuyển sinh 107 là Kỹ thuật Máy tính",
+        "url": "https://fme.hcmut.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-2023-truong-dai-hoc-bach-khoa.html",
+        "applicableYear": 2023,
+        "checkedAt": "2026-10-25",
+        "status": "verified"
+      },
+      {
+        "title": "Công bố thông tin tuyển sinh đại học chính quy năm 2026 — HCMUT",
+        "url": "https://hcmut.edu.vn/tintuc/cong-bo-thong-tin-tuyen-sinh-dai-hoc-chinh-quy-nam-2026",
+        "applicableYear": 2026,
+        "checkedAt": "2026-10-25",
+        "status": "needs_review"
+      }
+    ],
+    "status": "needs_review"
+  }
+]
