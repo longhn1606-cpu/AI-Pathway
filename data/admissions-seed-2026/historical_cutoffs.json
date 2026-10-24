@@ -1,11 +1,11 @@
 {
-  "title": "Historical admission cutoffs (2023-2025)",
+  "title": "Historical admission cutoffs (2023-2025) — revised demo program selection",
   "years": [
     2023,
     2024,
     2025
   ],
-  "checkedAt": "2026-10-24",
+  "checkedAt": "2026-10-25",
   "scoringPolicy": "Chỉ so sánh các điểm khi cùng trường, chương trình, năm, phương thức và thang điểm. null nghĩa là chưa xác minh được; không phải 0 và không có nghĩa là trường không tuyển sinh.",
   "records": [
     {
@@ -282,8 +282,8 @@
       "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
     },
     {
-      "id": "dut-co-khi-2023-high_school_exam",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2023-high_school_exam",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2023,
       "method": "high_school_exam",
@@ -292,11 +292,11 @@
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2023-academic_record",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2023-academic_record",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2023,
       "method": "academic_record",
@@ -305,11 +305,11 @@
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2023-competency_assessment",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2023-competency_assessment",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2023,
       "method": "competency_assessment",
@@ -318,50 +318,50 @@
       "sourceUrl": "https://dut.udn.vn/Tuyensinh2023/Gioithieu/id/7980",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2024-high_school_exam",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2024-high_school_exam",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2024,
       "method": "high_school_exam",
-      "cutoffScore": null,
-      "scoreScale": null,
-      "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
+      "cutoffScore": 25.82,
+      "scoreScale": 30,
+      "sourceUrl": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
       "checkedAt": "2026-10-24",
-      "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "status": "verified",
+      "notes": "Điểm thi tốt nghiệp THPT 2024 của Kỹ thuật máy tính, mã ngành 7480106, theo bảng điểm trúng tuyển chính thức của DUT."
     },
     {
-      "id": "dut-co-khi-2024-academic_record",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2024-academic_record",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2024,
       "method": "academic_record",
       "cutoffScore": null,
       "scoreScale": null,
-      "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
+      "sourceUrl": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2024-competency_assessment",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2024-competency_assessment",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2024,
       "method": "competency_assessment",
       "cutoffScore": null,
       "scoreScale": null,
-      "sourceUrl": "https://dut.udn.vn/TuyenSinh2024",
+      "sourceUrl": "https://dut.udn.vn/Tintuc/Tintuc/id/9602",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2025-high_school_exam",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2025-high_school_exam",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2025,
       "method": "high_school_exam",
@@ -370,11 +370,11 @@
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2025-academic_record",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2025-academic_record",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2025,
       "method": "academic_record",
@@ -383,11 +383,11 @@
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
-      "id": "dut-co-khi-2025-competency_assessment",
-      "programId": "dut-co-khi",
+      "id": "dut-ky-thuat-may-tinh-2025-competency_assessment",
+      "programId": "dut-ky-thuat-may-tinh",
       "universityId": "dut",
       "year": 2025,
       "method": "competency_assessment",
@@ -396,7 +396,7 @@
       "sourceUrl": "https://tuyensinh2025.dut.udn.vn/",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Cần đối chiếu bảng điểm chuẩn đúng năm, mã ngành và phương thức trên cổng tuyển sinh chính thức. Nguồn đã tìm thấy chưa đủ dữ liệu có thể kiểm chứng để điền số."
+      "notes": "Đã thay chương trình demo sang Kỹ thuật máy tính (7480106); điểm cho đúng năm và phương thức chưa được xác minh, nên giữ null."
     },
     {
       "id": "hcmut-khmt-2023-holistic_admission",
@@ -438,21 +438,21 @@
       "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
     },
     {
-      "id": "hcmut-ky-thuat-dien-2023-holistic_admission",
-      "programId": "hcmut-ky-thuat-dien",
+      "id": "hcmut-ky-thuat-may-tinh-2023-holistic_admission",
+      "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2023,
       "method": "holistic_admission",
       "cutoffScore": null,
       "scoreScale": null,
-      "sourceUrl": "https://mybk.hcmut.edu.vn/tuyensinh/search",
+      "sourceUrl": "https://fme.hcmut.edu.vn/thong-tin-tuyen-sinh-dai-hoc-chinh-quy-2023-truong-dai-hoc-bach-khoa.html",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
     },
     {
-      "id": "hcmut-ky-thuat-dien-2024-holistic_admission",
-      "programId": "hcmut-ky-thuat-dien",
+      "id": "hcmut-ky-thuat-may-tinh-2024-holistic_admission",
+      "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2024,
       "method": "holistic_admission",
@@ -461,11 +461,11 @@
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2024.html",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
     },
     {
-      "id": "hcmut-ky-thuat-dien-2025-holistic_admission",
-      "programId": "hcmut-ky-thuat-dien",
+      "id": "hcmut-ky-thuat-may-tinh-2025-holistic_admission",
+      "programId": "hcmut-ky-thuat-may-tinh",
       "universityId": "hcmut",
       "year": 2025,
       "method": "holistic_admission",
@@ -474,7 +474,7 @@
       "sourceUrl": "https://fme.hcmut.edu.vn/cong-bo-diem-chuan-cua-phuong-thuc-xet-tuyen-tong-hop-nam-2025.html",
       "checkedAt": "2026-10-24",
       "status": "needs_review",
-      "notes": "Trường sử dụng xét tuyển tổng hợp/đa tiêu chí; chưa xác minh được điểm riêng chính xác của chương trình này từ nguồn đang truy cập. Không dùng điểm toàn trường hoặc điểm của chương trình khác thay thế."
+      "notes": "Đã thay nhóm ngành 108 bằng chương trình Kỹ thuật Máy tính, mã tuyển sinh 107. Cần xác minh điểm riêng của chương trình theo đúng năm và phương thức."
     }
   ]
 }
