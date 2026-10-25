@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import { toStudentProfile } from './adapters/profileAdapter'
 
 type Interest = 'technology' | 'business' | 'health' | 'education' | 'arts' | 'other' | 'undecided'
 type Region = 'north' | 'central' | 'south' | 'anywhere'
@@ -46,6 +47,12 @@ function App() {
   }, [submittedProfile])
 
   const programsToShow = showAll ? visiblePrograms : visiblePrograms.slice(0, 3)
+  // Convert the submitted UI form through member 3's shared-domain adapter.
+  // The visible cards remain explicitly demo fixtures until canonical data is wired.
+  const normalizedProfile = useMemo(
+    () => submittedProfile ? toStudentProfile(submittedProfile) : null,
+    [submittedProfile],
+  )
 
   function updateProfile<K extends keyof Profile>(field: K, value: Profile[K]) {
     setProfile((current) => ({ ...current, [field]: value }))
@@ -126,7 +133,7 @@ function App() {
           <div className="section-wrap"><div className="section-intro results-intro"><div><span className="eyebrow">BƯỚC 02 <span className="eyebrow-slash">/</span> MỞ RỘNG LỰA CHỌN</span><h2>Những hướng đi<br className="desktop-break" /> đáng để khám phá.</h2></div><p>Đừng giới hạn bản thân quá sớm. Hãy xem nhiều hướng đi, tìm hiểu nguồn chính thức và cân nhắc điều phù hợp với bạn.</p></div>
             {!submittedProfile ? <div className="results-empty"><div className="empty-illustration"><div className="empty-paper"><span>✳</span><i /><i /><i /></div><div className="empty-search">⌕</div></div><div className="empty-copy"><span className="empty-label">KHỞI ĐẦU HÀNH TRÌNH</span><h3>Gợi ý của bạn sẽ xuất hiện ở đây</h3><p>Hoàn thành hồ sơ định hướng để xem giao diện gợi ý ngành học theo sở thích và khu vực bạn chọn.</p><a className="text-link" href="#explore">Điền hồ sơ của bạn <span aria-hidden="true">↑</span></a></div></div> : <>
               <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>lựa chọn minh họa</span></span><p>Phù hợp với một số tiêu chí bạn đã chọn</p></div><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div>
-              <div className="profile-summary"><span className="summary-label">HỒ SƠ ĐANG XEM</span><span className="summary-chip">Điểm: {profile.score}/30</span>{profile.interest && <span className="summary-chip">{interestLabels[profile.interest]}</span>}{profile.region && <span className="summary-chip">{regionLabels[profile.region]}</span>}{profile.budget && <span className="summary-chip">{budgetLabels[profile.budget]}</span>}</div>
+              <div className="profile-summary"><span className="summary-label">HỒ SƠ ĐANG XEM</span><span className="summary-chip">Schema: {normalizedProfile ? 'StudentProfile' : 'Chưa tạo'}</span><span className="summary-chip">Điểm: {profile.score}/30</span>{profile.interest && <span className="summary-chip">{interestLabels[profile.interest]}</span>}{profile.region && <span className="summary-chip">{regionLabels[profile.region]}</span>}{profile.budget && <span className="summary-chip">{budgetLabels[profile.budget]}</span>}</div>
               <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Đây là dữ liệu minh họa giao diện.</strong> Tên trường và chương trình dưới đây không phải dữ liệu tuyển sinh thực tế. Chưa có kết luận về điểm chuẩn hoặc khả năng trúng tuyển.</p></div>
               {visiblePrograms.length ? <div className="program-grid">{programsToShow.map((item, index) => <article className="program-card" key={item.id}><div className={`program-art program-art-${index % 3}`}><span className="program-art-label">HƯỚNG ĐI {String(index + 1).padStart(2, '0')}</span><span className="program-art-symbol">{index % 3 === 0 ? '✳' : index % 3 === 1 ? '↗' : '◇'}</span><span className="program-art-caption">AI PATHWAY <i>·</i> DEMO</span></div><div className="program-content"><div className="program-tags">{item.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><h3>{item.program}</h3><p className="program-school">{item.school}</p><p className="program-description">{item.description}</p><div className="program-meta"><span>⌖ {regionLabels[item.region]}</span><span className="demo-tag">Dữ liệu demo</span></div><button type="button" className="program-link" onClick={() => document.getElementById('data-note')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}>Tìm hiểu tiêu chí <span aria-hidden="true">↗</span></button></div></article>)}</div> : <div className="no-results"><span>⌕</span><h3>Chưa có lựa chọn khớp với từ khóa</h3><p>Thử bỏ bớt từ khóa hoặc chọn “Toàn quốc” để mở rộng kết quả minh họa.</p><button className="button button-secondary" type="button" onClick={() => { updateProfile('keywords', ''); setSubmittedProfile({ ...profile, keywords: '' }) }}>Xóa từ khóa</button></div>}
               {visiblePrograms.length > 3 && <div className="show-more-wrap"><button className="button button-secondary" type="button" onClick={() => setShowAll((current) => !current)}>{showAll ? 'Thu gọn danh sách' : `Xem thêm ${visiblePrograms.length - 3} lựa chọn`} <span aria-hidden="true">{showAll ? '↑' : '↓'}</span></button></div>}
