@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import type { RecommendationResponse } from './logic/recommendation'
+import type { SimulationResult } from './logic/simulation'
 import { integratedRecommendationService } from './services/integratedRecommendationService'
 import { toRecommendationProfile } from './adapters/recommendationProfileAdapter'
 import { validateUiProfile } from './adapters/profileAdapter'
@@ -51,6 +52,8 @@ function App() {
   const [recommendationResponse, setRecommendationResponse] = useState<RecommendationResponse | null>(null)
   const [recommendationLoading, setRecommendationLoading] = useState(false)
   const [recommendationError, setRecommendationError] = useState<string | null>(null)
+  const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
+  const [simulationLoading, setSimulationLoading] = useState(false)
 
   const visiblePrograms = useMemo(() => {
     if (!submittedProfile || !recommendationResponse) return []
@@ -80,6 +83,7 @@ function App() {
     setSubmittedProfile(profile)
     setRecommendationResponse(null)
     setRecommendationError(null)
+    setSimulationResult(null)
     setRecommendationLoading(true)
     setSaved(false)
     setShowAll(false)
@@ -96,12 +100,33 @@ function App() {
     }
   }
 
+  async function runSimulation() {
+    if (!submittedProfile) return
+    const baseline = toRecommendationProfile(submittedProfile)
+    if (baseline.expectedScore === null || baseline.expectedScore >= 30) return
+
+    setSimulationLoading(true)
+    try {
+      const result = await integratedRecommendationService.simulate(
+        { profile: baseline },
+        { expectedScore: Math.min(30, baseline.expectedScore + 1) },
+      )
+      setSimulationResult(result)
+    } catch (error) {
+      setRecommendationError(error instanceof Error ? error.message : 'Không thể chạy mô phỏng lúc này.')
+    } finally {
+      setSimulationLoading(false)
+    }
+  }
+
   function resetProfile() {
     setProfile(initialProfile)
     setSubmittedProfile(null)
     setRecommendationResponse(null)
     setRecommendationError(null)
+    setSimulationResult(null)
     setRecommendationLoading(false)
+    setSimulationLoading(false)
     setSaved(false)
     setShowAll(false)
   }
@@ -164,7 +189,8 @@ function App() {
         <section className="recommend-section" id="recommendations">
           <div className="section-wrap"><div className="section-intro results-intro"><div><span className="eyebrow">BƯỚC 02 <span className="eyebrow-slash">/</span> MỞ RỘNG LỰA CHỌN</span><h2>Những hướng đi<br className="desktop-break" /> đáng để khám phá.</h2></div><p>Đừng giới hạn bản thân quá sớm. Hãy xem nhiều hướng đi, tìm hiểu nguồn chính thức và cân nhắc điều phù hợp với bạn.</p></div>
             {!submittedProfile ? <div className="results-empty"><div className="empty-illustration"><div className="empty-paper"><span>✳</span><i /><i /><i /></div><div className="empty-search">⌕</div></div><div className="empty-copy"><span className="empty-label">KHỞI ĐẦU HÀNH TRÌNH</span><h3>Gợi ý của bạn sẽ xuất hiện ở đây</h3><p>Hoàn thành hồ sơ định hướng để xem giao diện gợi ý ngành học theo sở thích và khu vực bạn chọn.</p><a className="text-link" href="#explore">Điền hồ sơ của bạn <span aria-hidden="true">↑</span></a></div></div> : <>
-              <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>chương trình được recommendation engine trả về</span></span><p>Kết quả được tính từ hồ sơ và dữ liệu canonical; không phải xác suất trúng tuyển.</p></div><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div>
+              <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>chương trình được recommendation engine trả về</span></span><p>Kết quả được tính từ hồ sơ và dữ liệu canonical; không phải xác suất trúng tuyển.</p></div><div className="form-actions"><button className="button button-secondary" type="button" onClick={runSimulation} disabled={simulationLoading || !submittedProfile || !Number.isFinite(Number(submittedProfile.score)) || Number(submittedProfile.score) >= 30}>{simulationLoading ? 'Đang mô phỏng…' : 'Mô phỏng +1 điểm'}</button><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div></div>
+              {simulationResult && <div className="profile-summary" role="status"><span className="summary-label">KỊCH BẢN MÔ PHỎNG</span><span className="summary-chip">Điểm: {simulationResult.scenarioProfile.expectedScore}/30</span><span className="summary-chip">Trước: {simulationResult.before.results.length} gợi ý</span><span className="summary-chip">Sau: {simulationResult.after.results.length} gợi ý</span><span className="summary-chip">Thêm: {simulationResult.comparison.added.length}</span><span className="summary-chip">Loại: {simulationResult.comparison.removed.length}</span><span className="summary-chip">Giữ nguyên: {simulationResult.comparison.retained.length}</span></div>}
               <div className="profile-summary"><span className="summary-label">HỒ SƠ ĐANG XEM</span><span className="summary-chip">Điểm: {profile.score}/30</span>{profile.interest && <span className="summary-chip">{interestLabels[profile.interest]}</span>}{profile.region && <span className="summary-chip">{regionLabels[profile.region]}</span>}{profile.budget && <span className="summary-chip">{budgetLabels[profile.budget]}</span>}</div>
               <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Dữ liệu có nguồn và trạng thái riêng.</strong> Các chương trình lấy từ dataset canonical. Điểm chuẩn hoặc học phí còn thiếu sẽ tiếp tục hiển thị là chưa có dữ liệu; dữ liệu mô phỏng không phải số liệu chính thức. Kết quả gợi ý không phải dự đoán đỗ/trượt.</p></div>
               {recommendationResponse?.warnings.map((warning, index) => <p className="field-hint" role="status" key={index}>{warning}</p>)}
