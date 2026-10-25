@@ -18,12 +18,23 @@ const [universities, programs, cutoffs] = await Promise.all([
   readFile(path.join(root, 'data/admissions-seed-2026/programs.json'), 'utf8').then(JSON.parse),
   readFile(path.join(root, 'data/admissions-seed-2026/historical_cutoffs.json'), 'utf8').then(JSON.parse),
 ])
-const [{ validateAdmissionsDataset }, { toRecommendationDataset }, { recommendPrograms }, { simulateScenario }] = await Promise.all([
+const [{ validateAdmissionsDataset }, { toRecommendationDataset }, { recommendPrograms }] = await Promise.all([
   importTypeScript('src/data/admissionsDataValidation.ts'),
   importTypeScript('src/adapters/recommendationDatasetAdapter.ts'),
   importTypeScript('src/logic/recommendation.ts'),
-  importTypeScript('src/logic/simulation.ts'),
 ])
+
+const recommendationSource = await readFile(path.join(root, 'src/logic/recommendation.ts'), 'utf8')
+const recommendationCompiled = ts.transpileModule(recommendationSource, {
+  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+}).outputText
+const recommendationModuleUrl = `data:text/javascript;base64,${Buffer.from(recommendationCompiled).toString('base64')}`
+const simulationSource = await readFile(path.join(root, 'src/logic/simulation.ts'), 'utf8')
+const simulationCompiled = ts.transpileModule(simulationSource, {
+  compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
+}).outputText.replace("from './recommendation'", `from '${recommendationModuleUrl}'`)
+const simulationModuleUrl = `data:text/javascript;base64,${Buffer.from(simulationCompiled).toString('base64')}`
+const { simulateScenario } = await import(simulationModuleUrl)
 
 let passed = 0
 function test(name, fn) {
