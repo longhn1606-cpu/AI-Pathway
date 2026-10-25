@@ -72,6 +72,24 @@ class SeedDataTests(unittest.TestCase):
                 self.assertIn(source["status"], STATUSES)
                 self.assertTrue(source["url"].startswith("https://"))
 
+    def test_verified_method_requires_exact_verified_program_source(self):
+        program = dict(self.programs[0])
+        method = dict(program["admissionMethods"][0])
+        method["status"] = "verified"
+        method["sourceIds"] = [program["sources"][0]["title"]]
+        program["admissionMethods"] = [method]
+        source = dict(program["sources"][0])
+        source["status"] = "verified"
+        source["applicableYear"] = method["applicableYear"]
+        program["sources"] = [source]
+        self.assertEqual(method["status"], "verified")
+        self.assertEqual(len([s for s in program["sources"] if s["title"] == method["sourceIds"][0] and s["status"] == "verified" and s["applicableYear"] == method["applicableYear"]]), 1)
+
+        method["sourceIds"] = []
+        self.assertFalse(method["sourceIds"], "verified method without source must be rejected")
+        method["sourceIds"] = ["not-an-existing-source"]
+        self.assertFalse(any(s["title"] == method["sourceIds"][0] for s in program["sources"]), "unresolved source must be rejected")
+
     def test_cutoff_score_scales_and_statuses(self):
         for row in self.cutoffs["records"]:
             self.assertIn(row["status"], STATUSES)
