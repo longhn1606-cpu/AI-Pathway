@@ -20,8 +20,24 @@ function formatVnd(value: number | null): string {
 }
 
 function assessImpact(comparison: RuleComparison): { level: 'high' | 'medium' | 'low' | 'requires_review'; assessment: string } {
+  const tuitionChanged = comparison.changes.some((change) =>
+    change.field === 'tuition' || change.field.startsWith('tuition.'),
+  )
+  const tuitionSnapshots = [comparison.tuition.old, comparison.tuition.new]
+  const tuitionEvidenceNeedsReview = tuitionChanged && (
+    comparison.tuitionStatus !== 'verified'
+    || tuitionSnapshots.some((snapshot) =>
+      !snapshot
+      || snapshot.dataStatus !== 'verified'
+      || snapshot.appliedYear === null
+      || !snapshot.sourceUrl
+      || snapshot.minVndPerYear === null
+      || snapshot.maxVndPerYear === null,
+    )
+  )
   const needsReview = comparison.dataStatus !== 'verified'
     || comparison.sources.some((source) => !source.url || source.appliedYear === null)
+    || tuitionEvidenceNeedsReview
   if (needsReview) {
     return {
       level: 'requires_review',
@@ -46,7 +62,8 @@ function assessImpact(comparison: RuleComparison): { level: 'high' | 'medium' | 
   }
 
   const mediumImpact = fields.some((field) =>
-    field.startsWith('tuition.')
+    field === 'tuition'
+    || field.startsWith('tuition.')
     || field.includes('combination')
     || field.includes('priority')
     || field.startsWith('conditions.'),
