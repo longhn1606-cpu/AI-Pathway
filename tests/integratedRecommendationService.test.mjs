@@ -242,7 +242,7 @@ test('historical method not currently declared by a program is not mapped into i
     getUniversities: () => [methodUniversity],
     getPrograms: () => [{
       ...methodProgram,
-      admissionMethods: methodProgram.admissionMethods.filter((item) => item.method === 'high_school_exam'),
+      admissionMethods: methodProgram.admissionMethods.filter((item) => item.method === 'academic_record'),
     }],
     getHistoricalCutoffs: () => cutoffDataset,
   })
