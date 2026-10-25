@@ -2,7 +2,7 @@ import universitiesJson from '../../data/admissions-seed-2026/universities.json'
 import programsJson from '../../data/admissions-seed-2026/programs.json'
 import historicalCutoffsJson from '../../data/admissions-seed-2026/historical_cutoffs.json'
 import type { DataSource, University, UniversityProgram } from '../types'
-import { validateAdmissionsDataset } from './admissionsDataValidation'
+import { resolveUniqueSourceByTitle, validateAdmissionsDataset } from './admissionsDataValidation'
 export type { HistoricalCutoffRecord, HistoricalCutoffsDataset } from './admissionsDataValidation'
 
 const datasetErrors = validateAdmissionsDataset(universitiesJson, programsJson, historicalCutoffsJson)
@@ -17,8 +17,7 @@ export const historicalCutoffs = historicalCutoffsJson as import('./admissionsDa
  * supports title references only when an exact, unique match exists.
  */
 export function resolveProgramSource(program: UniversityProgram, sourceReference: string): DataSource | undefined {
-  const matches = program.sources.filter((source) => source.title === sourceReference)
-  return matches.length === 1 ? matches[0] : undefined
+  return resolveUniqueSourceByTitle(program.sources, sourceReference)
 }
 
 export function resolveMethodSources(program: UniversityProgram, sourceReferences: string[]): DataSource[] {
