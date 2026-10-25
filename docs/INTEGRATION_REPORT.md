@@ -1,70 +1,56 @@
-# AI Pathway — Integration Audit Report
+# AI Pathway — Integration Audit and Progress Report
 
 Date: 2026-10-25  
 Branch: feat/system-integration  
 Repository: longhn1606-cpu/AI-Pathway
 
-## Scope and method
+## PR status rechecked
 
-Inspected main, shared types, package scripts, frontend entry point, changed-file lists for PRs #1/#3/#4/#5/#6, and representative source files on their feature branches.
+The current open-PR search reports PR #1, #3, #4, #5, #6 and #7 as open. PR #2 is closed. PR #7 remains a Draft. No other PR was merged or modified by Member 5.
 
-main contains shared types and a React/Vite frontend using admissions seed JSON. package.json on main exposes dev/build/preview only, with no test script. Canonical src/data/admissionsData.ts and Member 3/4 modules inspected in PR branches are not present on main in this audit.
+PR #4 latest reported head in its PR description is ae497a0587783950f3f27a2c561a4b46addc4a1c. Its two reported workflow runs were independently retrieved:
+- Adapter unit tests, run #34: completed / success.
+- Demo data and app checks, run #110: completed / success.
 
-PR descriptions contain historical CI claims. These are recorded as PR-reported evidence, not independently re-run here.
+PR #6's latest description says it reuses src/adapters/profileAdapter.ts from PR #5, rather than adding a competing adapter. It adopts conservative budget ceilings for the bounded ranges and null for over70/flexible. PR #1's separate frontendProfileAdapter.ts is not copied into the Member 5 integration branch.
 
-## PR inventory
+## Files added to Member 5 branch
 
-| PR | Scope | Branch observed | Assessment |
-|---|---|---|---|
-| #1 | Recommendation, simulation, Member 3 profile adapter/service | feat/recommendation-logic | Engine exists in branch; service reads demo fixtures, not canonical dataset adapter |
-| #3 | Rule comparison/explanation | feature/member-4-rule-comparison | Public module exists; requires two explicit versioned snapshots |
-| #4 | Shared schema dataset adapters/validation | chore/shared-schema-adapters | Critical dependency; not on main at audit |
-| #5 | Frontend ports/status badge/profile adapter | feat/frontend-integration | Preparation only; PR description says UI not yet wired |
-| #6 | Frontend profile adapter | feat/frontend-profile-integration | Changes App.tsx; duplicates mapping; does not connect recommendation/simulation per description |
+- Member 1 dependency snapshot: admissionsData.ts, admissionsDataValidation.ts, ruleComparisonAdapter.ts.
+- Member 3 engine snapshot: recommendation.ts, simulation.ts.
+- Member 4 engine snapshot: ruleComparison/types.ts, compareRules.ts, explainRules.ts, compareAndExplainRules.ts, index.ts.
+- Member 5 services: integratedRecommendationService.ts, integratedRuleComparisonService.ts.
+- Tests: Member 1 validator/adapter tests, Member 3 recommendation/simulation suites, and Member 5 integration service tests.
+- CI: .github/workflows/system-integration.yml.
+- package scripts: test and test:recommendation.
 
-The PR search payload did not provide authoritative state/check fields. Therefore this report does not label any PR merged/open/closed based on that incomplete response. Review links:
-- https://github.com/longhn1606-cpu/AI-Pathway/pull/1
-- https://github.com/longhn1606-cpu/AI-Pathway/pull/3
-- https://github.com/longhn1606-cpu/AI-Pathway/pull/4
-- https://github.com/longhn1606-cpu/AI-Pathway/pull/5
-- https://github.com/longhn1606-cpu/AI-Pathway/pull/6
+The feature modules are copied into the isolated integration branch as dependency snapshots. This does not merge, close, or change the original member branches. After upstream PRs merge, reconcile the files with the merged base to avoid duplicate commits/conflicts.
 
-## Findings
+## Integration implemented
 
-Critical:
-1. PR #4 canonical dataset adapter is not on main; Member 3 service cannot yet consume canonical data directly.
-2. PR #1 and PR #6 both add src/adapters/frontendProfileAdapter.ts with distinct implementations.
-3. PR #5 and PR #6 duplicate form mapping and disagree on budget semantics: null-preserving vs upper-bound conversion.
-4. Current dataset records do not provide two historical rule snapshots for Member 4.
+1. Canonical dataset → recommendation/simulation:
+   integratedRecommendationService injects Member 1 canonical exports into Member 3's existing functions. It clones profile and dataset records at the boundary, preserves IDs/status/nulls and does not modify ranking logic.
+2. Rule comparison service boundary:
+   integratedRuleComparisonService delegates to Member 4's compareAndExplainRules. It requires explicit before/after snapshots and does not fabricate history.
+3. Test and CI scaffolding:
+   Added dataset validator tests, rule adapter tests, recommendation and simulation tests, plus integration tests for canonical IDs, provenance status, empty dataset behavior, simulation immutability and rule explanation.
 
-High:
-1. PR #1 service reads src/data/programs.ts and src/data/universities.ts, not Member 1's canonical exports.
-2. RecommendationResult has no numeric score; UI must not invent probability.
-3. AdmissionMethodInfo.sourceIds has no confirmed stable source-ID contract.
-4. main package scripts do not include module/integration test commands from feature branches.
+## Still incomplete
 
-Medium:
-1. Rule comparison requires richer source/version metadata than a single current program record provides.
-2. PR #5 service ports are not a connected runtime flow.
-3. Current frontend's local filtering is not evidence that recommendation/simulation engines are called.
+- Frontend App.tsx is not yet wired to the new integration services.
+- There is no confirmed historical rule snapshot source to populate the comparison service from canonical dataset.
+- No browser E2E run has been completed.
+- The current repository connector cannot run Node/Vite directly; CI is the execution path. Do not treat tests authored as tests passed.
 
-## Safe actions performed
+## Next steps
 
-- Created feat/system-integration from main. No other branch modified.
-- No schema, dataset, recommendation, simulation or rule-comparison business logic changed.
-- Added this audit and an observed integration contract.
-- Kept budget null until owner approval; rule comparison remains unavailable without two explicit snapshots.
-- Preserved the rule that simulated data cannot be represented as verified.
+1. Read the CI result for the current PR #7 head and fix any compile/test failures.
+2. Wire Member 2's frontend service ports to integratedRecommendationService and integratedRuleComparisonService without rewriting App layout.
+3. Add loading, empty and error states and ensure results are keyed by programId.
+4. Keep rule comparison disabled/empty until two valid versioned snapshots are supplied.
+5. Run at least 20 genuine frontend-to-service E2E submissions in CI/browser environment and update the test report with run evidence.
+6. After upstream PR merges, compare the integration snapshot against merged main and remove duplicated files safely.
 
-## Next sequence
+## Evidence limitations
 
-1. Member 1 confirms PR #4 validation and readiness.
-2. Member 2 resolves PR #5/#6 duplicate adapter and budget policy with Member 3.
-3. Inject canonical dataset into Member 3's existing service boundary without changing ranking logic.
-4. Agree on a lossless mapping or explicit snapshot source for Member 4.
-5. Wire frontend ports to agreed exports.
-6. Add cross-module tests and execute actual app flow in CI or local runtime.
-
-## Limitations
-
-No npm/Vite/browser tests or 20 E2E runs were executed. The GitHub repository connector used here can inspect and modify repository content but does not provide a Node.js shell. No test pass is claimed.
+No claim of end-to-end completion is made. The 20-run requirement remains outstanding.
