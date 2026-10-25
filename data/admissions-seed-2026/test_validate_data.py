@@ -34,10 +34,27 @@ class SeedDataTests(unittest.TestCase):
             self.assertIn(row["programId"], programs_by_id)
             self.assertEqual(row["universityId"], programs_by_id[row["programId"]]["universityId"])
 
-    def test_unknown_numbers_are_null(self):
+    def test_unknown_cutoffs_remain_null_and_tuition_snapshot_needs_review(self):
         for program in self.programs:
-            for key in ("tuitionMinVndPerYear", "tuitionMaxVndPerYear", "tuitionYear", "historicalCutoff", "cutoffYear", "cutoffScale"):
+            # Historical cutoff rows remain a separate collection. Do not flatten
+            # an arbitrary year/method into the single program-level cutoff tuple.
+            for key in ("historicalCutoff", "cutoffYear", "cutoffScale"):
                 self.assertIsNone(program[key])
+
+            # The current 2026 tuition snapshot is populated but the program data
+            # remains needs_review. Do not promote it to verified in the adapter.
+            self.assertEqual(program["status"], "needs_review")
+            minimum = program["tuitionMinVndPerYear"]
+            maximum = program["tuitionMaxVndPerYear"]
+            year = program["tuitionYear"]
+            if minimum is not None:
+                self.assertGreaterEqual(minimum, 0)
+            if maximum is not None:
+                self.assertGreaterEqual(maximum, 0)
+            if minimum is not None and maximum is not None:
+                self.assertLessEqual(minimum, maximum)
+            if year is not None:
+                self.assertEqual(year, 2026)
 
     def test_program_records_need_review(self):
         self.assertTrue(all(p["status"] == "needs_review" for p in self.programs))
