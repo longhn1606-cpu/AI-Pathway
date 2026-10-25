@@ -11,6 +11,20 @@ const scenarios = Array.from({ length: 20 }, (_, index) => ({
 }))
 
 try {
+  let serverReady = false
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    try {
+      const response = await fetch('http://127.0.0.1:5173')
+      if (response.ok) {
+        serverReady = true
+        break
+      }
+    } catch {
+      // Vite may still be starting; retry on the next iteration.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+  }
+  assert.equal(serverReady, true, 'Vite dev server did not become ready')
   await page.goto('http://127.0.0.1:5173', { waitUntil: 'domcontentloaded' })
   assert.match(await page.title(), /AI Pathway/i)
 
