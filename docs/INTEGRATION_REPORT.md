@@ -4,59 +4,47 @@ Date: 2026-10-25
 Branch: feat/system-integration  
 Repository: longhn1606-cpu/AI-Pathway
 
-## PR status rechecked
+## PR status
 
-Current open-PR search reports PR #1, #3, #4, #5, #6 and #7 as open. PR #2 is closed. PR #7 remains Draft. Member 5 did not merge or modify any other member's PR.
+PR #1, #3, #4, #5, #6 and #7 are open; PR #2 is closed. PR #7 remains Draft. Member 5 did not merge or modify another member's PR.
 
-PR #4 latest reported head ae497a0587783950f3f27a2c561a4b46addc4a1c has two independently retrieved successful workflow runs:
-- Adapter unit tests, run #34: success.
-- Demo data and app checks, run #110: success.
+PR #4 head ae497a0587783950f3f27a2c561a4b46addc4a1c has two independently retrieved successful workflows: Adapter unit tests (#34) and Demo data/app checks (#110).
 
-PR #6 now reuses PR #5's profileAdapter.ts and applies conservative budget ceilings to bounded ranges; over70/flexible remain null.
+PR #6 reuses PR #5 profileAdapter.ts and maps bounded budget ranges to conservative ceilings; over70/flexible remain null.
 
-## Integration files on Member 5 branch
+## Integrated branch contents
 
 - Member 1 dependency snapshot: admissionsData.ts, admissionsDataValidation.ts, ruleComparisonAdapter.ts.
 - Member 3 engine snapshot: recommendation.ts, simulation.ts.
 - Member 4 engine snapshot: ruleComparison/types.ts, compareRules.ts, explainRules.ts, compareAndExplainRules.ts, index.ts.
 - Member 5 services: integratedRecommendationService.ts, integratedRuleComparisonService.ts.
-- Member 5 adapters: recommendationProfileAdapter.ts; updated PR #6 profileAdapter.ts.
-- Frontend: App.tsx calls recommendation and simulation; RuleComparisonPanel.tsx connects to rule comparison service.
-- Tests: dataset validator, rule adapter, integrated recommendation, integrated rule comparison, recommendation profile adapter.
-- CI: system-integration.yml.
+- Member 5 adapters: recommendationProfileAdapter.ts and updated PR #6 profileAdapter.ts.
+- Frontend: App.tsx calls recommendation/simulation; RuleComparisonPanel.tsx connects to rule comparison service.
+- Tests: dataset validator, rule adapter, integrated recommendation, integrated rule comparison, profile taxonomy adapter, and a Playwright 20-profile E2E runner.
+- CI: system-integration.yml runs build, unit/integration tests and browser E2E.
 
-These are dependency snapshots on the isolated integration branch; original member branches and PRs remain untouched. Reconcile with upstream files after their PRs merge.
+These are dependency snapshots on the isolated integration branch. Original member branches and PRs remain untouched; reconcile with upstream files after their PRs merge.
 
 ## Integration implemented
 
 1. Dataset → recommendation/simulation: canonical exports injected into Member 3 engine; IDs/status/nullability preserved; profile and dataset records cloned at service boundary.
-2. UI → recommendation: form validated, profile adapted and passed to service. Results rendered by programId with reasons, warnings and DataStatus.
-3. UI → simulation: +1 score scenario uses a cloned profile and renders before/after/added/removed/retained counts. Baseline form state is not modified.
-4. Rule comparison → UI: panel is connected to Member 4 facade and renders a truthful empty state until two explicit versioned snapshots are supplied.
-5. Taxonomy mapping: UI technology maps to canonical dataset labels information_technology and engineering without changing Member 3's business logic.
+2. UI → recommendation: form validation, profile mapping and service call; render by programId with reasons/warnings/status.
+3. UI → simulation: +1 score scenario with before/after/added/removed/retained counts; baseline form state unchanged.
+4. Rule comparison → UI: connected panel shows truthful empty state until two explicit versioned snapshots exist.
+5. Taxonomy: UI technology maps to observed canonical labels information_technology and engineering; Member 3 ranking code unchanged.
 
 ## CI evidence and issue handling
 
-First CI attempt failed before install because setup-node npm cache requires a lockfile; cache was removed.
-Second attempt:
-- Production build: passed.
-- npm test: 19/19 passed.
-- The separate Member 3 test runner failed because it expected demo fixture files absent from the canonical main base. Those fixture-dependent runners were removed from this integration branch; integration tests use canonical JSON instead.
+- First CI attempt failed before install because setup-node npm cache expected a lockfile; cache removed.
+- Next attempt: build passed and npm test passed 19/19; legacy Member 3 test runner failed because its demo fixture files were not present in canonical base. That fixture-dependent runner was removed.
+- Subsequent run #47: production build and npm test completed successfully. This was before the latest taxonomy test and Playwright E2E workflow were added.
+- Latest workflow includes a taxonomy integration test and a Playwright suite that submits 20 distinct profiles through the actual frontend. Its result must be checked before reporting 20/20 E2E success.
 
-A new workflow run is pending for the latest frontend/service changes. Do not claim the latest head passes until its workflow result is retrieved.
+## Remaining
 
-## Remaining blockers
+- Confirm latest CI, including Playwright browser tests.
+- Rule comparison has no historical snapshot source in canonical data; panel remains empty until two authentic versioned snapshots are provided.
+- After upstream PRs merge, reconcile dependency snapshots with main.
+- Fix any real CI/browser failures and retain evidence.
 
-- No historical rule snapshot source is available in the canonical dataset; comparison remains empty/unavailable in UI until two snapshots are provided.
-- 20 browser E2E runs have not been performed.
-- After upstream PRs merge, dependency snapshot files must be reconciled with merged main to avoid duplication.
-
-## Next steps
-
-1. Confirm latest CI after frontend wiring.
-2. Fix any build/type/test failures.
-3. Run browser E2E with at least 20 distinct profiles, recording actual outputs.
-4. Coordinate with Member 1/4 to supply genuine versioned rule snapshots if rule comparison must be demonstrated with real data.
-5. Reconcile snapshot files when PRs #1/#3/#4 are merged.
-
-No full E2E completion is claimed.
+No full end-to-end completion is claimed until the latest 20-profile browser run passes.
