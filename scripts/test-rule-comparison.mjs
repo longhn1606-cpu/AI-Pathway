@@ -356,7 +356,7 @@ test('không so sánh điều kiện giữa hai ngành khác nhau trong cùng tr
   const after = rule({ programId: 'program-2', programName: 'Other major', conditions: { minimumScore: 28 } })
   const result = compareRules(before, after)
   assert.equal(result.changes.some((change) => change.field.startsWith('conditions.')), false)
-  assert.deepEqual(result.affectedUniversities, ['uni-1'])
+  assert.deepEqual(result.affectedUniversities, [])
   assert.deepEqual(result.affectedMajors, [])
   assert.equal(result.comparableScope, false)
 })
