@@ -152,3 +152,12 @@ The previous historical-cutoff blocker is closed at the adapter/service boundary
 - Frontend empty state now distinguishes zero engine recommendations from keyword filtering; the former is a valid criteria-based no-fit state.
 - Demo rule snapshots remain simulated. Authentic source-backed historical rule versions are still required for production rule-change claims.
 - Member 2 review of presentation/wording remains requested and not yet confirmed.
+
+
+## Owner confirmation and UI validation follow-up — 2026-10-25
+
+- **Member 3 confirmed** the exact RecommendationInput shape and method-specific historical cutoff resolution policy in the PR discussion. The integration must not pass the raw historical-cutoff collection to `recommendPrograms`; it resolves the eligible unique latest record through `toRecommendationDataset` before building the three-part input.
+- **Member 4's latest engine files are synchronized** with the upstream branch at the blob level for `types.ts`, `compareRules.ts`, `explainRules.ts`, and `index.ts`. Same-scope matching requires matching institution and program identity before comparing conditions, methods, tuition or source metadata; the additive affected-university/major fields are present.
+- **Member 2 review remains pending.** The integration code currently clears the submitted profile and all prior recommendation/simulation output when validation fails. This behavior is covered by a strengthened browser E2E assertion in the current follow-up commit; it is an implementation observation, not a substitute for Member 2's UI/contract approval.
+- **Member 1 reconciliation remains pending** for the upstream tuition regression expectation. In the integrated branch, 2026 tuition fixture values remain `needs_review`; null cutoff values remain null and no provenance/status is promoted.
+- These confirmations establish module-boundary compatibility only. They do not mean the upstream PRs are merged or that the demo data is authoritative.
