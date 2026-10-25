@@ -9,11 +9,11 @@ Canonical admissions JSON
   -> Member 1 schema / validator / dataset access
   -> Member 3 recommendation + simulation
   -> Member 2 React form / result presentation
-  -> Member 5 integration services and tests
+  -> Member 5 integration adapters/services
 
-Versioned rule snapshots
+Two versioned rule snapshots
   -> Member 4 compareAndExplainRules
-  -> Member 2 comparison presentation
+  -> Member 2 rule comparison panel
   -> Member 5 service boundary
 ```
 
@@ -39,7 +39,7 @@ Member 1's PR #4 files are present as an explicit dependency snapshot on this br
 - src/data/admissionsDataValidation.ts
 - src/logic/adapters/ruleComparisonAdapter.ts
 
-The canonical exports are universities, programs and historicalCutoffs. Dataset validation runs before canonical exports are exposed. Source resolution supports exact unique title matches only; sourceIds has no confirmed stable ID semantics.
+Canonical exports are universities, programs and historicalCutoffs. Dataset validation runs before exports are exposed. Source resolution supports exact unique title matches only; sourceIds has no confirmed stable ID semantics.
 
 Member 5 added src/services/integratedRecommendationService.ts. It injects canonical exports into Member 3's existing recommendPrograms and simulateScenario functions. It clones profiles, university/program records and nested arrays at the service boundary. It does not import Member 3's demo fixture files or modify ranking/simulation algorithms.
 
@@ -53,17 +53,34 @@ Null tuition/cutoff stays null. A simulated record remains simulated. A result d
 
 ## Recommendation / simulation API
 
-Input:
-`{ profile: StudentProfile }`
+Input: `{ profile: StudentProfile }`.
 
 Recommendation:
-`integratedRecommendationService.recommend(input)` returns Member 3's `{ results, excluded, warnings }`.
-`getRecommendations(input)` returns the results array for legacy consumers.
+- `integratedRecommendationService.recommend(input)` returns Member 3's `{ results, excluded, warnings }`.
+- `getRecommendations(input)` returns the results array for legacy consumers.
 
 Simulation:
-`integratedRecommendationService.simulate(input, changes: Partial<StudentProfile>)` returns scenarioProfile, before, after and added/removed/retained comparisons.
+- `integratedRecommendationService.simulate(input, changes: Partial<StudentProfile>)` returns scenarioProfile, before, after and added/removed/retained comparisons.
+- Simulation uses a cloned baseline profile and cloned canonical records. The original profile and canonical provider objects are not exposed for mutation.
 
-Simulation uses a cloned baseline profile and cloned canonical records. The original profile and canonical provider objects are not exposed for mutation.
+## Frontend profile adapter and taxonomy
+
+The integration branch uses the updated PR #6 version of `src/adapters/profileAdapter.ts`, which reuses the PR #5 adapter path and maps bounded budget ranges to conservative ceilings (20/40/70 million VND). Over70/flexible remain null. These are filter thresholds, not estimates of exact household budget.
+
+Member 5 added `src/adapters/recommendationProfileAdapter.ts` because the UI category `technology` does not exactly match the canonical program majorGroup strings. It maps the UI choice to the two observed dataset labels `information_technology` and `engineering`. This is an explicit input taxonomy adapter only; Member 3's ranking logic is unchanged. This mapping should be reviewed if Member 1 changes the dataset taxonomy.
+
+## Frontend service wiring
+
+src/App.tsx now:
+- validates the form using validateUiProfile;
+- maps the UI profile using toRecommendationProfile;
+- calls integratedRecommendationService.recommend;
+- renders only results whose programId is returned by the engine;
+- displays suitability reasons, warnings and returned DataStatus;
+- shows loading, error and empty states;
+- calls integratedRecommendationService.simulate for a +1 score scenario and displays before/after and added/removed/retained counts.
+
+Simulation is a counterfactual scenario only. The baseline form/profile remains unchanged.
 
 ## Dataset → rule comparison contract
 
@@ -72,17 +89,11 @@ Member 4 public implementation is present on this branch:
 - explainRules
 - compareAndExplainRules
 
-Member 5 added src/services/integratedRuleComparisonService.ts. Its compare(before, after) method delegates to Member 4's compareAndExplainRules and returns { comparison, explanation }.
+Member 5 added src/services/integratedRuleComparisonService.ts. Its compare(before, after) delegates to Member 4's compareAndExplainRules and returns { comparison, explanation }.
 
-Important limitation: canonical current-state UniversityProgram records do not encode two historical rule versions. The service therefore requires callers to supply two explicit AdmissionRuleVersion snapshots with source/version/year/status metadata. It does not derive or fabricate an old version from the current dataset. If either snapshot or provenance is missing, the Member 4 explanation should retain limitations/requires_review.
+Member 2's frontend is connected through src/components/RuleComparisonPanel.tsx. It displays a truthful empty state unless both snapshots are provided; when supplied, it renders explanation, impact level, changed fields, limitations and data status.
 
-## Frontend contract and profile adapter decision
-
-PR #5 exposes profileAdapter.ts and dependency-injected ports. PR #6 was updated to reuse the PR #5 profile adapter rather than define another adapter path. Its budget bands map to conservative upper-bound thresholds (20/40/70 million VND); over70/flexible remain null. This is an explicit threshold policy, not an assertion of exact household budget. The form still does not collect admission method, so preferredMethods remains [].
-
-PR #1's separate src/adapters/frontendProfileAdapter.ts is not copied into this integration branch. The integrated services consume the shared StudentProfile directly.
-
-The current frontend still needs to be wired to these integration services. No claim is made that the React UI already calls them.
+Important limitation: canonical current-state UniversityProgram records do not encode two historical rule versions. The panel is therefore empty in the current app. The service requires two explicit AdmissionRuleVersion snapshots with source/version/year/status metadata. It does not derive or fabricate an old version from the current dataset.
 
 ## Rule and provenance safeguards
 
@@ -97,12 +108,12 @@ The current frontend still needs to be wired to these integration services. No c
 
 | Area | Finding | Action |
 |---|---|---|
-| PR #4 | Adapter files are copied as dependency snapshot; PR #4 remains independently owned | Keep PR #4 unmerged/unmodified; reconcile by file-level diff after its merge |
-| PR #1 | Original service uses demo fixtures | Member 5's integration service injects canonical dataset |
-| PR #3 | Requires two versioned snapshots | Service boundary accepts explicit snapshots; snapshot history source remains open |
-| PR #5/#6 | Profile mapping and budget policy changed during PR #6 update | Reuse PR #5 adapter; confirm final UI contract with Member 2 |
-| Frontend | App still does not invoke integrated services | Wire after owners confirm the exported API and presentation |
-| E2E | Browser/runtime execution not available through repository connector | Use CI/local runner and record actual runs |
+| PR #4 | Adapter files are copied as dependency snapshot; PR #4 remains independently owned | Reconcile by file-level diff after its merge |
+| PR #1 | Original service uses demo fixtures | Member 5 service injects canonical dataset |
+| PR #3 | Requires two versioned snapshots | Service and panel are wired; historical snapshot source remains open |
+| PR #5/#6 | PR #6 reuses PR #5 adapter with budget ceilings | Integrated branch uses updated PR #6 version |
+| Taxonomy | UI technology vs dataset information_technology/engineering | Member 5 adapter maps observed labels; review if taxonomy changes |
+| E2E | Browser/runtime test execution pending | Run 20 real submissions in CI/browser environment |
 
 ## Owner approval boundaries
 
@@ -112,4 +123,4 @@ The current frontend still needs to be wired to these integration services. No c
 - Form fields, budget interpretation and UI states: Member 2.
 - No status promotion or null-value imputation without source evidence.
 
-This contract describes service-level integration on the Member 5 branch, not full product completion.
+This contract describes integration implementation on the Member 5 branch, not full product completion.
