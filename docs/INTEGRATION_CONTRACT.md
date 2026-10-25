@@ -1,102 +1,115 @@
 # AI Pathway — Integration Contract
 
-Audit snapshot: 2026-10-25. This is an observed contract, not a claim that Draft PRs are merged or E2E is complete.
+Audit snapshot: 2026-10-25. This contract records the interfaces integrated into Member 5's branch; it does not claim the PRs are merged or E2E is complete.
 
 ## Architecture and ownership
 
 ```text
-Canonical JSON + shared types (Member 1)
-        |                         |
-        v                         v
-Recommendation + Simulation    Rule Comparison
-(Member 3)                     (Member 4)
-        \                         /
-         v                       v
-          React Frontend (Member 2)
-                    |
-          Integration adapters/tests
-                 (Member 5)
+Canonical admissions JSON
+  -> Member 1 schema / validator / dataset access
+  -> Member 3 recommendation + simulation
+  -> Member 2 React form / result presentation
+  -> Member 5 integration services and tests
+
+Versioned rule snapshots
+  -> Member 4 compareAndExplainRules
+  -> Member 2 comparison presentation
+  -> Member 5 service boundary
 ```
 
-Member 1 owns schema, canonical dataset, validator and dataset adapters. Member 2 owns React UI, form mapping and presentation. Member 3 owns recommendation/simulation logic. Member 4 owns rule comparison/explanations. Member 5 owns integration seams, orchestration, integration tests and documentation. No business logic or shared schema is redefined here.
+Member 1 owns shared schema and canonical dataset. Member 2 owns frontend/form/presentation. Member 3 owns recommendation/simulation logic. Member 4 owns rule comparison/explanation logic. Member 5 owns adapters, orchestration, integration tests and documentation. Member 5 does not change another member's business rules.
 
-## Shared schema observed in src/types/index.ts
+## Shared schema
 
+Observed in src/types/index.ts:
 - DataStatus: verified | needs_review | simulated.
 - AdmissionMethod: high_school_exam | academic_record | competency_assessment | direct_admission | other.
 - GeographicRegion: north | central | south | nationwide.
-- DataSource: title, url, applicableYear, checkedAt, status.
-- University: id, name, shortName, province, region, website, sources, status.
-- AdmissionMethodInfo: method, description, applicableYear, sourceIds, status.
-- UniversityProgram: id, universityId, name, majorGroup, nullable tuition min/max/year, admissionMethods, nullable historicalCutoff/year/scale, sources, status.
-- StudentProfile: nullable expectedScore/scoreScale, interests, preferredRegions, nullable annualBudgetVnd, preferredMethods.
-- RecommendationResult: programId, suitabilityReasons, warnings, dataStatus.
+- University and UniversityProgram use stable id/universityId linkage.
+- UniversityProgram tuition min/max/year and historical cutoff/year/scale are nullable.
+- StudentProfile score/scale/budget are nullable; interests, preferredRegions and preferredMethods are arrays.
+- RecommendationResult identifies a program by programId and includes reasons, warnings and dataStatus. It has no numeric probability field.
 
-No schema change is proposed.
+No schema change is made in this integration branch.
 
-## Dataset contract observed in PR #4 branch
+## Dataset → recommendation contract
 
-Canonical exports: universities, programs, historicalCutoffs from src/data/admissionsData.ts. Dataset validation runs before exports. Source resolver supports exact unique title matching only. AdmissionMethodInfo.sourceIds has no confirmed stable ID semantics; do not invent IDs or choose among ambiguous titles.
+Member 1's PR #4 files are present as an explicit dependency snapshot on this branch:
+- src/data/admissionsData.ts
+- src/data/admissionsDataValidation.ts
+- src/logic/adapters/ruleComparisonAdapter.ts
+
+The canonical exports are universities, programs and historicalCutoffs. Dataset validation runs before canonical exports are exposed. Source resolution supports exact unique title matches only; sourceIds has no confirmed stable ID semantics.
+
+Member 5 added src/services/integratedRecommendationService.ts. It injects canonical exports into Member 3's existing recommendPrograms and simulateScenario functions. It clones profiles, university/program records and nested arrays at the service boundary. It does not import Member 3's demo fixture files or modify ranking/simulation algorithms.
 
 ID mapping:
 - University.id ↔ UniversityProgram.universityId.
 - UniversityProgram.id ↔ RecommendationResult.programId.
-- Rule comparison institutionId and programId are separate identifiers; member 4 logic requires both to match to identify affected programs.
-- Admission methods use exact shared enum values, not display labels.
+- Admission methods use exact shared enum values.
+- No ID is generated or repaired by the integration service.
 
-Nullable tuition/cutoff/source metadata remains null when unknown. Null is not zero and not evidence of no change. Preserve source URL, year, checkedAt and DataStatus.
+Null tuition/cutoff stays null. A simulated record remains simulated. A result does not become verified merely because it passes through an adapter.
 
-## Member 3 contract observed in PR #1 branch
+## Recommendation / simulation API
 
-RecommendationInput = { profile: StudentProfile; universities: University[]; programs: UniversityProgram[] }.
-recommendPrograms(input) returns { results: RecommendationResult[]; excluded: { programId; reasons }[]; warnings: string[] }.
-simulateScenario(baseline, changes: Partial<StudentProfile>) returns scenarioProfile, before, after and comparison groups added/removed/retained.
-UniversityService currently exposes async dataset getters, getRecommendations, getRecommendationReport and simulateRecommendations.
+Input:
+`{ profile: StudentProfile }`
 
-Important gap: PR #1 service imports src/data/programs.ts and src/data/universities.ts demo fixtures, not Member 1 canonical exports. Add a data-source seam; do not silently substitute fixtures. RecommendationResult has no numeric score/probability. Do not compare scores across incompatible scales or methods. Simulation must preserve baseline profile and read-only dataset.
+Recommendation:
+`integratedRecommendationService.recommend(input)` returns Member 3's `{ results, excluded, warnings }`.
+`getRecommendations(input)` returns the results array for legacy consumers.
 
-## Member 4 contract observed in PR #3 branch
+Simulation:
+`integratedRecommendationService.simulate(input, changes: Partial<StudentProfile>)` returns scenarioProfile, before, after and added/removed/retained comparisons.
 
-Public exports are compareRules and explainRules from src/logic/ruleComparison/index.ts. AdmissionRuleVersion contains id, institutionId, nullable programId, source metadata, nullable admissionMethod, conditions and optional nullable tuition snapshot. RuleSource contains name, nullable url/appliedYear/checkedAt, version and dataStatus. TuitionSnapshot contains nullable min/max/year, status and nullable source URL. RuleComparison and RuleExplanation carry changes, affected programs, evidence, limitations, provenance, impact level and explanation fields.
+Simulation uses a cloned baseline profile and cloned canonical records. The original profile and canonical provider objects are not exposed for mutation.
 
-Import exact types and signatures from Member 4 public module. A current UniversityProgram record is not two historical rule versions. A before/after comparison requires two explicit versioned snapshots with provenance; do not synthesize history.
+## Dataset → rule comparison contract
 
-## Frontend contract and duplicate work
+Member 4 public implementation is present on this branch:
+- compareRules
+- explainRules
+- compareAndExplainRules
 
-PR #5 branch adds profileAdapter.ts and dependency-injected service ports for recommendation, simulation and rule comparison. Its current budget bands map to annualBudgetVnd=null because ranges are not exact amounts. Current form does not collect admission method, so preferredMethods=[].
+Member 5 added src/services/integratedRuleComparisonService.ts. Its compare(before, after) method delegates to Member 4's compareAndExplainRules and returns { comparison, explanation }.
 
-PR #6 branch adds frontendProfileAdapter.ts and changes App.tsx. It maps three budget bands to 20/40/70 million VND upper bounds, unlike PR #5. PR #1 also contains src/adapters/frontendProfileAdapter.ts, duplicating the PR #6 path with a separate implementation. These adapters must be reconciled, not blindly merged. Safe default: budget remains null until Member 2/product owner approves a precise interpretation.
+Important limitation: canonical current-state UniversityProgram records do not encode two historical rule versions. The service therefore requires callers to supply two explicit AdmissionRuleVersion snapshots with source/version/year/status metadata. It does not derive or fabricate an old version from the current dataset. If either snapshot or provenance is missing, the Member 4 explanation should retain limitations/requires_review.
 
-## Data flow
+## Frontend contract and profile adapter decision
 
-1. Frontend validates form and maps it to StudentProfile.
-2. Dataset adapter validates canonical JSON and exposes shared types.
-3. Recommendation receives profile, universities and programs.
-4. Simulation receives baseline plus partial scenario changes and must not mutate baseline.
-5. Rule comparison receives two explicit snapshots.
-6. Frontend renders results by programId, reasons, warnings, explanation, provenance and status.
+PR #5 exposes profileAdapter.ts and dependency-injected ports. PR #6 was updated to reuse the PR #5 profile adapter rather than define another adapter path. Its budget bands map to conservative upper-bound thresholds (20/40/70 million VND); over70/flexible remain null. This is an explicit threshold policy, not an assertion of exact household budget. The form still does not collect admission method, so preferredMethods remains [].
 
-Missing values stay null. Invalid required IDs/enums are rejected, not guessed. Simulated never becomes verified. No change is claimed when evidence or one comparison side is missing.
+PR #1's separate src/adapters/frontendProfileAdapter.ts is not copied into this integration branch. The integrated services consume the shared StudentProfile directly.
 
-## Known incompatibilities
+The current frontend still needs to be wired to these integration services. No claim is made that the React UI already calls them.
 
-| Area | Finding | Safe action |
+## Rule and provenance safeguards
+
+- Rule comparison needs two explicitly versioned snapshots; current dataset alone is insufficient.
+- No change is claimed if evidence is insufficient or one side is missing.
+- Preserve source URL, version, applied year, checkedAt and DataStatus.
+- Do not treat null tuition as zero or no change.
+- Do not infer a stable source ID from source title.
+- Do not treat simulated fixtures as official admissions facts.
+
+## Known remaining incompatibilities
+
+| Area | Finding | Action |
 |---|---|---|
-| PR #4 | Canonical adapter absent from main at audit | Integrate after owner review/merge or explicit branch dependency |
-| PR #1 | Service reads demo fixtures | Inject canonical dataset at service boundary |
-| PR #1 / #6 | Duplicate frontendProfileAdapter path | Choose one after Member 2/3 review |
-| PR #5 / #6 | Duplicate profile mapping and budget policy conflict | Member 2 confirms canonical adapter and budget semantics |
-| Rule history | Canonical dataset is not a versioned history | Require two explicit snapshots |
-| Provenance | Rule metadata richer than current source model | Map losslessly or retain unknowns/limitations |
-| Runtime API | PR #1 is in-process demo service, not deployed HTTP API | Use local service boundary; do not claim HTTP backend |
-| Tests | main package scripts do not expose integration tests | Add integration scripts after dependency reconciliation |
+| PR #4 | Adapter files are copied as dependency snapshot; PR #4 remains independently owned | Keep PR #4 unmerged/unmodified; reconcile by file-level diff after its merge |
+| PR #1 | Original service uses demo fixtures | Member 5's integration service injects canonical dataset |
+| PR #3 | Requires two versioned snapshots | Service boundary accepts explicit snapshots; snapshot history source remains open |
+| PR #5/#6 | Profile mapping and budget policy changed during PR #6 update | Reuse PR #5 adapter; confirm final UI contract with Member 2 |
+| Frontend | App still does not invoke integrated services | Wire after owners confirm the exported API and presentation |
+| E2E | Browser/runtime execution not available through repository connector | Use CI/local runner and record actual runs |
 
-## Changes requiring owner approval
+## Owner approval boundaries
 
-- Shared types/dataset format: Member 1.
-- Recommendation ranking/cutoff/simulation semantics: Member 3.
+- Schema/dataset format: Member 1.
+- Ranking/cutoff/simulation semantics: Member 3.
 - Rule matching/impact/explanation semantics: Member 4.
-- Form contract, budget interpretation and UI states: Member 2.
-- Never promote DataStatus or fill null data without evidence.
+- Form fields, budget interpretation and UI states: Member 2.
+- No status promotion or null-value imputation without source evidence.
 
-This contract is an audit baseline. It does not certify end-to-end completion.
+This contract describes service-level integration on the Member 5 branch, not full product completion.
