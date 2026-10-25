@@ -92,8 +92,12 @@ Tại head `05a55f3cebb34843dc6c16539efab7d0fe655a62`, các yêu cầu tích h�
 - Null học phí được giữ là unknown; dữ liệu simulated/needs_review hoặc thiếu
   provenance không được nâng thành verified.
 - CI `Demo data and app checks` trên head này đã thành công
-  (run `40189002900`). Workflow `System integration checks` vẫn cần hoàn tất
-  trước khi xác nhận toàn bộ tích hợp. CI chỉ xác nhận kỹ thuật, không xác minh
+  (run `40189002900`). Workflow `System integration checks` (run
+  `40189002915`) thất bại ở browser E2E: assertion tại
+  `tests/e2e-frontend.mjs:67` không tìm thấy wording
+  `Chưa có snapshot học phí`. Build và unit/integration tests đã pass; cần
+  Member 5/2 đồng bộ wording UI với assertion hoặc cập nhật assertion theo
+  output đúng, sau đó chạy lại E2E. CI chỉ xác nhận kỹ thuật, không xác minh
   tính đúng hoặc hiệu lực pháp lý của dữ liệu tuyển sinh.
 
 ### Việc còn lại theo phân công
