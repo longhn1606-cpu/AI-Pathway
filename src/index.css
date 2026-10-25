@@ -14,3 +14,60 @@
 
 /* Accessible, responsive multi-select for admission-method preferences. */
 .method-fieldset{min-width:0;margin:0;padding:0;border:0}.method-fieldset legend{width:100%;padding:0}.method-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px}.method-option{display:flex;align-items:flex-start;gap:9px;min-width:0;padding:10px 11px;border:1px solid #e2e8f1;border-radius:8px;background:#fbfcff;color:#53677e;font-size:10px;line-height:1.5;cursor:pointer}.method-option input{width:16px;height:16px;flex:0 0 16px;margin:0;accent-color:var(--blue)}.method-option:has(input:checked){border-color:#a9bdf0;background:#f2f5ff;color:#294eaa}.method-option:focus-within{outline:3px solid #8eafff;outline-offset:2px}@media(max-width:430px){.method-options{grid-template-columns:1fr}.method-option{font-size:11px}}
+
+
+/* Acceptance fixes: readable result cards and overflow-safe narrow layouts. */
+.program-card,.program-content,.program-description,.program-school,.program-meta,
+.results-toolbar,.profile-summary,.demo-warning,.data-note,.form-card,.form-grid,
+.field,.field-label,.method-fieldset,.method-option,.section-intro,.closing-cta,
+.footer,.step-card { min-width: 0; }
+.program-description,.program-school,.demo-warning p,.data-note p,.field-hint,
+.no-results p,.section-intro>p,.step-card>p,.form-actions>p {
+  color: #526276;
+  font-size: 12px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.program-card h3 { font-size: 18px; line-height: 1.35; overflow-wrap: anywhere; }
+.program-tags span,.program-meta,.demo-tag,.program-link,.summary-chip { font-size: 11px; }
+.field-label { font-size: 13px; line-height: 1.5; flex-wrap: wrap; }
+.field input,.field select { font-size: 14px; }
+.method-option { font-size: 12px; color: #42566d; overflow-wrap: anywhere; }
+.results-toolbar p,.result-count span { font-size: 12px; line-height: 1.65; }
+.profile-summary { align-items: flex-start; }
+.demo-warning { color: #624a20; }
+@media(max-width:760px) {
+  .app-shell { overflow-x: clip; }
+  .hero,.section-wrap,.form-layout,.form-card,.recommend-section,.how-section,
+  .program-grid,.program-card,.program-content,.results-toolbar,.profile-summary,
+  .demo-warning,.data-note,.closing-cta,.footer { max-width: 100%; min-width: 0; }
+  .hero,.section-wrap { padding-left: max(16px, 5vw); padding-right: max(16px, 5vw); }
+  .hero h1 { overflow-wrap: anywhere; }
+  .form-card { padding: 20px 16px; }
+  .form-grid { grid-template-columns: minmax(0,1fr); }
+  .field-full { grid-column: 1; }
+  .form-card-heading { min-width: 0; }
+  .optional-label { margin-left: 0; }
+  .form-actions { min-width: 0; }
+  .program-grid { grid-template-columns: minmax(0,1fr); }
+  .program-content { padding: 17px; }
+  .program-description { min-height: 0; }
+  .program-meta { flex-wrap: wrap; }
+  .profile-summary { gap: 7px; }
+  .summary-chip { max-width: 100%; overflow-wrap: anywhere; }
+  .results-toolbar .form-actions { width: 100%; }
+  .results-toolbar .button { width: 100%; }
+  .closing-cta { padding-left: max(16px,5vw); padding-right: max(16px,5vw); }
+  .closing-cta h2 { overflow-wrap: anywhere; }
+  .footer { padding-left: max(16px,5vw); padding-right: max(16px,5vw); }
+}
+@media(max-width:380px) {
+  .topbar { padding-left: 14px; padding-right: 14px; gap: 7px; }
+  .brand { font-size: 13px; }
+  .topbar-cta { font-size: 10px; padding: 8px; }
+  .menu-toggle { font-size: 11px; }
+  .form-card { padding: 18px 13px; }
+  .hero h1 { font-size: clamp(37px, 11vw, 46px); letter-spacing: -1.8px; }
+  .section-intro h2,.how-heading h2 { font-size: 30px; }
+  .form-card-heading h3 { font-size: 17px; }
+}
