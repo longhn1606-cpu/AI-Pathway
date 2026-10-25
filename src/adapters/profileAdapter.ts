@@ -1,4 +1,4 @@
-import type { StudentProfile } from '../types'
+import type { AdmissionMethod, StudentProfile } from '../types'
 
 export type UiInterest =
   | 'technology'
@@ -18,6 +18,7 @@ export interface UiStudentProfile {
   region: UiRegion | ''
   budget: UiBudget | ''
   keywords: string
+  preferredMethods: AdmissionMethod[]
 }
 
 /**
@@ -57,7 +58,7 @@ export function toStudentProfile(profile: UiStudentProfile): StudentProfile {
     interests,
     preferredRegions,
     annualBudgetVnd,
-    preferredMethods: [],
+    preferredMethods: [...profile.preferredMethods],
   }
 }
 
