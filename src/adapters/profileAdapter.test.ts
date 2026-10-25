@@ -16,7 +16,7 @@ describe('profileAdapter', () => {
       scoreScale: 30,
       interests: ['technology'],
       preferredRegions: ['north'],
-      annualBudgetVnd: null,
+      annualBudgetVnd: 20_000_000,
       preferredMethods: [],
     })
   })
@@ -42,10 +42,14 @@ describe('profileAdapter', () => {
     expect(toStudentProfile({ ...base, region: 'anywhere' }).preferredRegions).toEqual(['nationwide'])
   })
 
-  it('keeps budget ranges unknown instead of inventing an exact annual budget', () => {
-    for (const budget of ['under20', '20to40', '40to70', 'over70', 'flexible'] as const) {
-      expect(toStudentProfile({ ...base, budget }).annualBudgetVnd).toBeNull()
-    }
+  it.each([
+    ['under20', 20_000_000],
+    ['20to40', 40_000_000],
+    ['40to70', 70_000_000],
+    ['over70', null],
+    ['flexible', null],
+  ] as const)('maps budget "%s" to its conservative maximum ceiling', (budget, expected) => {
+    expect(toStudentProfile({ ...base, budget }).annualBudgetVnd).toBe(expected)
   })
 
   it('does not invent admission-method preferences', () => {
