@@ -1,4 +1,4 @@
-import type { AdmissionMethod, DataSource, DataStatus, University, UniversityProgram } from '../types'
+import type { AdmissionMethod, DataSource, DataStatus } from '../types'
 
 const admissionMethods: readonly AdmissionMethod[] = [
   'high_school_exam', 'academic_record', 'competency_assessment', 'direct_admission', 'other',
@@ -77,9 +77,10 @@ export function validateAdmissionsDataset(
       !isRecord(cutoffs) || !Array.isArray(cutoffs.records)) {
     return ['Dataset roots must be arrays for universities/programs and an object with records for cutoffs.']
   }
+  const cutoffYears: unknown[] = Array.isArray(cutoffs.years) ? cutoffs.years : []
   if (!isNonEmptyString(cutoffs.title) || !isIsoDate(cutoffs.checkedAt) ||
       !isNonEmptyString(cutoffs.scoringPolicy) || !Array.isArray(cutoffs.years) ||
-      !cutoffs.years.every(isYear)) {
+      !cutoffYears.every(isYear)) {
     errors.push('historicalCutoffs metadata is invalid.')
   }
 
@@ -158,7 +159,7 @@ export function validateAdmissionsDataset(
       errors.push(`Cutoff ${item.id} universityId does not match its program.`)
     }
     if (item.scoreScale !== null && item.scoreScale <= 0) errors.push(`Cutoff ${item.id} has invalid scoreScale.`)
-    if (!cutoffs.years.includes(item.year)) errors.push(`Cutoff ${item.id} year is missing from dataset years.`)
+    if (!cutoffYears.includes(item.year)) errors.push(`Cutoff ${item.id} year is missing from dataset years.`)
     if (item.cutoffScore !== null && item.cutoffScore < 0) errors.push(`Cutoff ${item.id} has negative cutoffScore.`)
     if (item.cutoffScore !== null && item.scoreScale !== null && item.cutoffScore > item.scoreScale) {
       errors.push(`Cutoff ${item.id} exceeds its scoreScale.`)
