@@ -123,3 +123,53 @@ test('UI technology profile maps to canonical IT and engineering program groups'
     ['information_technology', 'engineering'].includes(program.majorGroup),
   ))
 })
+
+test('scale mismatch is surfaced without direct score comparison; null tuition remains unknown', async () => {
+  const source = {
+    title: 'Structural test source',
+    url: 'https://example.edu.vn/admissions',
+    applicableYear: 2026,
+    checkedAt: '2026-10-25',
+    status: 'verified',
+  }
+  const testUniversity = {
+    id: 'test-university',
+    name: 'Structural test university',
+    shortName: 'Test U',
+    province: 'Da Nang',
+    region: 'central',
+    website: 'https://example.edu.vn',
+    sources: [source],
+    status: 'verified',
+  }
+  const testProgram = {
+    id: 'test-program',
+    universityId: testUniversity.id,
+    name: 'Structural test program',
+    majorGroup: 'technology',
+    tuitionMinVndPerYear: null,
+    tuitionMaxVndPerYear: null,
+    tuitionYear: null,
+    admissionMethods: [],
+    historicalCutoff: 24,
+    cutoffYear: 2025,
+    cutoffScale: 100,
+    sources: [source],
+    status: 'verified',
+  }
+  const testService = createIntegratedRecommendationService({
+    getUniversities: () => [testUniversity],
+    getPrograms: () => [testProgram],
+  })
+  const response = await testService.recommend({
+    profile: {
+      ...profile,
+      interests: ['technology'],
+      preferredRegions: ['nationwide'],
+      annualBudgetVnd: 20_000_000,
+    },
+  })
+  assert.equal(response.results.length, 1)
+  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Không so sánh điểm trực tiếp')))
+  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu học phí')))
+})
