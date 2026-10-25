@@ -64,7 +64,9 @@ try {
     assert.ok(await page.getByText(/conditions.minimumScore/).count() > 0, 'Rule comparison should render changed fields')
     assert.equal(await page.getByRole('region', { name: 'Tác động học phí' }).count(), 1)
     assert.equal(await page.getByRole('region', { name: 'Việc học sinh nên làm tiếp theo' }).count(), 1)
-    assert.ok(await page.getByText(/chưa có snapshot học phí/i).count() > 0, 'Unverified null tuition must be disclosed as unknown')
+    const tuitionDisclosure = await page.getByRole('region', { name: 'Tác động học phí' }).innerText()
+    assert.match(tuitionDisclosure, /chưa có dữ liệu|needs_review|cần được rà soát/i, 'Null tuition amounts must remain visibly unknown')
+    assert.doesNotMatch(tuitionDisclosure, /0 đồng\/năm/, 'Null tuition must never be rendered as zero')
   }
 
   process.stdout.write('Frontend E2E profiles completed: 20/20\n')
