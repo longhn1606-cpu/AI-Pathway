@@ -71,3 +71,96 @@
   .section-intro h2,.how-heading h2 { font-size: 30px; }
   .form-card-heading h3 { font-size: 17px; }
 }
+
+
+/* Demo acceptance pass: prevent layout clipping and establish readable type hierarchy. */
+html, body, #root { width: 100%; max-width: 100%; }
+html { overflow-x: clip; }
+.app-shell { overflow-x: clip; overflow-y: visible; }
+main, section, article, header, footer, nav, form, fieldset, label,
+.data-note > div, .data-note section, .program-card, .program-content,
+.results-empty, .empty-copy, .hero-copy, .section-intro > *,
+.form-layout > *, .step-card > * {
+  min-width: 0;
+}
+p, li, small, strong, h1, h2, h3, h4, label, a, button, span {
+  overflow-wrap: anywhere;
+}
+button, input, select, textarea { max-width: 100%; }
+.field input, .field select { min-height: 44px; }
+.field-hint { color: #596b80; font-size: 12px; line-height: 1.65; }
+.program-card h3 { font-size: clamp(17px, 1.35vw, 20px); line-height: 1.35; }
+.program-school { color: #42566d; font-size: 13px; line-height: 1.55; }
+.program-description { color: #526276; font-size: 13px; line-height: 1.7; }
+.program-meta, .program-tags span, .demo-tag { font-size: 11px; line-height: 1.5; }
+.data-note { align-items: flex-start; }
+.data-note h3 { font-size: 17px; line-height: 1.4; overflow-wrap: anywhere; }
+.data-note h4 { font-size: 14px; line-height: 1.45; }
+.data-note p, .data-note li { color: #526276; font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; }
+.data-note ul { padding-left: 20px; margin: 8px 0 16px; }
+.no-results h3 { line-height: 1.4; }
+.no-results p, .no-results li { color: #526276; font-size: 13px; line-height: 1.7; }
+.demo-warning p { color: #624a20; font-size: 12px; line-height: 1.7; }
+.profile-summary .summary-chip { font-size: 12px; line-height: 1.45; }
+.results-toolbar .result-count { line-height: 1.35; }
+.results-toolbar p { color: #526276; }
+.form-card-heading h3 { line-height: 1.4; }
+.form-actions > p { color: #596b80; font-size: 12px; line-height: 1.65; }
+.topbar, .hero, .section-wrap, .closing-cta, .footer { min-width: 0; }
+
+@media (max-width: 760px) {
+  .topbar { padding-left: max(14px, 4vw); padding-right: max(14px, 4vw); gap: 8px; }
+  .brand { flex: 0 1 auto; min-width: 0; font-size: 15px; letter-spacing: -.35px; }
+  .menu-toggle, .topbar-cta { flex: 0 0 auto; white-space: nowrap; }
+  .nav-links { min-width: 0; }
+  .hero { padding-top: 44px; padding-bottom: 62px; }
+  .hero h1 { font-size: clamp(36px, 9.4vw, 54px); line-height: 1.12; letter-spacing: -1.8px; }
+  .hero-description { font-size: 14px; line-height: 1.75; }
+  .hero-art { width: 100%; min-width: 0; overflow: clip; }
+  .hero-bottom-note { max-width: calc(100% - 32px); font-size: 9px; letter-spacing: .8px; }
+  .section-intro h2, .how-heading h2 { font-size: clamp(29px, 7.8vw, 36px); line-height: 1.2; }
+  .section-intro > p, .how-heading > p { font-size: 14px; line-height: 1.7; }
+  .form-side-note > p { font-size: 13px; line-height: 1.7; }
+  .form-card { padding: 20px 16px; }
+  .form-card-heading { gap: 8px; }
+  .form-card-heading h3 { font-size: 18px; }
+  .field-label { font-size: 14px; }
+  .field input, .field select { font-size: 16px; }
+  .method-option { font-size: 13px; line-height: 1.55; }
+  .program-grid { grid-template-columns: minmax(0, 1fr); }
+  .program-content { padding: 18px; }
+  .program-card h3 { font-size: 19px; }
+  .program-school, .program-description { font-size: 14px; }
+  .program-description { line-height: 1.65; }
+  .program-meta { font-size: 12px; }
+  .data-note { gap: 9px; padding: 15px 13px; }
+  .data-note > div { flex: 1 1 0; }
+  .data-note h3 { font-size: 16px; }
+  .data-note p, .data-note li { font-size: 13px; }
+  .data-note .form-grid { grid-template-columns: minmax(0, 1fr); }
+  .results-empty { padding: 24px 16px; }
+  .empty-copy h3 { font-size: 21px; }
+  .empty-copy p { font-size: 14px; line-height: 1.7; }
+  .step-card h3 { font-size: 18px; }
+  .step-card > p { font-size: 13px; }
+  .closing-cta h2 { font-size: 21px; }
+  .footer p { font-size: 12px; line-height: 1.6; }
+}
+@media (max-width: 380px) {
+  .topbar { gap: 6px; }
+  .brand { gap: 6px; font-size: 13px; }
+  .brand-mark { width: 27px; height: 27px; }
+  .menu-toggle { gap: 5px; padding: 7px; font-size: 10px; }
+  .topbar-cta { gap: 4px; padding: 7px; font-size: 9px; }
+  .hero h1 { font-size: 36px; letter-spacing: -1.5px; }
+  .hero-art { min-height: 245px; }
+  .float-top { right: 0; }
+  .float-bottom { left: 0; }
+  .floating-card { max-width: 48%; padding: 8px; }
+  .floating-card small { overflow-wrap: anywhere; }
+  .form-card { padding: 17px 12px; }
+  .data-note { padding: 13px 10px; }
+}
+@media (min-width: 761px) {
+  .data-note p, .data-note li, .program-description { font-size: 13px; }
+}
