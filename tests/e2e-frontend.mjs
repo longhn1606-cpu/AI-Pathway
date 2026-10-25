@@ -26,6 +26,7 @@ try {
 
     await page.waitForFunction(
       () => document.querySelector('.program-card') || document.querySelector('.no-results'),
+      undefined,
       { timeout: 10000 },
     )
 
