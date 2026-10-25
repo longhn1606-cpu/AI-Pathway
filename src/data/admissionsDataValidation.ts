@@ -114,11 +114,19 @@ export function validateAdmissionsDataset(
     programIds.add(item.id)
     programUniversityIds.set(item.id, item.universityId)
     if (!universityIds.has(item.universityId)) errors.push(`Program ${item.id} references unknown universityId ${item.universityId}`)
+    if ((item.tuitionMinVndPerYear !== null && item.tuitionMinVndPerYear < 0) ||
+        (item.tuitionMaxVndPerYear !== null && item.tuitionMaxVndPerYear < 0)) {
+      errors.push(`Program ${item.id} has negative tuition.`)
+    }
     if (item.tuitionMinVndPerYear !== null && item.tuitionMaxVndPerYear !== null &&
         item.tuitionMinVndPerYear > item.tuitionMaxVndPerYear) {
       errors.push(`Program ${item.id} has tuition minimum greater than maximum.`)
     }
     if (item.cutoffScale !== null && item.cutoffScale <= 0) errors.push(`Program ${item.id} has invalid cutoffScale.`)
+    if (item.historicalCutoff !== null && item.historicalCutoff < 0) errors.push(`Program ${item.id} has negative historicalCutoff.`)
+    if (item.historicalCutoff !== null && item.cutoffScale !== null && item.historicalCutoff > item.cutoffScale) {
+      errors.push(`Program ${item.id} historicalCutoff exceeds cutoffScale.`)
+    }
     validateSources(item.sources, `programs[${index}].sources`, errors)
     for (const [methodIndex, method] of item.admissionMethods.entries()) {
       if (!isRecord(method) || !admissionMethods.includes(method.method as AdmissionMethod) ||
