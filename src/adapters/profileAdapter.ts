@@ -66,9 +66,12 @@ export function validateUiProfile(profile: UiStudentProfile): string[] {
   const errors: string[] = []
   if (!profile.score.trim()) errors.push('Vui lòng nhập điểm dự kiến.')
   else {
-    const score = Number(profile.score)
+    const scoreText = profile.score.trim()
+    const score = Number(scoreText)
     if (!Number.isFinite(score) || score < 0 || score > 30) {
       errors.push('Điểm dự kiến phải nằm trong khoảng 0–30.')
+    } else if (!/^\\d+(?:\\.\\d)?$/.test(scoreText)) {
+      errors.push('Điểm dự kiến chỉ được có tối đa một chữ số thập phân (ví dụ: 24.5).')
     }
   }
   if (!profile.interest) errors.push('Vui lòng chọn nhóm ngành quan tâm.')
