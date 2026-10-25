@@ -1,0 +1,24 @@
+name: Frontend profile integration checks
+
+on:
+  pull_request:
+    branches:
+      - feat/frontend-integration
+  push:
+    branches:
+      - feat/frontend-profile-integration
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: TypeScript and production build
+        run: npm run build
