@@ -88,10 +88,17 @@ test('tuition change with simulated evidence always requires review', () => {
     dataStatus: 'verified',
   }
   const newSource = { ...oldSource, appliedYear: 2027, version: 'v2' }
-  const result = service.compare(
-    snapshot('v1', 'v1', 20, oldTuition),
-    snapshot('v2', 'v2', 20, newTuition),
-  )
+  const oldRule = {
+    ...snapshot('v1', 'v1', 20),
+    source: { name: 'Verified rule source', url: 'https://example.edu/rules', appliedYear: 2026, version: 'v1', checkedAt: '2026-10-25', dataStatus: 'verified' },
+    tuition: oldTuition,
+  }
+  const newRule = {
+    ...snapshot('v2', 'v2', 20),
+    source: { name: 'Verified rule source', url: 'https://example.edu/rules', appliedYear: 2027, version: 'v2', checkedAt: '2026-10-25', dataStatus: 'verified' },
+    tuition: newTuition,
+  }
+  const result = service.compare(oldRule, newRule)
   assert.equal(result.explanation.impactLevel, 'requires_review')
 })
 
