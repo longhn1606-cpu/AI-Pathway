@@ -39,7 +39,8 @@ try {
     await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
 
     await page.waitForFunction(
-      () => document.querySelector('.program-card') || document.querySelector('.no-results'),
+      () => !document.querySelector('.no-results[role="status"]')
+        && (document.querySelector('.program-card') || document.querySelector('.no-results')),
       undefined,
       { timeout: 10000 },
     )
