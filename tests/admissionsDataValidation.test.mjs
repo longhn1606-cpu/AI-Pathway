@@ -94,3 +94,14 @@ test('resolves source title only when the exact match is unique', () => {
   assert.equal(resolveUniqueSourceByTitle([first], 'missing'), undefined)
   assert.equal(resolveUniqueSourceByTitle([first, { ...first }], first.title), undefined)
 })
+
+test('rejects negative tuition and inverted tuition ranges', () => {
+  const errors = validate([university], [{
+    ...program, tuitionMinVndPerYear: 30, tuitionMaxVndPerYear: 20,
+  }])
+  assert.ok(errors.some((error) => error.includes('minimum greater than maximum')))
+  const negative = validate([university], [{
+    ...program, tuitionMinVndPerYear: -1,
+  }])
+  assert.ok(negative.some((error) => error.includes('negative tuition')))
+})
