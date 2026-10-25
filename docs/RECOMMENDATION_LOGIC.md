@@ -1,27 +1,41 @@
-# Recommendation logic (demo)
+# Recommendation and simulation logic (demo)
 
-## Public contract
+## Public contracts
 
-The implementation imports the canonical domain types from `src/types/index.ts` and exports these functions from `src/logic/recommendation.ts`:
+Canonical domain types are imported from `src/types/index.ts`; the shared schema is not modified.
 
 - `recommendPrograms(input: RecommendationInput): RecommendationResponse`
 - `compareRecommendations(before, after): RecommendationComparison`
+- `simulateScenario(baseline, changes): SimulationResult`
 
-`RecommendationInput` contains `profile: StudentProfile`, `universities: University[]`, and `programs: UniversityProgram[]`. The response contains recommended `RecommendationResult[]`, excluded program IDs with reasons, and deduplicated global warnings. No shared schema fields were added.
+`RecommendationInput` contains a `StudentProfile`, `University[]`, and `UniversityProgram[]`. The recommendation response contains ordered results, excluded program IDs with reasons, and deduplicated warnings.
 
-## Rules
+`simulateScenario` accepts only profile-field overrides. It returns an independent `scenarioProfile`, the baseline and scenario recommendation responses, and added/removed/retained comparison groups. It does not write to the baseline profile or dataset. The source arrays are passed as read-only inputs to deterministic logic.
 
-- `preferredRegions: []` means no region restriction. If `nationwide` appears anywhere in the list, all three university regions are allowed.
-- `interests` are matched through a small explicit alias dictionary (for example `technology`, `CNTT`, `công nghệ và kỹ thuật`). Unknown labels are not fuzzy-matched; they do not silently match arbitrary majors.
-- A known budget excludes a program only when its known minimum annual tuition exceeds the budget. If the minimum is affordable but the maximum exceeds it, the program is retained with a cost-risk warning.
-- Missing tuition, score, scale, cutoff, or cutoff year is unknown—not zero. Different score scales are never compared directly.
-- Historical cutoffs only add contextual explanation; they never exclude a program or promise admission.
-- Preferred admission methods rank programs when a recorded method matches. Missing method data or no match produces a warning, not an assumed rejection.
-- A missing university link excludes the affected program with an explicit data-integrity reason. Duplicate IDs are skipped with a warning.
-- `simulated` and `needs_review` records receive visible warnings. A result's `dataStatus` is the most cautious of the linked university, program, source and admission-method statuses.
-- Results sort by explainable criterion points, then stable `programId` order. Points are internal only and are not presented as a probability or admission score.
+## Recommendation rules
 
-## Test and build
+- `preferredRegions: []` means no region restriction. `nationwide` permits all regions.
+- Major groups use an explicit alias dictionary; unknown labels are not fuzzy-matched.
+- A known budget excludes a program only when known minimum annual tuition exceeds the budget. If the maximum exceeds budget while the minimum does not, the program is retained with a cost-risk warning.
+- Missing tuition, score, scale, cutoff, or cutoff year is unknown—not zero.
+- Scores are compared only when the student's score scale exactly matches the historical cutoff scale. No conversion is inferred between THPT, academic-record, competency-assessment, or other admission methods.
+- Historical cutoffs are contextual only. They neither guarantee admission nor independently exclude a program.
+- Preferred admission methods contribute ranking points only when a recorded method matches; missing or unmatched methods produce warnings.
+- Missing university references exclude the affected program. Duplicate IDs are skipped with warnings.
+- `simulated` and `needs_review` records remain visibly flagged. Source URL syntax checks do not prove that a URL is official or factually correct.
+- Results are ranked by transparent internal criterion points, then stable `programId` order. The points are not a probability, chance, or admission score.
+
+## Simulation workflow
+
+1. Keep the original `StudentProfile` unchanged.
+2. Call `simulateScenario(input, profileChanges)`.
+3. Read `before` and `after` for full result details.
+4. Read `comparison.added`, `removed`, and `retained` to explain membership changes.
+5. Inspect result reasons and warnings to explain score, budget, major, region, or method effects.
+
+A scenario can produce unchanged recommendations. That is a valid result and must not be represented as a bug or forced difference.
+
+## Validation
 
 Run:
 
@@ -30,11 +44,11 @@ npm run test:recommendation
 npm run build
 ```
 
-The recommendation test runner uses the repository's existing TypeScript dependency and Node.js. The build command is the existing `tsc -b && vite build`. Run both locally before merging; this GitHub file-edit workflow does not execute repository commands, so no pass result should be inferred until the commands actually finish successfully.
+The recommendation command runs both the existing recommendation regression suite and the independent simulation suite. GitHub Actions is configured to run this command and the production build on pushes to `feat/recommendation-logic`.
 
 ## Limitations
 
-- The demo fixtures under `src/data/` use explicitly simulated values and `example.invalid` source placeholders. They must not be represented as official university, tuition, admission-method, or cutoff data.
-- Major-group matching is intentionally conservative and uses an explicit alias map. The team should agree a canonical major-group vocabulary before expanding aliases.
-- The current shared `RecommendationResult` has no numeric score or match-level field. Ranking is therefore expressed only through array order and reasons/warnings.
-- This is deterministic filtering/ranking, not an admissions prediction model.
+- Demo fixtures under `src/data/` are simulated, with `example.invalid` placeholder URLs. They are not official university, tuition, admission-method, or cutoff data.
+- The shared `RecommendationResult` has no numeric score field. Ranking is expressed by array order and reasons/warnings.
+- This is deterministic filtering and ranking, not an admissions prediction model.
+- This module does not perform legal verification of admissions rules or verify source ownership.
