@@ -24,7 +24,7 @@ export function ruleSourceToDataSource(source: RuleSourceInput): DataSource | nu
   if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') return null
 
   const checkedDate = new Date(source.checkedAt)
-  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(source.checkedAt) ||
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(source.checkedAt) ||
       !Number.isFinite(checkedDate.getTime()) ||
       checkedDate.toISOString().slice(0, 10) !== source.checkedAt) return null
 
