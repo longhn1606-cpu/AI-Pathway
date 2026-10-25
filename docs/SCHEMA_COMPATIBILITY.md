@@ -19,11 +19,24 @@ The existing `AdmissionMethodInfo.sourceIds` values are strings, while
 these arrays empty. For backward compatibility, the adapter resolves a legacy
 source reference by exact `DataSource.title` match.
 
+Resolution is scoped strictly to `program.sources` for the program being
+resolved. Do not fall back to `university.sources`: university-level sources
+may describe general information and are not automatically evidence for a
+specific program or admission method.
+
 Do not populate empty `sourceIds` merely because a source exists on the
 program: that would assert evidence coverage that has not been established.
 If no exact match exists, or more than one match exists, keep the reference
-unresolved and expose `needs_review`/a warning. The resolver is covered for
-unique, missing and ambiguous matches. Do not add a synthetic source ID.
+unresolved; do not select the first match, add a synthetic ID, or treat it as
+verified. The consuming module should surface a lightweight `needs_review`
+warning with the `programId`, method index/identifier and unresolved source
+title so the record can be checked. The adapter itself remains side-effect
+free and does not log or invent UI behavior.
+
+Multiple admission methods may reference the same source. This is allowed
+when the source genuinely applies to each method; title uniqueness is checked
+within one program's source list for each lookup, not across all methods.
+The resolver is covered for unique, missing and ambiguous matches.
 
 ## Member 4 rule-comparison boundary (PR #3)
 
