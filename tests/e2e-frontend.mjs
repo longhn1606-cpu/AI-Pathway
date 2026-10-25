@@ -31,30 +31,100 @@ try {
   await page.goto('http://127.0.0.1:5173', { waitUntil: 'domcontentloaded' })
   assert.match(await page.title(), /AI Pathway/i)
 
+  // Render a real recommendation result before taking responsive screenshots.
+  const scoreInput = page.locator('input[type="number"]')
+  const profileSelects = page.locator('form select')
+  await scoreInput.fill('30')
+  await profileSelects.nth(0).selectOption('undecided')
+  await profileSelects.nth(1).selectOption('anywhere')
+  await profileSelects.nth(2).selectOption('flexible')
+  await page.locator('.method-option').filter({ hasText: 'Thi tốt nghiệp THPT' }).locator('input').check()
+  await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
+  await page.waitForFunction(
+    () => {
+      const heading = document.querySelector('.no-results[role="status"] h3')?.textContent ?? ''
+      return !heading.includes('Đang phân tích hồ sơ')
+        && (document.querySelectorAll('.program-card').length > 0
+          || document.querySelector('.no-results[role="status"]'))
+    },
+    undefined,
+    { timeout: 15000 },
+  )
+  assert.ok(await page.locator('.program-card').count() > 0, 'Responsive screenshots require a populated recommendation result, not an empty state')
+  await page.locator('.program-card').first().waitFor({ state: 'visible' })
+  await page.locator('.profile-summary').waitFor({ state: 'visible' })
+
   for (const width of [320, 360, 390, 430]) {
     await page.setViewportSize({ width, height: 844 })
-    await page.screenshot({ path: `artifacts/responsive/mobile-${width}.png`, fullPage: true })
-    const layout = await page.evaluate(() => {
-      const selectors = ['.topbar .brand', '.menu-toggle', '.topbar-cta', '.hero-copy', '.form-card', '.results-empty', '.data-note', '.footer']
+    await page.waitForTimeout(150)
+    const resultLayout = await page.evaluate(() => {
+      const selectors = [
+        '.topbar .brand', '.menu-toggle', '.topbar-cta', '.hero-copy',
+        '.form-card', '.profile-summary', '.results-toolbar', '.program-grid',
+        '.program-card', '.data-note', '#recommendations section[aria-labelledby="rule-comparison-title"]',
+        '.footer',
+      ]
+      const visible = (element) => {
+        const style = getComputedStyle(element)
+        const rect = element.getBoundingClientRect()
+        return style.display !== 'none' && style.visibility !== 'hidden'
+          && Number(style.opacity) !== 0 && rect.width > 0 && rect.height > 0
+      }
       const boxes = selectors.flatMap((selector) => [...document.querySelectorAll(selector)]
-        .filter((element) => getComputedStyle(element).display !== 'none')
+        .filter(visible)
         .map((element) => {
           const rect = element.getBoundingClientRect()
-          return { selector, left: rect.left, right: rect.right, width: rect.width }
+          return {
+            selector,
+            left: rect.left,
+            right: rect.right,
+            width: rect.width,
+            scrollWidth: element.scrollWidth,
+            clientWidth: element.clientWidth,
+          }
         }))
+      const overflowingDescendants = [...document.querySelectorAll('body *')]
+        .filter(visible)
+        .flatMap((element) => {
+          const rect = element.getBoundingClientRect()
+          const style = getComputedStyle(element)
+          const hasInternalOverflow = element.scrollWidth > element.clientWidth + 1
+            && !['auto', 'scroll'].includes(style.overflowX)
+          const outsideViewport = rect.left < -1 || rect.right > document.documentElement.clientWidth + 1
+          return (hasInternalOverflow || outsideViewport) ? [{
+            tag: element.tagName,
+            className: typeof element.className === 'string' ? element.className : '',
+            text: (element.innerText || element.textContent || '').trim().slice(0, 100),
+            left: Math.round(rect.left * 10) / 10,
+            right: Math.round(rect.right * 10) / 10,
+            scrollWidth: element.scrollWidth,
+            clientWidth: element.clientWidth,
+            overflowX: style.overflowX,
+          }] : []
+        })
       return {
         viewportWidth: document.documentElement.clientWidth,
         documentWidth: document.documentElement.scrollWidth,
         boxes,
-        cardTitleFontSize: getComputedStyle(document.querySelector('.program-card h3') ?? document.querySelector('h1')).fontSize,
+        overflowingDescendants,
+        programCardCount: document.querySelectorAll('.program-card').length,
+        resultHeadingFontSize: getComputedStyle(document.querySelector('.program-card h3')).fontSize,
       }
     })
-    assert.equal(layout.documentWidth, layout.viewportWidth, `Mobile viewport ${width}px must not overflow horizontally`)
-    for (const box of layout.boxes) {
-      assert.ok(box.left >= -1 && box.right <= width + 1, `${box.selector} must fit within ${width}px viewport: ${JSON.stringify(box)}`)
+    assert.ok(resultLayout.programCardCount > 0, `Viewport ${width}px must show populated program cards`)
+    assert.equal(resultLayout.documentWidth, resultLayout.viewportWidth, `Mobile viewport ${width}px must not horizontally scroll`)
+    for (const box of resultLayout.boxes) {
+      assert.ok(box.left >= -1 && box.right <= width + 1,
+        `${box.selector} must fit within ${width}px viewport: ${JSON.stringify(box)}`)
+      assert.ok(box.scrollWidth <= box.clientWidth + 1,
+        `${box.selector} must not clip its own content at ${width}px: ${JSON.stringify(box)}`)
     }
-    assert.ok(Number.parseFloat(layout.cardTitleFontSize) >= 30, 'Hero heading must remain comfortably readable before results load')
+    assert.ok(Number.parseFloat(resultLayout.resultHeadingFontSize) >= 16,
+      `Program-card headings must remain readable at ${width}px`)
+    assert.deepEqual(resultLayout.overflowingDescendants, [],
+      `No visible element may overflow its container/viewport at ${width}px: ${JSON.stringify(resultLayout.overflowingDescendants)}`)
 
+    await page.screenshot({ path: `artifacts/responsive/results-${width}.png`, fullPage: true })
     await page.getByRole('button', { name: /Mở menu/ }).click()
     assert.equal(await page.getByRole('navigation', { name: 'Điều hướng chính' }).isVisible(), true, 'Mobile navigation must open')
     await page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Gợi ý' }).click()
