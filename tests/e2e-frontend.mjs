@@ -35,8 +35,17 @@ try {
   await profileValidationAlert.waitFor({ timeout: 5000 })
   assert.equal(await profileValidationAlert.locator('li').count(), 4, 'Empty profile must report all four required fields')
 
+  // Invalid numeric input is caught by the same runtime validator and must
+  // clear stale results rather than leaving the previous recommendation visible.
+  const scoreInput = page.locator('input[type="number"]')
+  await scoreInput.fill('31')
+  await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
+  await page.getByRole('alert').filter({ hasText: 'Điểm dự kiến phải nằm trong khoảng 0–30.' }).waitFor({ timeout: 5000 })
+  assert.equal(await page.locator('.program-card').count(), 0, 'Invalid submission must clear stale recommendation cards')
+
+  await page.getByLabel('Thi tốt nghiệp THPT').check()
+
   for (const [index, scenario] of scenarios.entries()) {
-    const scoreInput = page.locator('input[type="number"]')
     const selects = page.locator('form select')
 
     await scoreInput.fill(scenario.score)
@@ -57,6 +66,8 @@ try {
 
     const error = await page.locator('.no-results[role="alert"]').count()
     assert.equal(error, 0, `Scenario ${index + 1}: recommendation service returned an error`)
+
+    assert.equal(await page.locator('.profile-summary').filter({ hasText: 'Thi tốt nghiệp THPT' }).count(), 1, 'Selected admission method should remain visible in the submitted profile')
 
     const cardCount = await page.locator('.program-card').count()
     if (cardCount === 0) {
