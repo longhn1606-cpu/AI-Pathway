@@ -18,10 +18,11 @@ const [universities, programs, cutoffs] = await Promise.all([
   readFile(path.join(root, 'data/admissions-seed-2026/programs.json'), 'utf8').then(JSON.parse),
   readFile(path.join(root, 'data/admissions-seed-2026/historical_cutoffs.json'), 'utf8').then(JSON.parse),
 ])
-const [{ validateAdmissionsDataset }, { toRecommendationDataset }, { recommendPrograms }] = await Promise.all([
+const [{ validateAdmissionsDataset }, { toRecommendationDataset }, { recommendPrograms }, { simulateScenario }] = await Promise.all([
   importTypeScript('src/data/admissionsDataValidation.ts'),
   importTypeScript('src/adapters/recommendationDatasetAdapter.ts'),
   importTypeScript('src/logic/recommendation.ts'),
+  importTypeScript('src/logic/simulation.ts'),
 ])
 
 let passed = 0
@@ -89,6 +90,27 @@ test('latest canonical tuition values are used for budget filtering', () => {
   assert.ok(result.excluded.every((item) => item.reasons.some((reason) => reason.includes('vượt ngân sách'))))
 })
 
+test('simulation re-resolves cutoffs when the preferred admission method changes', () => {
+  const baselineProfile = {
+    expectedScore: 27, scoreScale: 30, interests: [], preferredRegions: [],
+    annualBudgetVnd: null, preferredMethods: ['high_school_exam'],
+  }
+  const baseline = toRecommendationDataset(baselineProfile, { universities, programs, historicalCutoffs: cutoffs })
+  const simulated = simulateScenario(
+    baseline,
+    { preferredMethods: ['academic_record'] },
+    (profile) => toRecommendationDataset(profile, { universities, programs, historicalCutoffs: cutoffs }),
+  )
+  const beforeDut = simulated.before.results.find((item) => item.programId === 'dut-cntt')
+  const afterDut = simulated.after.results.find((item) => item.programId === 'dut-cntt')
+  assert.ok(beforeDut)
+  assert.ok(afterDut)
+  assert.ok(!beforeDut.warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn lịch sử')))
+  assert.ok(afterDut.warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn lịch sử')))
+  assert.deepEqual(baselineProfile.preferredMethods, ['high_school_exam'])
+  assert.deepEqual(simulated.scenarioProfile.preferredMethods, ['academic_record'])
+})
+
 test('no preferred method means no cross-method cutoff inference', () => {
   const profile = {
     expectedScore: 27, scoreScale: 30, interests: [], preferredRegions: [],
@@ -102,4 +124,4 @@ test('no preferred method means no cross-method cutoff inference', () => {
   ))
 })
 
-process.stdout.write(`Canonical integration: ${passed}/6 tests passed.\\n`)
+process.stdout.write(`Canonical integration: ${passed}/7 tests passed.\\n`)
