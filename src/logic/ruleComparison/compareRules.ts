@@ -32,23 +32,22 @@ function valuesEqual(
 ): boolean {
   if (left === right) return true
   if (left === undefined || right === undefined) return false
-
   if (Array.isArray(left) && Array.isArray(right)) {
     if (unorderedArrayPaths.has(path)) {
-      return left.length === right.length
-        && [...left].map(stableValue).sort().every((value, index) => value === [...right].map(stableValue).sort()[index])
+      const leftValues = left.map(stableValue).sort()
+      const rightValues = right.map(stableValue).sort()
+      return leftValues.length === rightValues.length
+        && leftValues.every((value, index) => value === rightValues[index])
     }
     return left.length === right.length
       && left.every((value, index) => valuesEqual(value, right[index], `${path}[${index}]`, unorderedArrayPaths))
   }
-
   if (isPlainObject(left) && isPlainObject(right)) {
     const keys = new Set([...Object.keys(left), ...Object.keys(right)])
     return [...keys].every((key) =>
       valuesEqual(left[key], right[key], path ? `${path}.${key}` : key, unorderedArrayPaths),
     )
   }
-
   return left === right
 }
 
@@ -60,7 +59,6 @@ function collectConditionChanges(
   unorderedArrayPaths: Set<string>,
 ): void {
   if (valuesEqual(oldValue, newValue, path, unorderedArrayPaths)) return
-
   if (oldValue === undefined) {
     changes.push({ field: path, changeType: 'added', oldValue, newValue })
     return
@@ -69,21 +67,13 @@ function collectConditionChanges(
     changes.push({ field: path, changeType: 'removed', oldValue, newValue })
     return
   }
-
   if (isPlainObject(oldValue) && isPlainObject(newValue)) {
     const keys = [...new Set([...Object.keys(oldValue), ...Object.keys(newValue)])].sort()
     for (const key of keys) {
-      collectConditionChanges(
-        oldValue[key],
-        newValue[key],
-        path ? `${path}.${key}` : key,
-        changes,
-        unorderedArrayPaths,
-      )
+      collectConditionChanges(oldValue[key], newValue[key], path ? `${path}.${key}` : key, changes, unorderedArrayPaths)
     }
     return
   }
-
   changes.push({ field: path, changeType: 'modified', oldValue, newValue })
 }
 
@@ -93,10 +83,18 @@ function effectiveStatus(statuses: DataStatus[]): DataStatus {
   return 'verified'
 }
 
-/**
- * Compares two rule snapshots without mutating either input.
- * Arrays are ordered by default; configure set-like paths as unordered.
- */
+function compareScalar(
+  changes: RuleChange[],
+  field: string,
+  oldValue: string | number | boolean | null | undefined,
+  newValue: string | number | boolean | null | undefined,
+): void {
+  if (oldValue === newValue) return
+  const changeType = oldValue === undefined ? 'added' : newValue === undefined ? 'removed' : 'modified'
+  changes.push({ field, changeType, oldValue, newValue })
+}
+
+/** Compare rule content, identity, source metadata and any explicitly supplied tuition snapshot. */
 export function compareRules(
   oldRule: AdmissionRuleVersion,
   newRule: AdmissionRuleVersion,
@@ -105,64 +103,51 @@ export function compareRules(
   const changes: RuleChange[] = []
   const unorderedArrayPaths = new Set(options.unorderedArrayPaths ?? [])
 
-  if (oldRule.institutionId !== newRule.institutionId) {
-    changes.push({
-      field: 'institutionId',
-      changeType: 'modified',
-      oldValue: oldRule.institutionId,
-      newValue: newRule.institutionId,
-    })
-  }
-  if (oldRule.programId !== newRule.programId) {
-    changes.push({
-      field: 'programId',
-      changeType: 'modified',
-      oldValue: oldRule.programId,
-      newValue: newRule.programId,
-    })
-  }
-  if (oldRule.admissionMethod !== newRule.admissionMethod) {
-    changes.push({
-      field: 'admissionMethod',
-      changeType: 'modified',
-      oldValue: oldRule.admissionMethod,
-      newValue: newRule.admissionMethod,
-    })
-  }
+  const scalarFields: Array<[string, string | number | boolean | null | undefined, string | number | boolean | null | undefined]> = [
+    ['institutionId', oldRule.institutionId, newRule.institutionId],
+    ['institutionName', oldRule.institutionName, newRule.institutionName],
+    ['programId', oldRule.programId, newRule.programId],
+    ['programName', oldRule.programName, newRule.programName],
+    ['admissionMethod', oldRule.admissionMethod, newRule.admissionMethod],
+    ['source.name', oldRule.source.name, newRule.source.name],
+    ['source.url', oldRule.source.url, newRule.source.url],
+    ['source.appliedYear', oldRule.source.appliedYear, newRule.source.appliedYear],
+    ['source.version', oldRule.source.version, newRule.source.version],
+    ['source.checkedAt', oldRule.source.checkedAt, newRule.source.checkedAt],
+    ['source.dataStatus', oldRule.source.dataStatus, newRule.source.dataStatus],
+  ]
+  for (const [field, oldValue, newValue] of scalarFields) compareScalar(changes, field, oldValue, newValue)
 
-  const conditionKeys = [...new Set([
-    ...Object.keys(oldRule.conditions),
-    ...Object.keys(newRule.conditions),
-  ])].sort()
-
+  const conditionKeys = [...new Set([...Object.keys(oldRule.conditions), ...Object.keys(newRule.conditions)])].sort()
   for (const key of conditionKeys) {
-    collectConditionChanges(
-      oldRule.conditions[key],
-      newRule.conditions[key],
-      `conditions.${key}`,
-      changes,
-      unorderedArrayPaths,
-    )
+    collectConditionChanges(oldRule.conditions[key], newRule.conditions[key], `conditions.${key}`, changes, unorderedArrayPaths)
+  }
+
+  const oldTuition = oldRule.tuition ?? null
+  const newTuition = newRule.tuition ?? null
+  const tuitionFields = ['minVndPerYear', 'maxVndPerYear', 'appliedYear', 'dataStatus', 'sourceUrl'] as const
+  if (oldTuition === null && newTuition !== null) {
+    changes.push({ field: 'tuition', changeType: 'added', oldValue: null, newValue: 'provided' })
+  } else if (oldTuition !== null && newTuition === null) {
+    changes.push({ field: 'tuition', changeType: 'removed', oldValue: 'provided', newValue: null })
+  } else if (oldTuition && newTuition) {
+    for (const field of tuitionFields) {
+      compareScalar(changes, `tuition.${field}`, oldTuition[field], newTuition[field])
+    }
   }
 
   const sameInstitution = oldRule.institutionId === newRule.institutionId
-  const sameProgram = oldRule.programId !== null
-    && oldRule.programId === newRule.programId
-  const affectedPrograms = sameInstitution && sameProgram
-    ? [newRule.programId as string]
-    : []
+  const sameProgram = oldRule.programId !== null && oldRule.programId === newRule.programId
+  const affectedPrograms = sameInstitution && sameProgram ? [newRule.programId as string] : []
 
-  const evidence: string[] = []
-  if (sameInstitution) {
-    evidence.push(`Hai phiên bản có cùng institutionId: ${oldRule.institutionId}.`)
-  } else {
-    evidence.push('institutionId giữa hai phiên bản khác nhau; không gán thay đổi cho cùng một trường.')
-  }
-  if (sameProgram) {
-    evidence.push(`Hai phiên bản có cùng programId: ${newRule.programId}.`)
-  } else {
-    evidence.push('Không có programId trùng khớp để xác nhận một chương trình cụ thể bị ảnh hưởng.')
-  }
+  const evidence: string[] = [
+    sameInstitution
+      ? `Hai phiên bản có cùng institutionId: ${oldRule.institutionId}.`
+      : 'institutionId giữa hai phiên bản khác nhau; không gán thay đổi cho cùng một trường.',
+    sameProgram
+      ? `Hai phiên bản có cùng programId: ${newRule.programId}.`
+      : 'Không có programId trùng khớp để xác nhận một chương trình cụ thể bị ảnh hưởng.',
+  ]
 
   const limitations: string[] = []
   if (oldRule.source.dataStatus !== 'verified' || newRule.source.dataStatus !== 'verified') {
@@ -171,14 +156,22 @@ export function compareRules(
   if (!oldRule.source.url || !newRule.source.url) {
     limitations.push('Thiếu URL nguồn ở ít nhất một phiên bản; cần bổ sung hoặc kiểm tra tài liệu gốc.')
   }
-  if (oldRule.institutionId !== newRule.institutionId) {
-    limitations.push('Hai phiên bản thuộc institutionId khác nhau; không thể diễn giải đây là thay đổi theo thời gian của cùng một trường.')
+  if (oldRule.source.appliedYear === null || newRule.source.appliedYear === null) {
+    limitations.push('Thiếu năm áp dụng ở ít nhất một phiên bản; không thể xác nhận phạm vi thời gian.')
   }
-  if (!sameProgram) {
-    limitations.push('Chưa đủ căn cứ định danh programId để kết luận chương trình cụ thể chịu tác động.')
-  }
-  if (changes.length === 0) {
-    limitations.push('Không phát hiện khác biệt trong các trường được module so sánh; điều này không chứng minh toàn bộ văn bản quy định giống nhau.')
+  if (!sameInstitution) limitations.push('Hai phiên bản thuộc institutionId khác nhau; không thể diễn giải đây là thay đổi theo thời gian của cùng một trường.')
+  if (!sameProgram) limitations.push('Chưa đủ căn cứ định danh programId để kết luận chương trình cụ thể chịu tác động.')
+  if (changes.length === 0) limitations.push('Không phát hiện khác biệt trong các trường được module so sánh; điều này không chứng minh toàn bộ văn bản quy định giống nhau.')
+
+  const tuitionStatuses = [oldTuition?.dataStatus, newTuition?.dataStatus].filter((status): status is DataStatus => status !== undefined)
+  const tuitionStatus = tuitionStatuses.length ? effectiveStatus(tuitionStatuses) : null
+  if (!oldTuition || !newTuition) {
+    limitations.push('Thiếu snapshot học phí ở ít nhất một phiên bản; không thể kết luận học phí không thay đổi.')
+  } else if (
+    oldTuition.minVndPerYear === null || oldTuition.maxVndPerYear === null
+    || newTuition.minVndPerYear === null || newTuition.maxVndPerYear === null
+  ) {
+    limitations.push('Học phí có trường chưa có dữ liệu; không ước tính hoặc tự điền giá trị còn thiếu.')
   }
 
   return {
@@ -190,5 +183,6 @@ export function compareRules(
     limitations,
     sources: [oldRule.source, newRule.source],
     dataStatus: effectiveStatus([oldRule.source.dataStatus, newRule.source.dataStatus]),
+    tuitionStatus,
   }
 }
