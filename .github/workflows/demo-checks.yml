@@ -22,6 +22,12 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Build React app and type-check TypeScript
         run: npm run build
+      - name: Run Member 4 rule comparison regression suite (20 repeated runs)
+        run: |
+          for run in $(seq 1 20); do
+            echo "Rule comparison regression run $run/20"
+            npm run test:rule-comparison
+          done
       - name: Smoke-test production preview
         run: |
           npm run preview -- --host 127.0.0.1 > /tmp/ai-pathway-preview.log 2>&1 &

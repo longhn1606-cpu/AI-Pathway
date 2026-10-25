@@ -1,14 +1,7 @@
 import type { AdmissionMethod, DataStatus } from '../../types'
 
 export type RuleChangeType = 'added' | 'removed' | 'modified'
-
-export type RuleValue =
-  | string
-  | number
-  | boolean
-  | null
-  | RuleValue[]
-  | { [key: string]: RuleValue }
+export type RuleValue = string | number | boolean | null | RuleValue[] | { [key: string]: RuleValue }
 
 export interface RuleSource {
   name: string
@@ -19,7 +12,6 @@ export interface RuleSource {
   dataStatus: DataStatus
 }
 
-/** Optional snapshot: unknown tuition must remain null, never be inferred. */
 export interface TuitionSnapshot {
   minVndPerYear: number | null
   maxVndPerYear: number | null
@@ -40,6 +32,11 @@ export interface AdmissionRuleVersion {
   tuition?: TuitionSnapshot | null
 }
 
+export interface RuleComparisonInput {
+  before: AdmissionRuleVersion
+  after: AdmissionRuleVersion
+}
+
 export interface RuleChange {
   field: string
   changeType: RuleChangeType
@@ -47,10 +44,17 @@ export interface RuleChange {
   newValue: RuleValue | undefined
 }
 
+export type ChangedField = RuleChange
+
 export interface RuleComparison {
   oldVersionId: string
   newVersionId: string
   changes: RuleChange[]
+  /** True only when both snapshots refer to the same institution and program scope. */
+  comparableScope: boolean
+  affectedUniversities: string[]
+  affectedMajors: string[]
+  /** Backward-compatible alias for affectedMajors. */
   affectedPrograms: string[]
   evidence: string[]
   limitations: string[]
@@ -61,7 +65,6 @@ export interface RuleComparison {
 }
 
 export type ExplanationMode = 'template'
-
 export type RuleImpactLevel = 'high' | 'medium' | 'low' | 'requires_review'
 
 export interface RuleExplanation {
