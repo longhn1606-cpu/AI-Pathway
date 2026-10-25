@@ -156,6 +156,11 @@ try {
   const desktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
   assert.equal(desktopOverflow, false, 'Desktop viewport must not overflow horizontally')
 
+  // Reset the completed responsive scenario before asserting empty-profile validation.
+  // Otherwise the valid profile used to generate screenshots would still be populated.
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await scoreInput.waitFor({ state: 'visible' })
+
   // The UI owns required-field validation; an empty submit must report all
   // missing fields together and must not be mistaken for a service error.
   await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
