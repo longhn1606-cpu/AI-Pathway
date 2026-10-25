@@ -33,7 +33,10 @@ export function toRecommendationDataset(
       record.programId === program.id &&
       record.method === scoreMethod &&
       record.cutoffScore !== null &&
-      record.scoreScale === 30,
+      record.scoreScale === 30 &&
+      record.status === 'verified' &&
+      typeof record.sourceUrl === 'string' &&
+      /^https?:\\/\\//i.test(record.sourceUrl),
     )
     if (matches.length === 0) return program
 
