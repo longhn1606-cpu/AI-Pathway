@@ -144,7 +144,6 @@ try {
 
   // Invalid numeric input is caught by the same runtime validator and must
   // clear stale results rather than leaving the previous recommendation visible.
-  const scoreInput = page.locator('input[type="number"]')
   await scoreInput.fill('31')
   await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
   await page.getByRole('alert').filter({ hasText: 'Điểm dự kiến phải nằm trong khoảng 0–30.' }).waitFor({ timeout: 5000 })
