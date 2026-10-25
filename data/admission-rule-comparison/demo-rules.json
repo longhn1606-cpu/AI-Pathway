@@ -1,0 +1,47 @@
+{
+  "notice": "TOÀN BỘ HAI BẢN GHI DƯỚI ĐÂY LÀ KỊCH BẢN MÔ PHỎNG NỘI BỘ. Không phải quy định tuyển sinh chính thức. Không có URL nguồn chính thức.",
+  "versions": [
+    {
+      "id": "demo-dut-cntt-rule-a",
+      "institutionId": "dut",
+      "institutionName": "Trường Đại học Bách khoa – Đại học Đà Nẵng",
+      "programId": "dut-cntt",
+      "programName": "Công nghệ thông tin",
+      "source": {
+        "name": "Kịch bản minh họa AI Pathway — phiên bản A",
+        "url": null,
+        "appliedYear": null,
+        "version": "scenario-A",
+        "checkedAt": null,
+        "dataStatus": "simulated"
+      },
+      "admissionMethod": "high_school_exam",
+      "conditions": {
+        "minimumScore": 24,
+        "subjectCombinations": ["A00"],
+        "requiredDocuments": ["academic_transcript"]
+      }
+    },
+    {
+      "id": "demo-dut-cntt-rule-b",
+      "institutionId": "dut",
+      "institutionName": "Trường Đại học Bách khoa – Đại học Đà Nẵng",
+      "programId": "dut-cntt",
+      "programName": "Công nghệ thông tin",
+      "source": {
+        "name": "Kịch bản minh họa AI Pathway — phiên bản B",
+        "url": null,
+        "appliedYear": null,
+        "version": "scenario-B",
+        "checkedAt": null,
+        "dataStatus": "simulated"
+      },
+      "admissionMethod": "high_school_exam",
+      "conditions": {
+        "minimumScore": 25,
+        "subjectCombinations": ["A00", "D01"],
+        "requiredDocuments": ["academic_transcript", "identity_document"]
+      }
+    }
+  ]
+}
