@@ -51,3 +51,10 @@ test('rejects non-numeric, non-finite, negative, and over-scale scores', () => {
     assert.ok(validateUiProfile({ ...validProfile, score }).some((error) => error.includes('0–30')), score)
   }
 })
+
+test('rejects scores with more than one decimal place', () => {
+  for (const score of ['24.55', '18.123', '1.']) {
+    assert.ok(validateUiProfile({ ...validProfile, score }).some((error) => error.includes('một chữ số thập phân')), score)
+  }
+  assert.deepEqual(validateUiProfile({ ...validProfile, score: '24.5' }), [])
+})
