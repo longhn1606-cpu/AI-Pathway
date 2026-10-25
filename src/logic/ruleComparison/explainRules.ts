@@ -9,13 +9,14 @@ function formatValue(value: RuleValue | undefined): string {
 }
 
 function describeChange(change: RuleChange): string {
-  if (change.changeType === 'added') {
-    return `Thêm “${change.field}” với giá trị ${formatValue(change.newValue)}.`
-  }
-  if (change.changeType === 'removed') {
-    return `Xóa “${change.field}” (giá trị trước đó: ${formatValue(change.oldValue)}).`
-  }
+  if (change.changeType === 'added') return `Thêm “${change.field}” với giá trị ${formatValue(change.newValue)}.`
+  if (change.changeType === 'removed') return `Xóa “${change.field}” (giá trị trước đó: ${formatValue(change.oldValue)}).`
   return `“${change.field}” thay đổi từ ${formatValue(change.oldValue)} thành ${formatValue(change.newValue)}.`
+}
+
+function formatVnd(value: number | null): string {
+  if (value === null) return 'chưa có dữ liệu'
+  return `${new Intl.NumberFormat('vi-VN').format(value)} đồng/năm`
 }
 
 /** Deterministic, source-bounded explanation. This function does not call an AI API. */
@@ -25,9 +26,17 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
     ? comparison.affectedPrograms.map((programId) => `Chương trình có programId ${programId} được định danh ở cả hai phiên bản.`)
     : ['Chưa xác định được chương trình cụ thể bị ảnh hưởng từ các ID hiện có.']
 
+  const tuitionChanges = comparison.changes.filter((change) => change.field.startsWith('tuition'))
+  const tuitionImpact = tuitionChanges.length
+    ? tuitionChanges.map(describeChange)
+    : comparison.tuitionStatus === null
+      ? ['Chưa có snapshot học phí để so sánh. Không thể kết luận học phí giữ nguyên.']
+      : ['Không phát hiện thay đổi trong các trường học phí được cung cấp.']
+
   const nextSteps = [
     'Mở và đối chiếu tài liệu nguồn của cả hai phiên bản trước khi sử dụng kết quả.',
     'Kiểm tra năm áp dụng, đối tượng áp dụng và phương thức tuyển sinh trong văn bản gốc.',
+    'Đối chiếu học phí theo đúng năm học, chương trình đào tạo và hình thức đào tạo; hỏi bộ phận tuyển sinh nếu còn thiếu.',
     'Xác minh thay đổi với đơn vị tuyển sinh của trường nếu thông tin ảnh hưởng đến quyết định đăng ký.',
   ]
 
@@ -43,9 +52,10 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
     'Module không suy ra điều kiện trúng tuyển, khả năng trúng tuyển hoặc tác động ngoài các trường dữ liệu được cung cấp.',
   ]
 
-  if (comparison.changes.length === 0) {
-    whatChanged.push('Không phát hiện thay đổi trong các trường dữ liệu được đưa vào so sánh.')
-  }
+  if (comparison.changes.length === 0) whatChanged.push('Không phát hiện thay đổi trong các trường dữ liệu được đưa vào so sánh.')
+  if (comparison.tuitionStatus === 'simulated') tuitionImpact.push('Dữ liệu học phí đang ở trạng thái simulated; chỉ dùng để minh họa.')
+  if (comparison.tuitionStatus === 'needs_review') tuitionImpact.push('Dữ liệu học phí cần được rà soát trước khi sử dụng.')
+  if (comparison.tuitionStatus === null) tuitionImpact.push('Không có dữ liệu học phí đủ điều kiện để đưa ra nhận định định lượng.')
 
   return {
     mode: 'template',
@@ -54,6 +64,7 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
       : 'Đây là bản giải thích theo mẫu dựa trên dữ liệu so sánh được cung cấp; cần đọc nguồn gốc trước khi áp dụng.',
     whatChanged,
     potentiallyAffected,
+    tuitionImpact,
     nextSteps,
     unknowns,
     sourceDisclosure,
