@@ -33,6 +33,16 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
       ? ['Chưa có snapshot học phí để so sánh. Không thể kết luận học phí giữ nguyên.']
       : ['Không phát hiện thay đổi trong các trường học phí được cung cấp.']
 
+  for (const [label, snapshot] of [['Phiên bản cũ', comparison.tuition.old], ['Phiên bản mới', comparison.tuition.new]] as const) {
+    if (!snapshot) {
+      tuitionImpact.push(`${label}: chưa có snapshot học phí.`)
+      continue
+    }
+    tuitionImpact.push(
+      `${label}: ${formatVnd(snapshot.minVndPerYear)} – ${formatVnd(snapshot.maxVndPerYear)}; năm áp dụng: ${snapshot.appliedYear ?? 'chưa rõ'}; trạng thái: ${snapshot.dataStatus}.`,
+    )
+  }
+
   const nextSteps = [
     'Mở và đối chiếu tài liệu nguồn của cả hai phiên bản trước khi sử dụng kết quả.',
     'Kiểm tra năm áp dụng, đối tượng áp dụng và phương thức tuyển sinh trong văn bản gốc.',
