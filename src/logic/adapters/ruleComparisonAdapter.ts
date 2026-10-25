@@ -10,7 +10,24 @@ export interface RuleSourceInput {
 }
 
 export function ruleSourceToDataSource(source: RuleSourceInput): DataSource | null {
-  if (!source.url?.trim() || source.appliedYear === null || !source.checkedAt?.trim()) return null
+  if (!source.name.trim() || !source.url?.trim() ||
+      source.appliedYear === null || !Number.isInteger(source.appliedYear) ||
+      source.appliedYear < 1900 || source.appliedYear > 2200 ||
+      !source.checkedAt?.trim()) return null
+
+  let parsedUrl: URL
+  try {
+    parsedUrl = new URL(source.url)
+  } catch {
+    return null
+  }
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') return null
+
+  const checkedDate = new Date(source.checkedAt)
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(source.checkedAt) ||
+      !Number.isFinite(checkedDate.getTime()) ||
+      checkedDate.toISOString().slice(0, 10) !== source.checkedAt) return null
+
   return {
     title: source.name,
     url: source.url,
