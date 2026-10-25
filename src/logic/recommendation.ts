@@ -168,6 +168,26 @@ function evaluateProgram(
   const globalWarnings: string[] = []
   let rankScore = 0
 
+  const tuitionMin = program.tuitionMinVndPerYear
+  const tuitionMax = program.tuitionMaxVndPerYear
+  const tuitionComplete = tuitionMin !== null && tuitionMax !== null
+  const tuitionInvalid =
+    (tuitionMin !== null && (!Number.isFinite(tuitionMin) || tuitionMin < 0)) ||
+    (tuitionMax !== null && (!Number.isFinite(tuitionMax) || tuitionMax < 0)) ||
+    (tuitionComplete && tuitionMin > tuitionMax)
+  const tuitionValid = tuitionComplete && !tuitionInvalid
+
+  const cutoffComplete =
+    program.historicalCutoff !== null &&
+    program.cutoffYear !== null &&
+    program.cutoffScale !== null
+  const cutoffInvalid = cutoffComplete && (
+    !Number.isFinite(program.historicalCutoff) || program.historicalCutoff < 0 ||
+    !Number.isFinite(program.cutoffYear) || program.cutoffYear <= 0 ||
+    !Number.isFinite(program.cutoffScale) || program.cutoffScale <= 0 ||
+    program.historicalCutoff > program.cutoffScale
+  )
+
   if (!regionMatches(profile.preferredRegions, university.region)) {
     exclusionReasons.push(`Trường thuộc ${REGION_LABELS[university.region]}, ngoài khu vực ưu tiên.`)
   } else if (profile.preferredRegions.length > 0) {
@@ -189,18 +209,18 @@ function evaluateProgram(
   }
 
   if (profile.annualBudgetVnd !== null) {
-    const minTuition = program.tuitionMinVndPerYear
-    const maxTuition = program.tuitionMaxVndPerYear
-    if (minTuition === null || maxTuition === null) {
-      warnings.push('Chưa đủ dữ liệu học phí tối thiểu/tối đa để đánh giá đầy đủ ngân sách.')
-    } else if (minTuition > profile.annualBudgetVnd) {
+    if (!tuitionValid) {
+      warnings.push(tuitionInvalid
+        ? 'Dữ liệu học phí không hợp lệ; đã bỏ đánh giá ngân sách cho chương trình này.'
+        : 'Chưa đủ dữ liệu học phí tối thiểu/tối đa để đánh giá đầy đủ ngân sách.')
+    } else if (tuitionMin > profile.annualBudgetVnd) {
       exclusionReasons.push(
         `Học phí tối thiểu ${formatVnd(minTuition)} vượt ngân sách ${formatVnd(profile.annualBudgetVnd)}.`,
       )
-    } else if (maxTuition > profile.annualBudgetVnd) {
+    } else if (tuitionMax > profile.annualBudgetVnd) {
       reasons.push(`Học phí tối thiểu nằm trong ngân sách ${formatVnd(profile.annualBudgetVnd)}.`)
       warnings.push(
-        `Rủi ro chi phí: học phí có thể lên tới ${formatVnd(maxTuition)}, vượt ngân sách ${formatVnd(profile.annualBudgetVnd)}.`,
+        `Rủi ro chi phí: học phí có thể lên tới ${formatVnd(tuitionMax)}, vượt ngân sách ${formatVnd(profile.annualBudgetVnd)}.`,
       )
       rankScore += 1
     } else {
@@ -216,12 +236,10 @@ function evaluateProgram(
 
   if (profile.expectedScore === null || profile.scoreScale === null) {
     warnings.push('Thiếu điểm dự kiến hoặc thang điểm; chưa thể đối chiếu điểm chuẩn lịch sử.')
-  } else if (
-    program.historicalCutoff === null ||
-    program.cutoffYear === null ||
-    program.cutoffScale === null
-  ) {
+  } else if (!cutoffComplete) {
     warnings.push('Chưa đủ dữ liệu điểm chuẩn lịch sử, năm áp dụng hoặc thang điểm để đối chiếu.')
+  } else if (cutoffInvalid) {
+    warnings.push('Dữ liệu điểm chuẩn lịch sử hoặc thang điểm không hợp lệ; đã bỏ đối chiếu.')
   } else if (profile.scoreScale !== program.cutoffScale) {
     warnings.push(
       `Không so sánh điểm trực tiếp: hồ sơ dùng thang ${profile.scoreScale}, điểm chuẩn lịch sử dùng thang ${program.cutoffScale}.`,
@@ -254,10 +272,13 @@ function evaluateProgram(
     }
   }
 
-  if (program.tuitionMinVndPerYear === null || program.tuitionMaxVndPerYear === null) {
-    if (!warnings.some((warning) => warning.includes('dữ liệu học phí'))) {
-      warnings.push('Thiếu dữ liệu học phí; không thể kết luận chương trình phù hợp ngân sách.')
-    }
+  if (!tuitionValid && !warnings.some((warning) => warning.includes('dữ liệu học phí'))) {
+    warnings.push(tuitionInvalid
+      ? 'Dữ liệu học phí không hợp lệ; không thể kết luận chương trình phù hợp ngân sách.'
+      : 'Thiếu dữ liệu học phí; không thể kết luận chương trình phù hợp ngân sách.')
+  }
+  if (cutoffInvalid) {
+    warnings.push('Dữ liệu điểm chuẩn lịch sử hoặc thang điểm không hợp lệ; cần rà soát nguồn.')
   }
 
   const allSources = [...university.sources, ...program.sources]
@@ -289,7 +310,9 @@ function evaluateProgram(
     program.status,
     ...program.sources.map((source) => source.status),
     ...getMethodStatuses(program),
-    ...(hasMissingSourceCoverage || hasInvalidSourceUrl ? ['needs_review' as const] : []),
+    ...(hasMissingSourceCoverage || hasInvalidSourceUrl || tuitionInvalid || cutoffInvalid
+      ? ['needs_review' as const]
+      : []),
   ])
 
   if (dataStatus === 'simulated') {
