@@ -62,20 +62,31 @@ test('historical cutoff is selected only for one explicitly preferred method', (
   if (expected.status === 'simulated') assert.equal(program.status, 'simulated')
 })
 
-test('academic-record cutoff is not mixed with the high-school-exam cutoff', () => {
+test('historical cutoff is not applied when the program does not currently offer that method', () => {
   const profile = {
     expectedScore: 24, scoreScale: 30, interests: [], preferredRegions: [],
     annualBudgetVnd: null, preferredMethods: ['academic_record'],
   }
   const input = toRecommendationDataset(profile, { universities, programs, historicalCutoffs: cutoffs })
   const program = input.programs.find((item) => item.id === 'dut-cntt')
-  const expected = cutoffs.records
-    .filter((record) => record.programId === 'dut-cntt' && record.method === 'academic_record')
-    .sort((a, b) => b.year - a.year)[0]
-  assert.equal(program.historicalCutoff, expected.cutoffScore)
-  assert.equal(program.cutoffYear, expected.year)
-  assert.equal(program.cutoffScale, expected.scoreScale)
-  assert.equal(program.status, 'simulated')
+  assert.ok(!program.admissionMethods.some((item) => item.method === 'academic_record'))
+  assert.equal(program.historicalCutoff, null)
+  assert.equal(program.cutoffYear, null)
+  assert.equal(program.cutoffScale, null)
+})
+
+test('latest canonical tuition values are used for budget filtering', () => {
+  const profile = {
+    expectedScore: null, scoreScale: null, interests: [], preferredRegions: [],
+    annualBudgetVnd: 25_000_000, preferredMethods: [],
+  }
+  assert.equal(programs.find((item) => item.id === 'dut-cntt').tuitionMinVndPerYear, 28_000_000)
+  assert.equal(programs.find((item) => item.id === 'dut-cntt').tuitionYear, 2026)
+  const input = toRecommendationDataset(profile, { universities, programs, historicalCutoffs: cutoffs })
+  const result = recommendPrograms(input)
+  assert.equal(result.results.length, 0)
+  assert.equal(result.excluded.length, programs.length)
+  assert.ok(result.excluded.every((item) => item.reasons.some((reason) => reason.includes('vượt ngân sách'))))
 })
 
 test('no preferred method means no cross-method cutoff inference', () => {
@@ -91,4 +102,4 @@ test('no preferred method means no cross-method cutoff inference', () => {
   ))
 })
 
-process.stdout.write(`Canonical integration: ${passed}/5 tests passed.\\n`)
+process.stdout.write(`Canonical integration: ${passed}/6 tests passed.\\n`)
