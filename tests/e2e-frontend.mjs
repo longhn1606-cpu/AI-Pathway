@@ -39,8 +39,11 @@ try {
     await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
 
     await page.waitForFunction(
-      () => !document.querySelector('.no-results[role="status"]')
-        && (document.querySelector('.program-card') || document.querySelector('.no-results')),
+      () => {
+        const statusHeading = document.querySelector('.no-results[role="status"] h3')?.textContent ?? ''
+        const stillLoading = statusHeading.includes('Đang phân tích hồ sơ')
+        return !stillLoading && (document.querySelector('.program-card') || document.querySelector('.no-results'))
+      },
       undefined,
       { timeout: 10000 },
     )
