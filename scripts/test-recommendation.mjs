@@ -302,4 +302,54 @@ test('thay đổi ngân sách không bắt buộc làm thay đổi kết quả n
   assert.deepEqual(before.results, after.results)
 })
 
+
+test('học phí âm, không hữu hạn hoặc min lớn hơn max không được dùng để loại chương trình', () => {
+  const invalidRanges = [
+    { tuitionMinVndPerYear: -1, tuitionMaxVndPerYear: 20000000 },
+    { tuitionMinVndPerYear: 10000000, tuitionMaxVndPerYear: Number.NaN },
+    { tuitionMinVndPerYear: 30000000, tuitionMaxVndPerYear: 20000000 },
+  ]
+  for (const range of invalidRanges) {
+    const program = { ...programs[0], ...range }
+    const result = recommendPrograms(input(
+      { interests: ['technology'], annualBudgetVnd: 25000000 },
+      [universities[0]],
+      [program],
+    ))
+    assert.equal(result.results.length, 1)
+    assert.equal(result.results[0].dataStatus, 'needs_review')
+    assert.ok(result.results[0].warnings.some((warning) => warning.includes('học phí không hợp lệ')))
+    assert.equal(result.excluded.length, 0)
+  }
+})
+
+test('điểm chuẩn lịch sử ngoài thang hoặc năm không hợp lệ không được đem so sánh', () => {
+  const invalidCutoffs = [
+    { historicalCutoff: 31, cutoffScale: 30, cutoffYear: 2025 },
+    { historicalCutoff: -1, cutoffScale: 30, cutoffYear: 2025 },
+    { historicalCutoff: 20, cutoffScale: 0, cutoffYear: 2025 },
+    { historicalCutoff: 20, cutoffScale: 30, cutoffYear: -1 },
+  ]
+  for (const cutoff of invalidCutoffs) {
+    const program = { ...programs[0], ...cutoff }
+    const result = recommendPrograms(input({}, [universities[0]], [program]))
+    assert.equal(result.results[0].dataStatus, 'needs_review')
+    assert.ok(result.results[0].warnings.some((warning) => warning.includes('điểm chuẩn lịch sử') && warning.includes('không hợp lệ')))
+    assert.ok(!result.results[0].suitabilityReasons.some((reason) => reason.includes('điểm chuẩn tham khảo')))
+  }
+})
+
+test('ID chương trình trùng chỉ được tính một lần và phát cảnh báo', () => {
+  const duplicate = { ...programs[0], name: 'Bản ghi trùng ID' }
+  const result = recommendPrograms(input({}, universities, [programs[0], duplicate]))
+  assert.equal(result.results.filter((item) => item.programId === programs[0].id).length, 1)
+  assert.ok(result.warnings.some((warning) => warning.includes('ID chương trình bị trùng')))
+})
+
+test('dataset rỗng trả về kết quả rỗng có cảnh báo rõ ràng', () => {
+  const result = recommendPrograms(input({}, [], []))
+  assert.deepEqual(result.results, [])
+  assert.ok(result.warnings.some((warning) => warning.includes('Chưa có chương trình nào')))
+})
+
 process.stdout.write(`\nKết quả: ${passed} kiểm thử passed.\n`)
