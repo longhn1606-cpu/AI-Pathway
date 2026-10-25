@@ -15,8 +15,9 @@ export interface RecommendationDatasetInput {
 
 /**
  * The shared program schema has one cutoff slot, while canonical history is
- * method-specific. Populate that slot only when the student explicitly chose
- * exactly one admission method and there is one unambiguous latest record.
+ * method-specific. The UI score is always the high-school graduation exam
+ * score on a 30-point scale, independent of the student's optional admission
+ * preferences. Populate the slot only from one unambiguous verified record.
  */
 export function toRecommendationDataset(
   profile: StudentProfile,
@@ -24,9 +25,8 @@ export function toRecommendationDataset(
 ): RecommendationDatasetInput {
   const scoreMethod: AdmissionMethod = 'high_school_exam'
   const programs = data.programs.map((program) => {
-    // Historical rows must also match a method currently declared for this program.
-    // A historical academic-record cutoff must not imply that the current program
-    // offers academic-record admission.
+    // The program must currently declare THPT admission; historical rows for
+    // unrelated methods must never be mapped into this score comparison.
     if (!program.admissionMethods.some((item) => item.method === scoreMethod)) return program
 
     const matches = data.historicalCutoffs.records.filter((record) =>
@@ -42,7 +42,7 @@ export function toRecommendationDataset(
 
     const latestYear = Math.max(...matches.map((record) => record.year))
     const latest = matches.filter((record) => record.year === latestYear)
-    // Never choose arbitrarily if the canonical dataset has duplicate latest rows.
+    // Never choose arbitrarily if verified records have duplicate latest years.
     if (latest.length !== 1) return program
 
     const cutoff = latest[0]
