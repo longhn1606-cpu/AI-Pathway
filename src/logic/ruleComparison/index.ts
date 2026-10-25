@@ -1,9 +1,11 @@
-export type { 
+export type {
   AdmissionRuleVersion,
+  ChangedField,
   ExplanationMode,
   RuleChange,
   RuleChangeType,
   RuleComparison,
+  RuleComparisonInput,
   RuleExplanation,
   RuleImpactLevel,
   RuleSource,
