@@ -42,6 +42,9 @@ try {
   await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
   await page.getByRole('alert').filter({ hasText: 'Điểm dự kiến phải nằm trong khoảng 0–30.' }).waitFor({ timeout: 5000 })
   assert.equal(await page.locator('.program-card').count(), 0, 'Invalid submission must clear stale recommendation cards')
+  assert.equal(await page.locator('.profile-summary').count(), 0, 'Invalid submission must clear the previously submitted profile summary')
+  await page.getByText('Gợi ý của bạn sẽ xuất hiện ở đây').waitFor({ timeout: 5000 })
+  assert.equal(await page.locator('.results-empty').count(), 1, 'Invalid submission must return the results area to its initial empty state')
 
   await page.getByLabel('Thi tốt nghiệp THPT').check()
 
