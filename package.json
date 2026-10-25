@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "test": "node --test tests/*.test.mjs",
-    "test:recommendation": "node scripts/test-recommendation.mjs && node scripts/test-simulation.mjs"
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "react": "^19.0.0",
