@@ -28,6 +28,15 @@ try {
   await page.goto('http://127.0.0.1:5173', { waitUntil: 'domcontentloaded' })
   assert.match(await page.title(), /AI Pathway/i)
 
+  for (const width of [320, 360, 390, 430]) {
+    await page.setViewportSize({ width, height: 844 })
+    const hasHorizontalOverflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    )
+    assert.equal(hasHorizontalOverflow, false, `Mobile viewport ${width}px must not overflow horizontally`)
+  }
+  await page.setViewportSize({ width: 1280, height: 900 })
+
   // The UI owns required-field validation; an empty submit must report all
   // missing fields together and must not be mistaken for a service error.
   await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
@@ -85,6 +94,13 @@ try {
     assert.equal(await page.locator('.profile-summary').filter({ hasText: 'Thi tốt nghiệp THPT' }).count(), 1, 'Selected admission method should remain visible in the submitted profile')
 
     const cardCount = await page.locator('.program-card').count()
+    if (index === 0 && cardCount > 0) {
+      const cardText = await page.locator('.program-card').allInnerTexts()
+      assert.ok(
+        cardText.some((text) => /điểm dự kiến (đang bằng hoặc cao hơn|thấp hơn) điểm chuẩn tham khảo năm/i.test(text)),
+        'A /30 THPT score must be compared with a verified same-program THPT cutoff when one exists',
+      )
+    }
     if (cardCount === 0) {
       const noMatchState = page.locator('.no-results[role="status"]').filter({ hasText: 'Chưa có chương trình phù hợp với tiêu chí hiện tại' })
       assert.equal(await noMatchState.count(), 1, `Scenario ${index + 1}: empty recommendations must show a valid criteria-based empty state for ${JSON.stringify(scenario)}`)
