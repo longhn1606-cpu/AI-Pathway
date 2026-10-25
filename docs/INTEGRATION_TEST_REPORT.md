@@ -104,3 +104,14 @@ Commit tested: `e7428857e27bdb96086e3243bfa7bda6c901333b`
 - Updated regression keeps program-level cutoff tuple null while allowing the separate 2026 tuition snapshot to remain `needs_review`.
 
 The 2026 tuition snapshot is not verified source-level tuition advice. The demo rule snapshots remain simulated. These data limitations are not covered by a green CI result.
+
+
+## Follow-up browser regression — 2026-10-25
+
+The existing invalid-profile flow already clears `submittedProfile`, recommendation output and simulation output in `src/App.tsx`. The Playwright E2E now explicitly asserts all three user-visible consequences after an invalid score submission:
+
+- no stale recommendation cards remain;
+- no previously submitted profile summary remains;
+- the initial results empty state is restored.
+
+Test change commit: `8b2282fe0740ff7d0fd0968cc10109a842b67efe`. **Pending CI verification**: do not count these new assertions as passed until the workflow run for the updated branch head completes successfully. Existing verified baseline on head `1c4bdcf045a5406f63bee4ea2320ada7793411ac`: system integration build/unit/E2E workflow SUCCESS; demo-data workflow SUCCESS, including Member 4 regression 20 repeated runs, preview smoke, structural validator and Python regression.
