@@ -161,3 +161,8 @@ The previous historical-cutoff blocker is closed at the adapter/service boundary
 - **Member 2 review remains pending.** The integration code currently clears the submitted profile and all prior recommendation/simulation output when validation fails. This behavior is covered by a strengthened browser E2E assertion in the current follow-up commit; it is an implementation observation, not a substitute for Member 2's UI/contract approval.
 - **Member 1 reconciliation remains pending** for the upstream tuition regression expectation. In the integrated branch, 2026 tuition fixture values remain `needs_review`; null cutoff values remain null and no provenance/status is promoted.
 - These confirmations establish module-boundary compatibility only. They do not mean the upstream PRs are merged or that the demo data is authoritative.
+
+
+## Member 1 confirmation — 2026-10-25
+
+Member 1 confirms that the six 2026 tuition values in the canonical demo fixtures are intentional simulated values. Keep their `simulated` provenance/status; do not present them as official tuition. If historical cutoff evidence is absent, `historicalCutoff`, `cutoffYear`, and `cutoffScale` must remain null, never zero or a default. This confirms the fixture/regression contract only, not real-world tuition accuracy or PR approval.
