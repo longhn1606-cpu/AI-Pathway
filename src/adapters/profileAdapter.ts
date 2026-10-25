@@ -18,7 +18,7 @@ export interface UiStudentProfile {
   region: UiRegion | ''
   budget: UiBudget | ''
   keywords: string
-  preferredMethods: AdmissionMethod[]
+  preferredMethods?: AdmissionMethod[]
 }
 
 /**
@@ -58,7 +58,7 @@ export function toStudentProfile(profile: UiStudentProfile): StudentProfile {
     interests,
     preferredRegions,
     annualBudgetVnd,
-    preferredMethods: [...profile.preferredMethods],
+    preferredMethods: [...(profile.preferredMethods ?? [])],
   }
 }
 
