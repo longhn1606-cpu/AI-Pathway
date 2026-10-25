@@ -215,7 +215,7 @@ function evaluateProgram(
         : 'Chưa đủ dữ liệu học phí tối thiểu/tối đa để đánh giá đầy đủ ngân sách.')
     } else if (tuitionMin > profile.annualBudgetVnd) {
       exclusionReasons.push(
-        `Học phí tối thiểu ${formatVnd(minTuition)} vượt ngân sách ${formatVnd(profile.annualBudgetVnd)}.`,
+        `Học phí tối thiểu ${formatVnd(tuitionMin)} vượt ngân sách ${formatVnd(profile.annualBudgetVnd)}.`,
       )
     } else if (tuitionMax > profile.annualBudgetVnd) {
       reasons.push(`Học phí tối thiểu nằm trong ngân sách ${formatVnd(profile.annualBudgetVnd)}.`)
