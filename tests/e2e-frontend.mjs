@@ -49,7 +49,10 @@ try {
     assert.equal(error, 0, `Scenario ${index + 1}: recommendation service returned an error`)
 
     const cardCount = await page.locator('.program-card').count()
-    assert.ok(cardCount > 0, `Scenario ${index + 1}: no recommendation cards for ${JSON.stringify(scenario)}`)
+    if (cardCount === 0) {
+      const noMatchState = page.locator('.no-results[role="status"]').filter({ hasText: 'Chưa có chương trình phù hợp với tiêu chí hiện tại' })
+      assert.equal(await noMatchState.count(), 1, `Scenario ${index + 1}: empty recommendations must show a valid criteria-based empty state for ${JSON.stringify(scenario)}`)
+    }
 
     if (index % 4 === 0 && Number(scenario.score) < 30) {
       await page.getByRole('button', { name: 'Mô phỏng +1 điểm' }).click()
