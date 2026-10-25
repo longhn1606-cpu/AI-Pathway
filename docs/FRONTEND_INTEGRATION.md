@@ -15,47 +15,9 @@ The frontend currently has:
 Map this into `StudentProfile` before calling `demoUniversityService`:
 
 ```ts
-import type { StudentProfile } from '../types'
-// Production adapter: import { toStudentProfile } from '../adapters/frontendProfileAdapter'
+import { toStudentProfile } from '../adapters/frontendProfileAdapter'
 
-type UiProfile = {
-  score: string
-  interest: 'technology' | 'business' | 'health' | 'education' | 'arts' | 'other' | 'undecided' | ''
-  region: 'north' | 'central' | 'south' | 'anywhere' | ''
-  budget: 'under20' | '20to40' | '40to70' | 'over70' | 'flexible' | ''
-}
-
-export function toStudentProfile(profile: UiProfile): StudentProfile {
-  const parsedScore = profile.score.trim() === '' ? null : Number(profile.score)
-  const expectedScore =
-    parsedScore !== null && Number.isFinite(parsedScore) && parsedScore >= 0 && parsedScore <= 30
-      ? parsedScore
-      : null
-
-  const budgetCeilings: Record<string, number | null> = {
-    under20: 20_000_000,
-    '20to40': 40_000_000,
-    '40to70': 70_000_000,
-    over70: null,
-    flexible: null,
-  }
-
-  return {
-    expectedScore,
-    scoreScale: expectedScore === null ? null : 30,
-    interests: profile.interest && profile.interest !== 'undecided'
-      ? [profile.interest]
-      : [],
-    preferredRegions: profile.region && profile.region !== 'anywhere'
-      ? [profile.region]
-      : [],
-    // These are upper-bound interpretations of the UI's broad budget bands,
-    // not exact personal budgets. No upper bound is represented as null.
-    annualBudgetVnd: profile.budget ? budgetCeilings[profile.budget] : null,
-    // The current UI does not collect an admission-method preference.
-    preferredMethods: [],
-  }
-}
+const studentProfile = toStudentProfile(profile)
 ```
 
 ## Calling recommendation and simulation
