@@ -241,3 +241,43 @@ test('dữ liệu học phí null vẫn được giữ nguyên khi giải thích
 })
 
 process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
+
+const scenariosPath = path.join(root, 'data/admission-rule-comparison/demo-scenarios.json')
+const scenarios = JSON.parse(await readFile(scenariosPath, 'utf8'))
+test('bộ kịch bản demo có ít nhất 7 tình huống được gắn nhãn simulated', () => {
+  assert.ok(scenarios.scenarios.length >= 7)
+  assert.ok(scenarios.scenarios.every((item) =>
+    item.oldRule.source.dataStatus === 'simulated'
+    && item.newRule.source.dataStatus === 'simulated'
+    && item.notice.includes('mô phỏng'),
+  ))
+})
+for (const scenario of scenarios.scenarios) {
+  test(`kịch bản demo: ${scenario.id} — ${scenario.title}`, () => {
+    const result = compareRules(scenario.oldRule, scenario.newRule)
+    assert.ok(result.changes.some((change) => scenario.expectedChangedFields.includes(change.field)),
+      `Thiếu thay đổi mong đợi: ${scenario.expectedChangedFields.join(', ')}`)
+    const explanation = explainRules(result)
+    assert.ok(explanation.whatChanged.length > 0)
+    assert.ok(explanation.sourceDisclosure.length === 2)
+    assert.ok(explanation.impactAssessment.length > 0)
+    assert.equal(explanation.impactLevel, 'requires_review',
+      'Kịch bản mô phỏng phải yêu cầu rà soát, không được kết luận mức ảnh hưởng thực tế')
+  })
+}
+test('đánh giá mức độ ảnh hưởng cao chỉ dùng khi nguồn và năm đã verified', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const oldRule = rule({ source: verifiedSource, conditions: { minimumScore: 22 } })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' }, conditions: { minimumScore: 25 } })
+  const explanation = explainRules(compareRules(oldRule, newRule))
+  assert.equal(explanation.impactLevel, 'high')
+})
+test('metadata đơn thuần được phân loại mức ảnh hưởng thấp khi dữ liệu verified', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const oldRule = rule({ source: verifiedSource })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' } })
+  const explanation = explainRules(compareRules(oldRule, newRule))
+  assert.equal(explanation.impactLevel, 'low')
+})
+
+process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
