@@ -62,13 +62,17 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
   }
 
   const potentiallyAffected: string[] = []
+  if (!comparison.affectedMajors.length) {
+    potentiallyAffected.push('Chưa đủ ID khớp để xác định ngành/chương trình cụ thể bị ảnh hưởng.')
+  } else {
+    potentiallyAffected.push(`Ngành/chương trình có programId ${comparison.affectedMajors[0]} được định danh ở cả hai phiên bản.`)
+  }
   if (comparison.affectedUniversities.length) {
     potentiallyAffected.push(`Trường có institutionId ${comparison.affectedUniversities[0]} được định danh ở cả hai phiên bản.`)
   }
-  if (comparison.affectedMajors.length) {
-    potentiallyAffected.push(`Ngành/chương trình có programId ${comparison.affectedMajors[0]} được định danh ở cả hai phiên bản.`)
+  if (!comparison.affectedUniversities.length && !comparison.affectedMajors.length) {
+    potentiallyAffected.push('Chưa đủ ID khớp để xác định trường cụ thể bị ảnh hưởng.')
   }
-  if (!potentiallyAffected.length) potentiallyAffected.push('Chưa đủ ID khớp để xác định trường hoặc ngành cụ thể bị ảnh hưởng.')
 
   const tuitionChanges = comparison.changes.filter((change) => change.field === 'tuition' || change.field.startsWith('tuition.'))
   const tuitionImpact = !comparison.comparableScope
