@@ -3,42 +3,46 @@
 Date: 2026-10-25  
 Branch: feat/system-integration
 
-## Test implementation status
-
-Integration test code has been added, but tests have not yet been executed by a confirmed workflow result in this report.
+## Test implementation
 
 The branch includes:
 - tests/admissionsDataValidation.test.mjs
 - tests/ruleComparisonAdapter.test.mjs
 - tests/integratedRecommendationService.test.mjs
 - tests/integratedRuleComparisonService.test.mjs
-- scripts/test-recommendation.mjs
-- scripts/test-simulation.mjs
+- tests/recommendationProfileAdapter.test.mjs
 
-CI workflow .github/workflows/system-integration.yml runs npm install, npm run build, npm test and npm run test:recommendation on the integration branch / PR.
+CI workflow .github/workflows/system-integration.yml runs npm install, npm run build and npm test.
 
-**Actual E2E runs completed: 0 / 20.** Unit/integration test files are not counted as E2E runs.
+## CI evidence
+
+- Run #19 failed at setup-node because npm caching was enabled but the repository has no lockfile. No install/build/tests ran.
+- Run #21: production build passed; npm test passed 19/19; a separate legacy Member 3 test command failed because its demo fixture files were absent from the integration branch.
+- The fixture-dependent test runner was removed. The latest branch adds frontend wiring and a recommendation profile adapter test; its workflow is pending at the time of this report.
+- The previous 19/19 result applies only to the test set before the newest adapter test; it is not a pass claim for the current head.
+
+Actual browser E2E runs completed: 0 / 20.
 
 ## Integration matrix
 
 | ID | Scenario | Implementation/evidence | Status |
 |---|---|---|---|
-| IT-01 | Schema compatibility | Member 1 validator suite included | CI pending |
-| IT-02 | Dataset → recommendation | Integrated service injects canonical exports; test checks canonical IDs/status | CI pending |
-| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates to Member 4 | Partial; snapshot history source unavailable |
-| IT-04 | Recommendation → frontend | Frontend service wiring not implemented | Pending |
-| IT-05 | Simulation → frontend | Simulation service exists; UI wiring pending | Pending |
-| IT-06 | Rule comparison → frontend | Rule service exists; UI wiring pending | Pending |
-| IT-07 | Missing data | Null tuition/cutoff remain unknown in source schema/engine | CI pending |
-| IT-08 | Invalid input | Member 3 regression suite covers invalid score/scale/budget | CI pending |
-| IT-09 | Duplicate IDs | Member 1 validator suite covers duplicate IDs | CI pending |
-| IT-10 | Null tuition/cutoff | Member 1 adapter and Member 3 suites cover null behavior | CI pending |
-| IT-11 | Provenance | Service test checks DataStatus; adapter suite covers provenance | CI pending |
-| IT-12 | Regression | Build + all included suites in CI workflow | CI pending |
-| IT-13 | Simulation immutability | Integration test snapshots baseline profile | CI pending |
-| IT-14 | Scale mismatch | Member 3 recommendation regression suite | CI pending |
-| IT-15 | Ambiguous source mapping | Member 1 exact-unique source resolver tests | CI pending |
-| IT-16 | Missing rule evidence | Rule service test preserves missing tuition and simulated status | CI pending |
+| IT-01 | Schema compatibility | Member 1 validator tests | Previously passed in npm test; rerun latest CI |
+| IT-02 | Dataset → recommendation | Canonical service test checks IDs/status | Previously passed in npm test; rerun latest CI |
+| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates to Member 4 | Service test passed previously; history source unavailable |
+| IT-04 | Recommendation → frontend | App.tsx calls service and renders results by programId | Build pending latest head |
+| IT-05 | Simulation → frontend | App calls simulate and renders before/after counts | Build pending latest head |
+| IT-06 | Rule comparison → frontend | RuleComparisonPanel connected; empty state without snapshots | Build pending latest head |
+| IT-07 | Missing data | Null tuition/cutoff retained | Covered by validator/adapter/engine |
+| IT-08 | Invalid input | validateUiProfile and engine safeguards | Build/test pending latest head |
+| IT-09 | Duplicate IDs | Member 1 validator rejects duplicates | Previously covered; rerun latest CI |
+| IT-10 | Null tuition/cutoff | Null not coerced to zero | Previously covered; rerun latest CI |
+| IT-11 | Provenance | DataStatus retained in service and comparison | Previously covered; rerun latest CI |
+| IT-12 | Regression | Production build + npm test workflow | Pending latest head |
+| IT-13 | Simulation immutability | Integration test snapshots baseline profile | Previously covered; rerun latest CI |
+| IT-14 | Scale mismatch | Member 3 engine behavior unchanged | Existing engine contract; full test suite pending |
+| IT-15 | Ambiguous source mapping | Exact unique source resolver | Previously covered; rerun latest CI |
+| IT-16 | Missing rule evidence | Rule panel requires both snapshots; no fabricated comparison | Service/UI implementation present |
 
 ## Twenty-run E2E plan
 
@@ -48,4 +52,4 @@ Do not create fictitious admissions records. Profile variations are test inputs 
 
 ## Evidence policy
 
-A run counts only when the actual app and integration path execute. Static inspection, mocks, unit tests, CI build success and PR body claims are not E2E runs. Retain failures and reproduction details; reruns do not erase failed attempts.
+A run counts only when the actual app and integration path execute in a browser/runtime. Static inspection, mocks, unit tests, CI build success and PR body claims are not E2E runs. Retain failures and reproduction details; reruns do not erase failed attempts.
