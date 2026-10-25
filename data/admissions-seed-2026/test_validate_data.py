@@ -34,9 +34,29 @@ class SeedDataTests(unittest.TestCase):
             self.assertIn(row["programId"], programs_by_id)
             self.assertEqual(row["universityId"], programs_by_id[row["programId"]]["universityId"])
 
-    def test_unknown_numbers_are_null(self):
+    def test_unknown_cutoffs_remain_null_and_demo_tuition_is_explicit(self):
+        # Tuition values below are fixed illustrative fixtures for UI/demo only.
+        # Their simulated nature is documented in docs/SCHEMA_COMPATIBILITY.md;
+        # these assertions must never be interpreted as official fee verification.
+        expected_demo_tuition = {
+            "hust-it1": (30000000, 45000000, 2026),
+            "hust-ee2": (30000000, 45000000, 2026),
+            "dut-cntt": (28000000, 38000000, 2026),
+            "dut-ky-thuat-may-tinh": (28000000, 38000000, 2026),
+            "hcmut-khmt": (40000000, 80000000, 2026),
+            "hcmut-ky-thuat-may-tinh": (40000000, 80000000, 2026),
+        }
+        self.assertEqual({p["id"] for p in self.programs}, set(expected_demo_tuition))
         for program in self.programs:
-            for key in ("tuitionMinVndPerYear", "tuitionMaxVndPerYear", "tuitionYear", "historicalCutoff", "cutoffYear", "cutoffScale"):
+            self.assertEqual(
+                (
+                    program["tuitionMinVndPerYear"],
+                    program["tuitionMaxVndPerYear"],
+                    program["tuitionYear"],
+                ),
+                expected_demo_tuition[program["id"]],
+            )
+            for key in ("historicalCutoff", "cutoffYear", "cutoffScale"):
                 self.assertIsNone(program[key])
 
     def test_program_records_need_review(self):
