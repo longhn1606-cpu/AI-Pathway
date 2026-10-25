@@ -115,3 +115,16 @@ The existing invalid-profile flow already clears `submittedProfile`, recommendat
 - the initial results empty state is restored.
 
 Test change commit: `8b2282fe0740ff7d0fd0968cc10109a842b67efe`. **Pending CI verification**: do not count these new assertions as passed until the workflow run for the updated branch head completes successfully. Existing verified baseline on head `1c4bdcf045a5406f63bee4ea2320ada7793411ac`: system integration build/unit/E2E workflow SUCCESS; demo-data workflow SUCCESS, including Member 4 regression 20 repeated runs, preview smoke, structural validator and Python regression.
+
+
+## Latest follow-up verification — 2026-10-25
+
+On PR #7 head `8708529aa8dc40280383e9933a79917a7148b9b9`:
+- System integration run #162: SUCCESS — production build, npm test, Chromium E2E including the new invalid-profile stale-state assertions.
+- Demo data/app run #358: SUCCESS — Member 4 rule regression repeated 20 times, production preview smoke, dataset validation and Python regression.
+
+On PR #4 head `e983235f7073859fad42250d1fb8bd0e980d82cd`:
+- Demo data/app run #350: SUCCESS.
+- Adapter unit tests run #58: SUCCESS.
+
+Member 1 confirmed the six 2026 tuition fixtures are simulated demo data and historical cutoff tuple fields remain null when unsupported. CI success validates code and fixture structure, not official tuition facts.
