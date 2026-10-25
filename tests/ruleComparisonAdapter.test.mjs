@@ -40,6 +40,10 @@ test('ruleSourceToDataSource rejects missing or whitespace provenance', () => {
   assert.equal(adapter.ruleSourceToDataSource({ ...base, url: '  ' }), null)
   assert.equal(adapter.ruleSourceToDataSource({ ...base, checkedAt: '  ' }), null)
   assert.equal(adapter.ruleSourceToDataSource({ ...base, appliedYear: null }), null)
+  assert.equal(adapter.ruleSourceToDataSource({ ...base, name: '  ' }), null)
+  assert.equal(adapter.ruleSourceToDataSource({ ...base, url: 'javascript:alert(1)' }), null)
+  assert.equal(adapter.ruleSourceToDataSource({ ...base, appliedYear: 2201 }), null)
+  assert.equal(adapter.ruleSourceToDataSource({ ...base, checkedAt: '2026-02-30' }), null)
 })
 
 test('dataSourceToRuleSource preserves source fields and supplied version', () => {
