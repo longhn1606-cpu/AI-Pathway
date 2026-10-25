@@ -58,8 +58,10 @@ try {
       assert.equal(await scoreInput.inputValue(), scenario.score, 'Simulation must not mutate the baseline form score')
     }
 
-    const ruleEmptyState = page.getByText(/Chưa có đủ hai phiên bản quy định/)
-    assert.equal(await ruleEmptyState.count(), 1, 'Rule comparison must show an honest empty state without two snapshots')
+    const simulatedNotice = page.getByText(/Kịch bản bên dưới được cung cấp bởi module Member 4/)
+    assert.equal(await simulatedNotice.count(), 1, 'Rule comparison fixture must be explicitly labelled simulated')
+    assert.equal(await page.getByText(/Mức độ ảnh hưởng:/).count(), 1)
+    assert.ok(await page.getByText(/conditions.minimumScore/).count() > 0, 'Rule comparison should render changed fields')
   }
 
   process.stdout.write('Frontend E2E profiles completed: 20/20\n')
