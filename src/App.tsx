@@ -4,6 +4,7 @@ import type { SimulationResult } from './logic/simulation'
 import { integratedRecommendationService } from './services/integratedRecommendationService'
 import { toRecommendationProfile } from './adapters/recommendationProfileAdapter'
 import { validateUiProfile } from './adapters/profileAdapter'
+import { RuleComparisonPanel } from './components/RuleComparisonPanel'
 import type { DataSource, DataStatus, University, UniversityProgram } from './types'
 import universitiesJson from '../data/admissions-seed-2026/universities.json'
 import programsJson from '../data/admissions-seed-2026/programs.json'
@@ -198,6 +199,7 @@ function App() {
               {visiblePrograms.length > 3 && <div className="show-more-wrap"><button className="button button-secondary" type="button" onClick={() => setShowAll((current) => !current)}>{showAll ? 'Thu gọn danh sách' : `Xem thêm ${visiblePrograms.length - 3} lựa chọn`} <span aria-hidden="true">{showAll ? '↑' : '↓'}</span></button></div>}
               <div className="save-profile"><div><span className="save-icon">✓</span><span><strong>Muốn tiếp tục tinh chỉnh?</strong><small>Hồ sơ hiện chỉ được giữ trong trạng thái trang khi bạn đang mở demo.</small></span></div><button className="button button-primary" type="button" onClick={saveProfile}>{saved ? 'Đã ghi nhận ✓' : 'Ghi nhận hồ sơ'}</button></div>{saved && <p className="save-confirmation" role="status">Đã ghi nhận hồ sơ trong giao diện demo. Thông tin chưa được gửi lên máy chủ.</p>}
             </>}
+            <RuleComparisonPanel />
             <div className="data-note" id="data-note"><span className="data-note-icon">i</span><div><strong>Minh bạch về dữ liệu</strong><p>Bộ dữ liệu demo gồm các chương trình được chọn để thử nghiệm. Các điểm chuẩn có nhãn mô phỏng là số liệu giả lập; chỉ so sánh khi cùng chương trình, năm, phương thức và thang điểm. Nguồn, học phí và phương thức có thể còn cần xác minh. Không dùng bản demo này để quyết định tuyển sinh thực tế.</p></div></div>
           </div>
         </section>
