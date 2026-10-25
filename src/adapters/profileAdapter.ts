@@ -70,7 +70,7 @@ export function validateUiProfile(profile: UiStudentProfile): string[] {
     const score = Number(scoreText)
     if (!Number.isFinite(score) || score < 0 || score > 30) {
       errors.push('Điểm dự kiến phải nằm trong khoảng 0–30.')
-    } else if (!/^\\d+(?:\\.\\d)?$/.test(scoreText)) {
+    } else if (!/^\d+(?:\.\d)?$/.test(scoreText)) {
       errors.push('Điểm dự kiến chỉ được có tối đa một chữ số thập phân (ví dụ: 24.5).')
     }
   }
