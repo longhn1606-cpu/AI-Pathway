@@ -1,7 +1,7 @@
 import type { RecommendationResult, StudentProfile, University, UniversityProgram } from '../types'
-import { programs } from '../data/programs'
-import { universities } from '../data/universities'
-import { recommendPrograms, type RecommendationResponse } from '../logic/recommendation'
+import { programs, universities, historicalCutoffs } from '../data/admissionsData'
+import { toRecommendationDataset } from '../adapters/recommendationDatasetAdapter'
+import { recommendPrograms, compareRecommendations, type RecommendationResponse } from '../logic/recommendation'
 import { simulateScenario, type SimulationResult } from '../logic/simulation'
 
 export interface UniversityService {
@@ -42,36 +42,38 @@ export const demoUniversityService: UniversityService = {
   },
 
   async getRecommendationReport(profile) {
-    const [universityRecords, programRecords] = await Promise.all([
-      this.getUniversities(),
-      Promise.resolve(programs),
-    ])
-    return recommendPrograms({
-      profile: {
-        ...profile,
-        interests: [...profile.interests],
-        preferredRegions: [...profile.preferredRegions],
-        preferredMethods: [...profile.preferredMethods],
-      },
-      universities: universityRecords,
-      programs: programRecords,
+    const profileCopy: StudentProfile = {
+      ...profile,
+      interests: [...profile.interests],
+      preferredRegions: [...profile.preferredRegions],
+      preferredMethods: [...profile.preferredMethods],
+    }
+    const input = toRecommendationDataset(profileCopy, {
+      universities,
+      programs,
+      historicalCutoffs,
     })
+    return recommendPrograms(input)
   },
 
   async simulateRecommendations(profile, changes) {
-    const [universityRecords, programRecords] = await Promise.all([
-      this.getUniversities(),
-      Promise.resolve(programs),
-    ])
-    return simulateScenario({
-      profile: {
-        ...profile,
-        interests: [...profile.interests],
-        preferredRegions: [...profile.preferredRegions],
-        preferredMethods: [...profile.preferredMethods],
-      },
-      universities: universityRecords,
-      programs: programRecords,
-    }, changes)
+    const profileCopy: StudentProfile = {
+      ...profile,
+      interests: [...profile.interests],
+      preferredRegions: [...profile.preferredRegions],
+      preferredMethods: [...profile.preferredMethods],
+    }
+    const input = toRecommendationDataset(profileCopy, {
+      universities,
+      programs,
+      historicalCutoffs,
+    })
+    return simulateScenario(input, changes, (scenarioProfile) =>
+      toRecommendationDataset(scenarioProfile, {
+        universities,
+        programs,
+        historicalCutoffs,
+      }),
+    )
   },
 }
