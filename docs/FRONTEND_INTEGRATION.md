@@ -1,6 +1,6 @@
 # Frontend integration contract (prepared ahead of UI merge)
 
-This guide is intentionally separate from `src/App.tsx`: the current frontend is a UI-only demo and uses a different local profile shape. Do not pass its `demoPrograms` IDs into recommendation logic.
+This guide is intentionally separate from `src/App.tsx`: the current frontend is a UI-only demo and uses a different local profile shape. A reusable, tested adapter is now available at `src/adapters/frontendProfileAdapter.ts`; import `toStudentProfile` rather than duplicating the mapping. Do not pass UI-only `demoPrograms` IDs into recommendation logic.
 
 ## UI-to-domain mapping
 
@@ -16,6 +16,7 @@ Map this into `StudentProfile` before calling `demoUniversityService`:
 
 ```ts
 import type { StudentProfile } from '../types'
+// Production adapter: import { toStudentProfile } from '../adapters/frontendProfileAdapter'
 
 type UiProfile = {
   score: string
