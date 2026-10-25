@@ -7,6 +7,8 @@ Canonical domain types are imported from `src/types/index.ts`; the shared schema
 - `recommendPrograms(input: RecommendationInput): RecommendationResponse`
 - `compareRecommendations(before, after): RecommendationComparison`
 - `simulateScenario(baseline, changes): SimulationResult`
+- `demoUniversityService.getRecommendationReport(profile)` returns results, exclusions and warnings.
+- `demoUniversityService.simulateRecommendations(profile, changes)` exposes the scenario workflow through the service boundary.
 
 `RecommendationInput` contains a `StudentProfile`, `University[]`, and `UniversityProgram[]`. The recommendation response contains ordered results, excluded program IDs with reasons, and deduplicated warnings.
 
@@ -24,6 +26,20 @@ Canonical domain types are imported from `src/types/index.ts`; the shared schema
 - Missing university references exclude the affected program. Duplicate IDs are skipped with warnings.
 - `simulated` and `needs_review` records remain visibly flagged. Source URL syntax checks do not prove that a URL is official or factually correct.
 - Results are ranked by transparent internal criterion points, then stable `programId` order. The points are not a probability, chance, or admission score.
+
+### Ranking weights
+
+| Criterion | Internal points | Rule |
+|---|---:|---|
+| Major-group match | +5 | Exact match after explicit alias normalization |
+| Preferred admission method | +3 | At least one recorded method matches |
+| Annual tuition fully within budget | +3 | Both known tuition bounds are within budget |
+| Minimum tuition within budget, maximum exceeds | +1 | Keep result and emit cost-risk warning |
+| Preferred region match | +2 | Region preference is present and matched |
+| Historical cutoff context | +2 | Score is at/above cutoff and scales match exactly |
+
+A score below a comparable historical cutoff does not exclude the program and does not subtract points; it adds a warning only. Missing or incomparable score data adds no points. A missing budget or unknown tuition adds no cost points. These are heuristic ordering weights, not calibrated probabilities.
+
 
 ## Simulation workflow
 
