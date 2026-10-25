@@ -278,7 +278,6 @@ test('metadata đơn thuần được phân loại mức ảnh hưởng thấp k
   assert.equal(explanation.impactLevel, 'low')
 })
 
-process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
 
 test('thay đổi học phí verified được phân loại mức ảnh hưởng trung bình', () => {
   const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
@@ -316,7 +315,6 @@ test('thay đổi học phí đầy đủ và verified được phân loại med
   assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'medium')
 })
 
-process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
 
 
 test('thay đổi phương thức xét tuyển được phát hiện', () => {
@@ -411,3 +409,5 @@ test('thiếu nguồn/năm và simulated không được nâng thành verified',
 test('đầu vào không có snapshot thứ hai được phân biệt qua contract input bắt buộc', () => {
   assert.throws(() => compareRules(rule(), undefined), TypeError)
 })
+
+process.stdout.write(`\nTổng kết cuối: ${passed} kiểm thử passed.\n`)
