@@ -46,6 +46,12 @@ serviceSource = serviceSource
 const serviceUrl = `data:text/javascript;base64,${Buffer.from(serviceSource).toString('base64')}`
 
 const { createIntegratedRecommendationService } = await import(serviceUrl)
+const profileAdapterSource = await compile('src/adapters/profileAdapter.ts')
+const profileAdapterUrl = `data:text/javascript;base64,${Buffer.from(profileAdapterSource).toString('base64')}`
+const recommendationProfileSource = (await compile('src/adapters/recommendationProfileAdapter.ts'))
+  .replace("from './profileAdapter'", `from '${profileAdapterUrl}'`)
+const recommendationProfileUrl = `data:text/javascript;base64,${Buffer.from(recommendationProfileSource).toString('base64')}`
+const { toRecommendationProfile } = await import(recommendationProfileUrl)
 const service = createIntegratedRecommendationService()
 const profile = {
   expectedScore: 24,
@@ -98,4 +104,22 @@ test('service returns no invented records for an empty injected dataset', async 
   const response = await emptyService.recommend({ profile })
   assert.deepEqual(response.results, [])
   assert.ok(response.warnings.some((warning) => warning.includes('Chưa có chương trình')))
+})
+
+test('UI technology profile maps to canonical IT and engineering program groups', async () => {
+  const uiProfile = toRecommendationProfile({
+    score: '24',
+    interest: 'technology',
+    region: 'anywhere',
+    budget: 'flexible',
+    keywords: '',
+  })
+  const response = await service.recommend({ profile: uiProfile })
+  const returnedPrograms = programs.filter((program) =>
+    response.results.some((result) => result.programId === program.id),
+  )
+  assert.ok(returnedPrograms.length > 0)
+  assert.ok(returnedPrograms.every((program) =>
+    ['information_technology', 'engineering'].includes(program.majorGroup),
+  ))
 })
