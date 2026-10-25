@@ -60,7 +60,7 @@ try {
   await page.getByRole('alert').filter({ hasText: 'tối đa một chữ số thập phân' }).waitFor({ timeout: 5000 })
   assert.equal(await page.locator('.results-empty').count(), 1, 'Over-precision score must not create a submitted profile')
 
-  await page.getByLabel('Thi tốt nghiệp THPT').check()
+  await page.locator('.method-option').filter({ hasText: 'Thi tốt nghiệp THPT' }).locator('input').check()
 
   const ruleSelects = page.locator('#recommendations section[aria-labelledby="rule-comparison-title"] select')
   const firstRuleVersion = await ruleSelects.nth(0).inputValue()
