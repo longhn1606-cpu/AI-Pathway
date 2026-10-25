@@ -158,3 +158,12 @@ export function validateAdmissionsDataset(
   }
   return errors
 }
+
+/** Resolve only an exact, unique title; ambiguous or absent references stay unresolved. */
+export function resolveUniqueSourceByTitle(
+  sources: DataSource[],
+  sourceReference: string,
+): DataSource | undefined {
+  const matches = sources.filter((source) => source.title === sourceReference)
+  return matches.length === 1 ? matches[0] : undefined
+}
