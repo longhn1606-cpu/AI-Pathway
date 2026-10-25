@@ -128,3 +128,31 @@ On PR #4 head `e983235f7073859fad42250d1fb8bd0e980d82cd`:
 - Adapter unit tests run #58: SUCCESS.
 
 Member 1 confirmed the six 2026 tuition fixtures are simulated demo data and historical cutoff tuple fields remain null when unsupported. CI success validates code and fixture structure, not official tuition facts.
+
+
+## Latest acceptance on PR #7 head 8ef9a99 — 2026-10-25
+
+The live branch head was re-read from GitHub as `8ef9a99a0caad38d4663d9f68756a8ca9ed234b0`.
+
+**System integration**
+- Run #192 (`40195320245`): SUCCESS.
+- Run #191 (`40195315594`): SUCCESS.
+- Both runs completed production build, `npm test`, Playwright installation, Chromium setup and browser E2E successfully.
+
+**Demo data and app validation**
+- Run #388 (`40195320251`): SUCCESS.
+- Run #387 (`40195315549`): SUCCESS.
+- Both completed TypeScript/production build, Member 4 rule-comparison regression repeated 20 times, production preview smoke test, dataset structure validation and Python regression tests.
+
+**Correction of earlier failed attempt**
+- Earlier integration run #178 (`40194278083`) failed at `npm test`; the browser E2E steps were skipped.
+- The current branch head includes the subsequent fixture correction (commit message: `test: correct mismatched source year fixture`). The two later integration runs above pass on the corrected head.
+- The earlier failure is retained in this report; it is not represented as a pass.
+
+**Data interpretation**
+- Dataset validation workflow passed, but its pass status does not mean source accuracy is verified. The previously reported 16 warnings remain review/provenance caveats.
+- Demo rule snapshots remain simulated; 2026 tuition data must retain its non-verified demo status. Missing historical cutoff values remain null.
+
+**Acceptance boundary**
+- CI Chromium E2E is verified on this exact head. A separate manual browser/device review is not evidenced by these workflow runs and must not be claimed.
+- PR #7 remains Open / Draft; CI success alone does not approve or merge the PR.
