@@ -46,7 +46,19 @@ try {
   await page.getByText('Gợi ý của bạn sẽ xuất hiện ở đây').waitFor({ timeout: 5000 })
   assert.equal(await page.locator('.results-empty').count(), 1, 'Invalid submission must return the results area to its initial empty state')
 
+  await scoreInput.fill('24.55')
+  await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
+  await page.getByRole('alert').filter({ hasText: 'tối đa một chữ số thập phân' }).waitFor({ timeout: 5000 })
+  assert.equal(await page.locator('.results-empty').count(), 1, 'Over-precision score must not create a submitted profile')
+
   await page.getByLabel('Thi tốt nghiệp THPT').check()
+
+  const ruleSelects = page.locator('#recommendations select')
+  const firstRuleVersion = await ruleSelects.nth(0).inputValue()
+  await ruleSelects.nth(1).selectOption(firstRuleVersion)
+  await page.getByRole('alert').filter({ hasText: 'Hãy chọn hai phiên bản khác nhau' }).waitFor({ timeout: 5000 })
+  assert.equal(await page.getByRole('region', { name: 'Tác động học phí' }).count(), 0, 'Same-version comparison must not render a misleading impact report')
+  await ruleSelects.nth(1).selectOption({ index: 1 })
 
   for (const [index, scenario] of scenarios.entries()) {
     const selects = page.locator('form select')
