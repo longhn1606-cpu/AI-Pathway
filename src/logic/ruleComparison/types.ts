@@ -62,8 +62,12 @@ export interface RuleComparison {
 
 export type ExplanationMode = 'template'
 
+export type RuleImpactLevel = 'high' | 'medium' | 'low' | 'requires_review'
+
 export interface RuleExplanation {
   mode: ExplanationMode
+  impactLevel: RuleImpactLevel
+  impactAssessment: string
   summary: string
   whatChanged: string[]
   potentiallyAffected: string[]
