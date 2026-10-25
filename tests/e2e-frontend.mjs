@@ -1,5 +1,8 @@
 import assert from 'node:assert/strict'
+import { mkdir } from 'node:fs/promises'
 import { chromium } from 'playwright'
+
+await mkdir('artifacts/responsive', { recursive: true })
 
 const browser = await chromium.launch({ headless: true })
 const page = await browser.newPage()
@@ -30,12 +33,37 @@ try {
 
   for (const width of [320, 360, 390, 430]) {
     await page.setViewportSize({ width, height: 844 })
-    const hasHorizontalOverflow = await page.evaluate(
-      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
-    )
-    assert.equal(hasHorizontalOverflow, false, `Mobile viewport ${width}px must not overflow horizontally`)
+    await page.screenshot({ path: `artifacts/responsive/mobile-${width}.png`, fullPage: true })
+    const layout = await page.evaluate(() => {
+      const selectors = ['.topbar .brand', '.menu-toggle', '.topbar-cta', '.hero-copy', '.form-card', '.results-empty', '.data-note', '.footer']
+      const boxes = selectors.flatMap((selector) => [...document.querySelectorAll(selector)]
+        .filter((element) => getComputedStyle(element).display !== 'none')
+        .map((element) => {
+          const rect = element.getBoundingClientRect()
+          return { selector, left: rect.left, right: rect.right, width: rect.width }
+        }))
+      return {
+        viewportWidth: document.documentElement.clientWidth,
+        documentWidth: document.documentElement.scrollWidth,
+        boxes,
+        cardTitleFontSize: getComputedStyle(document.querySelector('.program-card h3') ?? document.querySelector('h1')).fontSize,
+      }
+    })
+    assert.equal(layout.documentWidth, layout.viewportWidth, `Mobile viewport ${width}px must not overflow horizontally`)
+    for (const box of layout.boxes) {
+      assert.ok(box.left >= -1 && box.right <= width + 1, `${box.selector} must fit within ${width}px viewport: ${JSON.stringify(box)}`)
+    }
+    assert.ok(Number.parseFloat(layout.cardTitleFontSize) >= 30, 'Hero heading must remain comfortably readable before results load')
+
+    await page.getByRole('button', { name: /Mở menu/ }).click()
+    assert.equal(await page.getByRole('navigation', { name: 'Điều hướng chính' }).isVisible(), true, 'Mobile navigation must open')
+    await page.getByRole('navigation', { name: 'Điều hướng chính' }).getByRole('link', { name: 'Gợi ý' }).click()
+    assert.equal(await page.getByRole('navigation', { name: 'Điều hướng chính' }).isVisible(), false, 'Mobile navigation must close after selection')
   }
   await page.setViewportSize({ width: 1280, height: 900 })
+  await page.screenshot({ path: 'artifacts/responsive/desktop-1280.png', fullPage: true })
+  const desktopOverflow = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth)
+  assert.equal(desktopOverflow, false, 'Desktop viewport must not overflow horizontally')
 
   // The UI owns required-field validation; an empty submit must report all
   // missing fields together and must not be mistaken for a service error.
