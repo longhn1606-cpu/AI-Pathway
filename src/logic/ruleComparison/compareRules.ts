@@ -7,9 +7,15 @@ import type {
 } from './types'
 
 export interface CompareRulesOptions {
-  /** Paths whose arrays represent sets, so element order is not meaningful. */
+  /** Additional paths whose arrays represent sets, so element order is not meaningful. */
   unorderedArrayPaths?: string[]
 }
+
+const DEFAULT_UNORDERED_ARRAY_PATHS = [
+  'conditions.combinations',
+  'conditions.subjectCombinations',
+  'conditions.subjectCombinations',
+]
 
 function isPlainObject(value: RuleValue | undefined): value is { [key: string]: RuleValue } {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
@@ -94,59 +100,79 @@ function compareScalar(
   changes.push({ field, changeType, oldValue, newValue })
 }
 
-/** Compare rule content, identity, source metadata and any explicitly supplied tuition snapshot. */
+/**
+ * Compares only like-for-like rule snapshots. If institution or program identity
+ * differs, only identity changes are reported; admission conditions are not compared
+ * across unrelated entities.
+ */
 export function compareRules(
   oldRule: AdmissionRuleVersion,
   newRule: AdmissionRuleVersion,
   options: CompareRulesOptions = {},
 ): RuleComparison {
   const changes: RuleChange[] = []
-  const unorderedArrayPaths = new Set(options.unorderedArrayPaths ?? [])
+  const unorderedArrayPaths = new Set([
+    ...DEFAULT_UNORDERED_ARRAY_PATHS,
+    ...(options.unorderedArrayPaths ?? []),
+  ])
 
-  const scalarFields: Array<[string, string | number | boolean | null | undefined, string | number | boolean | null | undefined]> = [
-    ['institutionId', oldRule.institutionId, newRule.institutionId],
-    ['institutionName', oldRule.institutionName, newRule.institutionName],
-    ['programId', oldRule.programId, newRule.programId],
-    ['programName', oldRule.programName, newRule.programName],
-    ['admissionMethod', oldRule.admissionMethod, newRule.admissionMethod],
-    ['source.name', oldRule.source.name, newRule.source.name],
-    ['source.url', oldRule.source.url, newRule.source.url],
-    ['source.appliedYear', oldRule.source.appliedYear, newRule.source.appliedYear],
-    ['source.version', oldRule.source.version, newRule.source.version],
-    ['source.checkedAt', oldRule.source.checkedAt, newRule.source.checkedAt],
-    ['source.dataStatus', oldRule.source.dataStatus, newRule.source.dataStatus],
-  ]
-  for (const [field, oldValue, newValue] of scalarFields) compareScalar(changes, field, oldValue, newValue)
+  compareScalar(changes, 'institutionId', oldRule.institutionId, newRule.institutionId)
+  compareScalar(changes, 'institutionName', oldRule.institutionName, newRule.institutionName)
+  compareScalar(changes, 'programId', oldRule.programId, newRule.programId)
+  compareScalar(changes, 'programName', oldRule.programName, newRule.programName)
 
-  const conditionKeys = [...new Set([...Object.keys(oldRule.conditions), ...Object.keys(newRule.conditions)])].sort()
-  for (const key of conditionKeys) {
-    collectConditionChanges(oldRule.conditions[key], newRule.conditions[key], `conditions.${key}`, changes, unorderedArrayPaths)
+  const sameInstitution = oldRule.institutionId === newRule.institutionId
+  const sameProgramScope = oldRule.programId === newRule.programId
+  const comparableScope = sameInstitution && sameProgramScope
+
+  if (comparableScope) {
+    compareScalar(changes, 'admissionMethod', oldRule.admissionMethod, newRule.admissionMethod)
+    const scalarFields: Array<[string, string | number | boolean | null | undefined, string | number | boolean | null | undefined]> = [
+      ['source.name', oldRule.source.name, newRule.source.name],
+      ['source.url', oldRule.source.url, newRule.source.url],
+      ['source.appliedYear', oldRule.source.appliedYear, newRule.source.appliedYear],
+      ['source.version', oldRule.source.version, newRule.source.version],
+      ['source.checkedAt', oldRule.source.checkedAt, newRule.source.checkedAt],
+      ['source.dataStatus', oldRule.source.dataStatus, newRule.source.dataStatus],
+    ]
+    for (const [field, oldValue, newValue] of scalarFields) compareScalar(changes, field, oldValue, newValue)
+
+    const conditionKeys = [...new Set([...Object.keys(oldRule.conditions), ...Object.keys(newRule.conditions)])].sort()
+    for (const key of conditionKeys) {
+      collectConditionChanges(oldRule.conditions[key], newRule.conditions[key], `conditions.${key}`, changes, unorderedArrayPaths)
+    }
   }
 
   const oldTuition = oldRule.tuition ?? null
   const newTuition = newRule.tuition ?? null
-  const tuitionFields = ['minVndPerYear', 'maxVndPerYear', 'appliedYear', 'dataStatus', 'sourceUrl'] as const
-  if (oldTuition === null && newTuition !== null) {
-    changes.push({ field: 'tuition', changeType: 'added', oldValue: null, newValue: 'provided' })
-  } else if (oldTuition !== null && newTuition === null) {
-    changes.push({ field: 'tuition', changeType: 'removed', oldValue: 'provided', newValue: null })
-  } else if (oldTuition && newTuition) {
-    for (const field of tuitionFields) {
-      compareScalar(changes, `tuition.${field}`, oldTuition[field], newTuition[field])
+  if (comparableScope) {
+    const tuitionFields = ['minVndPerYear', 'maxVndPerYear', 'appliedYear', 'dataStatus', 'sourceUrl'] as const
+    if (oldTuition === null && newTuition !== null) {
+      changes.push({ field: 'tuition', changeType: 'added', oldValue: null, newValue: 'provided' })
+    } else if (oldTuition !== null && newTuition === null) {
+      changes.push({ field: 'tuition', changeType: 'removed', oldValue: 'provided', newValue: null })
+    } else if (oldTuition && newTuition) {
+      for (const field of tuitionFields) {
+        compareScalar(changes, `tuition.${field}`, oldTuition[field], newTuition[field])
+      }
     }
   }
 
-  const sameInstitution = oldRule.institutionId === newRule.institutionId
-  const sameProgram = oldRule.programId !== null && oldRule.programId === newRule.programId
-  const affectedPrograms = sameInstitution && sameProgram ? [newRule.programId as string] : []
+  const affectedUniversities = sameInstitution ? [newRule.institutionId] : []
+  const sameMajor = sameInstitution && oldRule.programId !== null
+    && oldRule.programId === newRule.programId
+  const affectedMajors = sameMajor ? [newRule.programId as string] : []
+  const affectedPrograms = affectedMajors
 
   const evidence: string[] = [
     sameInstitution
       ? `Hai phiên bản có cùng institutionId: ${oldRule.institutionId}.`
       : 'institutionId giữa hai phiên bản khác nhau; không gán thay đổi cho cùng một trường.',
-    sameProgram
-      ? `Hai phiên bản có cùng programId: ${newRule.programId}.`
-      : 'Không có programId trùng khớp để xác nhận một chương trình cụ thể bị ảnh hưởng.',
+    sameProgramScope
+      ? oldRule.programId === null
+        ? 'Cả hai snapshot đều ở phạm vi cấp trường; không định danh một ngành cụ thể.'
+        : `Hai phiên bản có cùng programId: ${newRule.programId}.`
+      : 'programId giữa hai phiên bản khác nhau; không so sánh điều kiện giữa hai chương trình khác nhau.',
   ]
 
   const limitations: string[] = []
@@ -160,17 +186,18 @@ export function compareRules(
     limitations.push('Thiếu năm áp dụng ở ít nhất một phiên bản; không thể xác nhận phạm vi thời gian.')
   }
   if (!sameInstitution) limitations.push('Hai phiên bản thuộc institutionId khác nhau; không thể diễn giải đây là thay đổi theo thời gian của cùng một trường.')
-  if (!sameProgram) limitations.push('Chưa đủ căn cứ định danh programId để kết luận chương trình cụ thể chịu tác động.')
+  if (!sameProgramScope) limitations.push('Hai phiên bản thuộc programId khác nhau; không thể diễn giải đây là thay đổi của cùng một ngành.')
+  if (!comparableScope) limitations.push('Chỉ các trường định danh trường/ngành được báo cáo; điều kiện tuyển sinh không được so sánh giữa hai phạm vi khác nhau.')
   if (changes.length === 0) limitations.push('Không phát hiện khác biệt trong các trường được module so sánh; điều này không chứng minh toàn bộ văn bản quy định giống nhau.')
 
   const tuitionStatuses = [oldTuition?.dataStatus, newTuition?.dataStatus].filter((status): status is DataStatus => status !== undefined)
   const tuitionStatus = tuitionStatuses.length ? effectiveStatus(tuitionStatuses) : null
-  if (!oldTuition || !newTuition) {
+  if (comparableScope && (!oldTuition || !newTuition)) {
     limitations.push('Thiếu snapshot học phí ở ít nhất một phiên bản; không thể kết luận học phí không thay đổi.')
-  } else if (
+  } else if (comparableScope && oldTuition && newTuition && (
     oldTuition.minVndPerYear === null || oldTuition.maxVndPerYear === null
     || newTuition.minVndPerYear === null || newTuition.maxVndPerYear === null
-  ) {
+  )) {
     limitations.push('Học phí có trường chưa có dữ liệu; không ước tính hoặc tự điền giá trị còn thiếu.')
   }
 
@@ -178,6 +205,8 @@ export function compareRules(
     oldVersionId: oldRule.id,
     newVersionId: newRule.id,
     changes,
+    affectedUniversities,
+    affectedMajors,
     affectedPrograms,
     evidence,
     limitations,
