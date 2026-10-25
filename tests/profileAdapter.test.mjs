@@ -19,6 +19,7 @@ const validProfile = {
   region: 'central',
   budget: '20to40',
   keywords: '',
+  preferredMethods: ['high_school_exam'],
 }
 
 test('accepts a complete valid profile and maps its score to scale 30', () => {
@@ -26,6 +27,7 @@ test('accepts a complete valid profile and maps its score to scale 30', () => {
   const profile = toStudentProfile(validProfile)
   assert.equal(profile.expectedScore, 24.5)
   assert.equal(profile.scoreScale, 30)
+  assert.deepEqual(profile.preferredMethods, ['high_school_exam'])
 })
 
 test('reports every required field when the profile is incomplete', () => {
@@ -35,6 +37,7 @@ test('reports every required field when the profile is incomplete', () => {
     region: '',
     budget: '',
     keywords: '',
+    preferredMethods: [],
   })
   assert.equal(errors.length, 4)
   assert.ok(errors.some((error) => error.includes('điểm')))
