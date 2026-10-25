@@ -105,3 +105,34 @@ test('rejects negative tuition and inverted tuition ranges', () => {
   }])
   assert.ok(negative.some((error) => error.includes('negative tuition')))
 })
+
+
+test('rejects empty university and program roots', () => {
+  assert.ok(validate([], [program]).some((error) => error.includes('universities must not be empty')))
+  assert.ok(validate([university], []).some((error) => error.includes('programs must not be empty')))
+})
+
+test('rejects verified cutoff without a source URL', () => {
+  const errors = validate([university], [program], {
+    ...cutoffs, records: [{ ...cutoffs.records[0], sourceUrl: null }],
+  })
+  assert.ok(errors.some((error) => error.includes('must include a source URL')))
+})
+
+test('rejects simulated cutoff without an explicit simulation note', () => {
+  const errors = validate([university], [program], {
+    ...cutoffs, records: [{ ...cutoffs.records[0], status: 'simulated', notes: 'example' }],
+  })
+  assert.ok(errors.some((error) => error.includes('explicit simulation note')))
+})
+
+test('rejects cutoff score without matching scale', () => {
+  const errors = validate([university], [program], {
+    ...cutoffs, records: [{ ...cutoffs.records[0], scoreScale: null }],
+  })
+  assert.ok(errors.some((error) => error.includes('must both be null or both be present')))
+})
+
+test('allows an empty cutoff record list to represent no matching year/method', () => {
+  assert.deepEqual(validate([university], [program], { ...cutoffs, records: [] }), [])
+})
