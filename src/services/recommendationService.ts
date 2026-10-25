@@ -1,7 +1,7 @@
 import type { RecommendationResult, StudentProfile, University, UniversityProgram } from '../types'
 import { programs, universities, historicalCutoffs } from '../data/admissionsData'
 import { toRecommendationDataset } from '../adapters/recommendationDatasetAdapter'
-import { recommendPrograms, compareRecommendations, type RecommendationResponse } from '../logic/recommendation'
+import { recommendPrograms, type RecommendationResponse } from '../logic/recommendation'
 import { simulateScenario, type SimulationResult } from '../logic/simulation'
 
 export interface UniversityService {
