@@ -123,7 +123,7 @@ export function compareRules(oldRule: AdmissionRuleVersion, newRule: AdmissionRu
     }
   }
 
-  const affectedUniversities = sameInstitution ? [newRule.institutionId] : []
+  const affectedUniversities = comparableScope ? [newRule.institutionId] : []
   const sameMajor = sameInstitution && oldRule.programId !== null && oldRule.programId === newRule.programId
   const affectedMajors = sameMajor ? [newRule.programId as string] : []
   const limitations: string[] = []
