@@ -332,20 +332,16 @@ export function recommendPrograms(input: RecommendationInput): RecommendationRes
   let evaluationInput = input
   let safeProfile = input.profile
 
-  const hasScoreInput = input.profile.expectedScore !== null || input.profile.scoreScale !== null
-  if (hasScoreInput) {
-    const validScale = typeof input.profile.scoreScale === 'number'
-      && Number.isFinite(input.profile.scoreScale)
-      && input.profile.scoreScale > 0
-    const validScore = typeof input.profile.expectedScore === 'number'
-      && Number.isFinite(input.profile.expectedScore)
-      && validScale
-      && input.profile.expectedScore >= 0
-      && input.profile.expectedScore <= input.profile.scoreScale!
-    if (!validScore) {
-      safeProfile = { ...safeProfile, expectedScore: null, scoreScale: null }
-      warnings.push('Điểm dự kiến hoặc thang điểm không hợp lệ (điểm phải nằm trong khoảng 0 đến thang điểm dương); đã bỏ đối chiếu điểm chuẩn.')
-    }
+  const scoreScale = input.profile.scoreScale
+  const expectedScore = input.profile.expectedScore
+  const invalidScale = scoreScale !== null
+    && (!Number.isFinite(scoreScale) || scoreScale <= 0)
+  const invalidScore = expectedScore !== null && scoreScale !== null
+    && (!Number.isFinite(expectedScore) || expectedScore < 0 || expectedScore > scoreScale)
+
+  if (invalidScale || invalidScore) {
+    safeProfile = { ...safeProfile, expectedScore: null, scoreScale: null }
+    warnings.push('Điểm dự kiến hoặc thang điểm không hợp lệ (điểm phải nằm trong khoảng 0 đến thang điểm dương); đã bỏ đối chiếu điểm chuẩn.')
   }
 
   if (input.profile.annualBudgetVnd !== null
