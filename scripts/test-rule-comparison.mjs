@@ -289,4 +289,31 @@ test('thay đổi học phí verified được phân loại mức ảnh hưởng
   assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'medium')
 })
 
+
+test('học phí simulated không được phân loại medium dù nguồn quy định verified', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const oldTuition = { minVndPerYear: 20_000_000, maxVndPerYear: 25_000_000, appliedYear: 2026, dataStatus: 'simulated', sourceUrl: null }
+  const newTuition = { ...oldTuition, minVndPerYear: 22_000_000, appliedYear: 2027 }
+  const oldRule = rule({ source: verifiedSource, tuition: oldTuition })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' }, tuition: newTuition })
+  assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'requires_review')
+})
+
+test('thêm snapshot học phí không đầy đủ phải yêu cầu rà soát', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const tuition = { minVndPerYear: null, maxVndPerYear: null, appliedYear: null, dataStatus: 'needs_review', sourceUrl: null }
+  const oldRule = rule({ source: verifiedSource })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' }, tuition })
+  assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'requires_review')
+})
+
+test('thay đổi học phí đầy đủ và verified được phân loại medium', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const oldTuition = { minVndPerYear: 20_000_000, maxVndPerYear: 25_000_000, appliedYear: 2026, dataStatus: 'verified', sourceUrl: 'https://university.example/tuition-2026' }
+  const newTuition = { ...oldTuition, minVndPerYear: 22_000_000, appliedYear: 2027, sourceUrl: 'https://university.example/tuition-2027' }
+  const oldRule = rule({ source: verifiedSource, tuition: oldTuition })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' }, tuition: newTuition })
+  assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'medium')
+})
+
 process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
