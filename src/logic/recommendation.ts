@@ -60,6 +60,7 @@ const MAJOR_ALIASES: Record<string, string> = {
   'it': 'technology',
   'cntt': 'technology',
   'computer science': 'technology',
+  'information technology': 'technology',
   'khoa hoc may tinh': 'technology',
   'business': 'business',
   'economics': 'business',
