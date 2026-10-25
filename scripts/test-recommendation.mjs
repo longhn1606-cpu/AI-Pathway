@@ -304,18 +304,19 @@ test('thay đổi ngân sách không bắt buộc làm thay đổi kết quả n
 
 
 test('học phí âm, không hữu hạn hoặc min lớn hơn max không được dùng để loại chương trình', () => {
+  const verified = verifiedSourceInput('https://admissions.example.edu.vn/program')
   const invalidRanges = [
     { tuitionMinVndPerYear: -1, tuitionMaxVndPerYear: 20000000 },
     { tuitionMinVndPerYear: 10000000, tuitionMaxVndPerYear: Number.NaN },
     { tuitionMinVndPerYear: 30000000, tuitionMaxVndPerYear: 20000000 },
   ]
   for (const range of invalidRanges) {
-    const program = { ...programs[0], ...range }
-    const result = recommendPrograms(input(
-      { interests: ['technology'], annualBudgetVnd: 25000000 },
-      [universities[0]],
-      [program],
-    ))
+    const program = { ...verified.programs[0], ...range }
+    const result = recommendPrograms({
+      profile: { ...baseProfile, interests: ['technology'], annualBudgetVnd: 25000000 },
+      universities: verified.universities,
+      programs: [program],
+    })
     assert.equal(result.results.length, 1)
     assert.equal(result.results[0].dataStatus, 'needs_review')
     assert.ok(result.results[0].warnings.some((warning) => warning.includes('học phí không hợp lệ')))
@@ -324,6 +325,7 @@ test('học phí âm, không hữu hạn hoặc min lớn hơn max không đư�
 })
 
 test('điểm chuẩn lịch sử ngoài thang hoặc năm không hợp lệ không được đem so sánh', () => {
+  const verified = verifiedSourceInput('https://admissions.example.edu.vn/program')
   const invalidCutoffs = [
     { historicalCutoff: 31, cutoffScale: 30, cutoffYear: 2025 },
     { historicalCutoff: -1, cutoffScale: 30, cutoffYear: 2025 },
@@ -331,8 +333,12 @@ test('điểm chuẩn lịch sử ngoài thang hoặc năm không hợp lệ kh�
     { historicalCutoff: 20, cutoffScale: 30, cutoffYear: -1 },
   ]
   for (const cutoff of invalidCutoffs) {
-    const program = { ...programs[0], ...cutoff }
-    const result = recommendPrograms(input({}, [universities[0]], [program]))
+    const program = { ...verified.programs[0], ...cutoff }
+    const result = recommendPrograms({
+      profile: baseProfile,
+      universities: verified.universities,
+      programs: [program],
+    })
     assert.equal(result.results[0].dataStatus, 'needs_review')
     assert.ok(result.results[0].warnings.some((warning) => warning.includes('điểm chuẩn lịch sử') && warning.includes('không hợp lệ')))
     assert.ok(!result.results[0].suitabilityReasons.some((reason) => reason.includes('điểm chuẩn tham khảo')))
