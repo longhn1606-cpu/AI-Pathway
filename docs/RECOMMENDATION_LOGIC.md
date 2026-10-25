@@ -70,3 +70,14 @@ The recommendation command runs the recommendation regression suite, independent
 - The shared `RecommendationResult` has no numeric score field. Ranking is expressed by array order and reasons/warnings.
 - This is deterministic filtering and ranking, not an admissions prediction model.
 - This module does not perform legal verification of admissions rules or verify source ownership.
+
+
+## Canonical dataset integration
+
+- Recommendation service now reads `universities`, `programs`, and `historicalCutoffs` from `src/data/admissionsData.ts`; the former demo fixtures remain only for isolated legacy unit tests.
+- `src/adapters/recommendationDatasetAdapter.ts` selects a historical cutoff only when the profile explicitly contains exactly one preferred admission method. It selects the unique latest record for that program and method; missing or ambiguous records remain un-compared.
+- The adapter preserves cutoff provenance by carrying the source URL, checked date, applicable year, and data status into the derived program record. Simulated cutoff status propagates to the recommendation result.
+- When a profile has zero or multiple preferred methods, no single cutoff is inferred because the shared `UniversityProgram` contract contains only one cutoff slot.
+- Simulation now re-resolves the canonical dataset for both baseline and scenario profiles, so changing the preferred admission method cannot reuse a cutoff selected for the previous method.
+- Canonical data validation and method-specific adapter coverage run in `npm run test:recommendation`.
+- `information_technology` in the canonical dataset is normalized as the existing `technology` interest category; no shared schema fields were changed.
