@@ -4,7 +4,9 @@ import type {
   University,
   UniversityProgram,
 } from '../types'
-import { programs as canonicalPrograms, universities as canonicalUniversities } from '../data/admissionsData'
+import { programs as canonicalPrograms, universities as canonicalUniversities, historicalCutoffs as canonicalHistoricalCutoffs } from '../data/admissionsData'
+import type { HistoricalCutoffsDataset } from '../data/admissionsDataValidation'
+import { toRecommendationDataset } from '../adapters/recommendationDatasetAdapter'
 import {
   recommendPrograms,
   type RecommendationResponse,
@@ -17,6 +19,7 @@ import {
 export interface AdmissionsDataProvider {
   getUniversities(): University[]
   getPrograms(): UniversityProgram[]
+  getHistoricalCutoffs?(): HistoricalCutoffsDataset
 }
 
 export interface IntegratedRecommendationInput {
@@ -37,6 +40,7 @@ export interface IntegratedRecommendationService {
 const canonicalProvider: AdmissionsDataProvider = {
   getUniversities: () => canonicalUniversities,
   getPrograms: () => canonicalPrograms,
+  getHistoricalCutoffs: () => canonicalHistoricalCutoffs,
 }
 
 function cloneProfile(profile: StudentProfile): StudentProfile {
@@ -76,13 +80,21 @@ export function createIntegratedRecommendationService(
 ): IntegratedRecommendationService {
   const readUniversities = () => data.getUniversities().map(cloneUniversity)
   const readPrograms = () => data.getPrograms().map(cloneProgram)
+  const readHistoricalCutoffs = (): HistoricalCutoffsDataset =>
+    data.getHistoricalCutoffs?.() ?? {
+      title: 'No historical cutoff data supplied',
+      years: [],
+      checkedAt: '1970-01-01',
+      scoringPolicy: 'No historical cutoff data supplied; leave cutoff fields unknown.',
+      records: [],
+    }
 
   function buildInput(profile: StudentProfile) {
-    return {
-      profile: cloneProfile(profile),
+    return toRecommendationDataset(cloneProfile(profile), {
       universities: readUniversities(),
       programs: readPrograms(),
-    }
+      historicalCutoffs: readHistoricalCutoffs(),
+    })
   }
 
   return {
@@ -108,7 +120,7 @@ export function createIntegratedRecommendationService(
         interests: changes.interests ? [...changes.interests] : undefined,
         preferredRegions: changes.preferredRegions ? [...changes.preferredRegions] : undefined,
         preferredMethods: changes.preferredMethods ? [...changes.preferredMethods] : undefined,
-      })
+      }, (scenarioProfile) => buildInput(scenarioProfile))
     },
   }
 }

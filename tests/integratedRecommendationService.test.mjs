@@ -43,8 +43,11 @@ serviceSource = serviceSource
   .replace("from '../data/admissionsData'", `from '${canonicalModuleUrl}'`)
   .replace("from '../logic/recommendation'", `from '${recommendationUrl}'`)
   .replace("from '../logic/simulation'", `from '${simulationUrl}'`)
+const encodeBase64 = (value) => btoa(Array.from(new TextEncoder().encode(value), (byte) => String.fromCharCode(byte)).join(''))
+const datasetAdapterSource = await compile('src/adapters/recommendationDatasetAdapter.ts')
+const datasetAdapterUrl = `data:text/javascript;base64,${encodeBase64(datasetAdapterSource)}`
+serviceSource = serviceSource.replace("from '../adapters/recommendationDatasetAdapter'", `from '${datasetAdapterUrl}'`)
 const serviceUrl = `data:text/javascript;base64,${Buffer.from(serviceSource).toString('base64')}`
-
 const { createIntegratedRecommendationService } = await import(serviceUrl)
 const profileAdapterSource = await compile('src/adapters/profileAdapter.ts')
 const profileAdapterUrl = `data:text/javascript;base64,${Buffer.from(profileAdapterSource).toString('base64')}`
@@ -172,4 +175,86 @@ test('scale mismatch is surfaced without direct score comparison; null tuition r
   assert.equal(response.results.length, 1)
   assert.ok(response.results[0].warnings.some((warning) => warning.includes('Không so sánh điểm trực tiếp')))
   assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu học phí')))
+})
+
+
+const cutoffDataset = {
+  title: 'Method-specific integration fixture',
+  years: [2024, 2025],
+  checkedAt: '2026-10-25',
+  scoringPolicy: 'Compare only the same program, year, method and score scale.',
+  records: [
+    { id: 'p-hs-2024', programId: 'method-program', universityId: 'method-university', year: 2024, method: 'high_school_exam', cutoffScore: 26, scoreScale: 30, sourceUrl: 'https://example.edu.vn/cutoff-2024', checkedAt: '2026-10-25', status: 'verified' },
+    { id: 'p-hs-2025', programId: 'method-program', universityId: 'method-university', year: 2025, method: 'high_school_exam', cutoffScore: 24, scoreScale: 30, sourceUrl: 'https://example.edu.vn/cutoff-2025', checkedAt: '2026-10-25', status: 'verified' },
+    { id: 'p-ar-2025', programId: 'method-program', universityId: 'method-university', year: 2025, method: 'academic_record', cutoffScore: 23, scoreScale: 30, sourceUrl: 'https://example.edu.vn/academic-2025', checkedAt: '2026-10-25', status: 'simulated' },
+  ],
+}
+const methodUniversity = {
+  id: 'method-university', name: 'Method University', shortName: 'MU',
+  province: 'Da Nang', region: 'central', website: 'https://example.edu.vn',
+  sources: [{ title: 'Base source', url: 'https://example.edu.vn/admissions', applicableYear: 2026, checkedAt: '2026-10-25', status: 'verified' }],
+  status: 'verified',
+}
+const methodProgram = {
+  id: 'method-program', universityId: 'method-university', name: 'Method Program',
+  majorGroup: 'technology', tuitionMinVndPerYear: null, tuitionMaxVndPerYear: null,
+  tuitionYear: null,
+  admissionMethods: [
+    { method: 'high_school_exam', description: 'High school exam', applicableYear: 2026, sourceIds: ['Base source'], status: 'verified' },
+    { method: 'academic_record', description: 'Academic record', applicableYear: 2026, sourceIds: ['Base source'], status: 'verified' },
+  ],
+  historicalCutoff: null, cutoffYear: null, cutoffScale: null,
+  sources: [{ title: 'Base source', url: 'https://example.edu.vn/admissions', applicableYear: 2026, checkedAt: '2026-10-25', status: 'verified' }],
+  status: 'verified',
+}
+const methodProfile = {
+  expectedScore: 25, scoreScale: 30, interests: ['technology'],
+  preferredRegions: ['nationwide'], annualBudgetVnd: null,
+  preferredMethods: ['high_school_exam'],
+}
+const methodService = createIntegratedRecommendationService({
+  getUniversities: () => [methodUniversity],
+  getPrograms: () => [methodProgram],
+  getHistoricalCutoffs: () => cutoffDataset,
+})
+
+test('historical cutoff adapter selects the latest unique record for the one selected method', async () => {
+  const response = await methodService.recommend({ profile: methodProfile })
+  assert.equal(response.results.length, 1)
+  assert.ok(response.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
+  assert.ok(!response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
+})
+
+test('simulation re-resolves cutoff for the changed admission method in both before and after states', async () => {
+  const result = await methodService.simulate(
+    { profile: methodProfile },
+    { preferredMethods: ['academic_record'] },
+  )
+  assert.ok(result.before.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
+  assert.equal(result.before.results[0].dataStatus, 'verified')
+  assert.ok(result.after.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
+  assert.equal(result.after.results[0].dataStatus, 'simulated')
+  assert.equal(result.scenarioProfile.preferredMethods[0], 'academic_record')
+})
+
+test('historical method not currently declared by a program is not mapped into its cutoff slot', async () => {
+  const unavailableMethodService = createIntegratedRecommendationService({
+    getUniversities: () => [methodUniversity],
+    getPrograms: () => [{
+      ...methodProgram,
+      admissionMethods: methodProgram.admissionMethods.filter((item) => item.method === 'high_school_exam'),
+    }],
+    getHistoricalCutoffs: () => cutoffDataset,
+  })
+  const response = await unavailableMethodService.recommend({
+    profile: { ...methodProfile, preferredMethods: ['academic_record'] },
+  })
+  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
+})
+
+test('multiple selected methods leave the single cutoff slot unknown instead of choosing arbitrarily', async () => {
+  const response = await methodService.recommend({
+    profile: { ...methodProfile, preferredMethods: ['high_school_exam', 'academic_record'] },
+  })
+  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
 })
