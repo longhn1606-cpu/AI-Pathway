@@ -21,7 +21,7 @@ function stableValue(value: RuleValue): string {
     const entries = Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableValue(value[key])}`)
     return `{${entries.join(',')}}`
   }
-  return JSON.stringify(value)
+  return JSON.stringify(value) ?? String(value)
 }
 
 function valuesEqual(
