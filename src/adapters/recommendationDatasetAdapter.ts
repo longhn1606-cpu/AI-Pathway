@@ -22,22 +22,18 @@ export function toRecommendationDataset(
   profile: StudentProfile,
   data: CanonicalAdmissionsData,
 ): RecommendationDatasetInput {
-  if (profile.preferredMethods.length !== 1) {
-    return { profile, universities: data.universities, programs: data.programs }
-  }
-
-  const selectedMethod: AdmissionMethod = profile.preferredMethods[0]
+  const scoreMethod: AdmissionMethod = 'high_school_exam'
   const programs = data.programs.map((program) => {
     // Historical rows must also match a method currently declared for this program.
     // A historical academic-record cutoff must not imply that the current program
     // offers academic-record admission.
-    if (!program.admissionMethods.some((item) => item.method === selectedMethod)) return program
+    if (!program.admissionMethods.some((item) => item.method === scoreMethod)) return program
 
     const matches = data.historicalCutoffs.records.filter((record) =>
       record.programId === program.id &&
-      record.method === selectedMethod &&
+      record.method === scoreMethod &&
       record.cutoffScore !== null &&
-      record.scoreScale !== null,
+      record.scoreScale === 30,
     )
     if (matches.length === 0) return program
 
@@ -56,7 +52,7 @@ export function toRecommendationDataset(
 
     const cutoffSource = cutoff.sourceUrl
       ? [{
-          title: `Điểm chuẩn lịch sử (${selectedMethod}) năm ${cutoff.year}`,
+          title: `Điểm chuẩn lịch sử (thi tốt nghiệp THPT) năm ${cutoff.year}`,
           url: cutoff.sourceUrl,
           applicableYear: cutoff.year,
           checkedAt: cutoff.checkedAt,
