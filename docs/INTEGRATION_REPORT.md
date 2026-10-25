@@ -30,7 +30,7 @@ These are dependency snapshots on the isolated integration branch. Original memb
 1. Dataset → recommendation/simulation: canonical exports injected into Member 3 engine; IDs/status/nullability preserved; profile and dataset records cloned at service boundary.
 2. UI → recommendation: form validation, profile mapping and service call; render by programId with reasons/warnings/status.
 3. UI → simulation: +1 score scenario with before/after/added/removed/retained counts; baseline form state unchanged.
-4. Rule comparison → UI: connected panel shows truthful empty state until two explicit versioned snapshots exist.
+4. Rule comparison → UI: connected panel uses Member 4's two existing simulated demo snapshots; both are labelled simulated and the pair adapter rejects missing/duplicate version IDs. No official rule is claimed.
 5. Taxonomy: UI technology maps to observed canonical labels information_technology and engineering; Member 3 ranking code unchanged.
 
 ## CI evidence and issue handling
@@ -47,7 +47,7 @@ The canonical historicalCutoffs collection is separate from UniversityProgram, w
 ## Remaining
 
 - Rerun CI after the newest score-scale/null-tuition test addition.
-- Rule comparison has no historical snapshot source in canonical data; panel remains empty until two authentic versioned snapshots are provided.
+- Rule comparison demo uses Member 4's simulated snapshot pair; production comparison still needs two authentic versioned snapshots from a source-backed history.
 - Historical cutoff records remain separate from the single nullable cutoff tuple in Member 3's input; Member 1/3 must agree on a lossless policy before cutoff history influences recommendation.
 - After upstream PRs merge, reconcile dependency snapshots with main.
 
