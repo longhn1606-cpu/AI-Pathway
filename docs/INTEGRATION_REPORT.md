@@ -6,51 +6,57 @@ Repository: longhn1606-cpu/AI-Pathway
 
 ## PR status rechecked
 
-The current open-PR search reports PR #1, #3, #4, #5, #6 and #7 as open. PR #2 is closed. PR #7 remains a Draft. No other PR was merged or modified by Member 5.
+Current open-PR search reports PR #1, #3, #4, #5, #6 and #7 as open. PR #2 is closed. PR #7 remains Draft. Member 5 did not merge or modify any other member's PR.
 
-PR #4 latest reported head in its PR description is ae497a0587783950f3f27a2c561a4b46addc4a1c. Its two reported workflow runs were independently retrieved:
-- Adapter unit tests, run #34: completed / success.
-- Demo data and app checks, run #110: completed / success.
+PR #4 latest reported head ae497a0587783950f3f27a2c561a4b46addc4a1c has two independently retrieved successful workflow runs:
+- Adapter unit tests, run #34: success.
+- Demo data and app checks, run #110: success.
 
-PR #6's latest description says it reuses src/adapters/profileAdapter.ts from PR #5, rather than adding a competing adapter. It adopts conservative budget ceilings for the bounded ranges and null for over70/flexible. PR #1's separate frontendProfileAdapter.ts is not copied into the Member 5 integration branch.
+PR #6 now reuses PR #5's profileAdapter.ts and applies conservative budget ceilings to bounded ranges; over70/flexible remain null.
 
-## Files added to Member 5 branch
+## Integration files on Member 5 branch
 
 - Member 1 dependency snapshot: admissionsData.ts, admissionsDataValidation.ts, ruleComparisonAdapter.ts.
 - Member 3 engine snapshot: recommendation.ts, simulation.ts.
 - Member 4 engine snapshot: ruleComparison/types.ts, compareRules.ts, explainRules.ts, compareAndExplainRules.ts, index.ts.
 - Member 5 services: integratedRecommendationService.ts, integratedRuleComparisonService.ts.
-- Tests: Member 1 validator/adapter tests, Member 3 recommendation/simulation suites, and Member 5 integration service tests.
-- CI: .github/workflows/system-integration.yml.
-- package scripts: test and test:recommendation.
+- Member 5 adapters: recommendationProfileAdapter.ts; updated PR #6 profileAdapter.ts.
+- Frontend: App.tsx calls recommendation and simulation; RuleComparisonPanel.tsx connects to rule comparison service.
+- Tests: dataset validator, rule adapter, integrated recommendation, integrated rule comparison, recommendation profile adapter.
+- CI: system-integration.yml.
 
-The feature modules are copied into the isolated integration branch as dependency snapshots. This does not merge, close, or change the original member branches. After upstream PRs merge, reconcile the files with the merged base to avoid duplicate commits/conflicts.
+These are dependency snapshots on the isolated integration branch; original member branches and PRs remain untouched. Reconcile with upstream files after their PRs merge.
 
 ## Integration implemented
 
-1. Canonical dataset → recommendation/simulation:
-   integratedRecommendationService injects Member 1 canonical exports into Member 3's existing functions. It clones profile and dataset records at the boundary, preserves IDs/status/nulls and does not modify ranking logic.
-2. Rule comparison service boundary:
-   integratedRuleComparisonService delegates to Member 4's compareAndExplainRules. It requires explicit before/after snapshots and does not fabricate history.
-3. Test and CI scaffolding:
-   Added dataset validator tests, rule adapter tests, recommendation and simulation tests, plus integration tests for canonical IDs, provenance status, empty dataset behavior, simulation immutability and rule explanation.
+1. Dataset → recommendation/simulation: canonical exports injected into Member 3 engine; IDs/status/nullability preserved; profile and dataset records cloned at service boundary.
+2. UI → recommendation: form validated, profile adapted and passed to service. Results rendered by programId with reasons, warnings and DataStatus.
+3. UI → simulation: +1 score scenario uses a cloned profile and renders before/after/added/removed/retained counts. Baseline form state is not modified.
+4. Rule comparison → UI: panel is connected to Member 4 facade and renders a truthful empty state until two explicit versioned snapshots are supplied.
+5. Taxonomy mapping: UI technology maps to canonical dataset labels information_technology and engineering without changing Member 3's business logic.
 
-## Still incomplete
+## CI evidence and issue handling
 
-- Frontend App.tsx is not yet wired to the new integration services.
-- There is no confirmed historical rule snapshot source to populate the comparison service from canonical dataset.
-- No browser E2E run has been completed.
-- The current repository connector cannot run Node/Vite directly; CI is the execution path. Do not treat tests authored as tests passed.
+First CI attempt failed before install because setup-node npm cache requires a lockfile; cache was removed.
+Second attempt:
+- Production build: passed.
+- npm test: 19/19 passed.
+- The separate Member 3 test runner failed because it expected demo fixture files absent from the canonical main base. Those fixture-dependent runners were removed from this integration branch; integration tests use canonical JSON instead.
+
+A new workflow run is pending for the latest frontend/service changes. Do not claim the latest head passes until its workflow result is retrieved.
+
+## Remaining blockers
+
+- No historical rule snapshot source is available in the canonical dataset; comparison remains empty/unavailable in UI until two snapshots are provided.
+- 20 browser E2E runs have not been performed.
+- After upstream PRs merge, dependency snapshot files must be reconciled with merged main to avoid duplication.
 
 ## Next steps
 
-1. Read the CI result for the current PR #7 head and fix any compile/test failures.
-2. Wire Member 2's frontend service ports to integratedRecommendationService and integratedRuleComparisonService without rewriting App layout.
-3. Add loading, empty and error states and ensure results are keyed by programId.
-4. Keep rule comparison disabled/empty until two valid versioned snapshots are supplied.
-5. Run at least 20 genuine frontend-to-service E2E submissions in CI/browser environment and update the test report with run evidence.
-6. After upstream PR merges, compare the integration snapshot against merged main and remove duplicated files safely.
+1. Confirm latest CI after frontend wiring.
+2. Fix any build/type/test failures.
+3. Run browser E2E with at least 20 distinct profiles, recording actual outputs.
+4. Coordinate with Member 1/4 to supply genuine versioned rule snapshots if rule comparison must be demonstrated with real data.
+5. Reconcile snapshot files when PRs #1/#3/#4 are merged.
 
-## Evidence limitations
-
-No claim of end-to-end completion is made. The 20-run requirement remains outstanding.
+No full E2E completion is claimed.
