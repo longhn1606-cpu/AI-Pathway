@@ -184,5 +184,6 @@ export function compareRules(
     sources: [oldRule.source, newRule.source],
     dataStatus: effectiveStatus([oldRule.source.dataStatus, newRule.source.dataStatus]),
     tuitionStatus,
+    tuition: { old: oldTuition, new: newTuition },
   }
 }
