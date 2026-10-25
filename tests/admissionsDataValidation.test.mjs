@@ -87,6 +87,24 @@ test('rejects malformed admission methods and preserves explicit null values', (
   assert.deepEqual(validate(), [])
 })
 
+test('rejects verified admission methods without a valid matching program source', () => {
+  const verifiedMethod = { ...program.admissionMethods[0], status: 'verified', sourceIds: [] }
+  const missing = validate([university], [{ ...program, admissionMethods: [verifiedMethod] }])
+  assert.ok(missing.some((error) => error.includes('verified but has no sourceIds')))
+
+  const unresolved = validate([university], [{
+    ...program,
+    admissionMethods: [{ ...verifiedMethod, sourceIds: ['not-in-program-sources'] }],
+  }])
+  assert.ok(unresolved.some((error) => error.includes('exactly one program source')))
+
+  const wrongYear = validate([university], [{
+    ...program,
+    admissionMethods: [{ ...verifiedMethod, sourceIds: [sourceRecord.title] }],
+  }])
+  assert.ok(wrongYear.some((error) => error.includes('match applicableYear')))
+})
+
 test('resolves source title only when the exact match is unique', () => {
   const first = { ...sourceRecord }
   const second = { ...sourceRecord, title: 'Another source' }
