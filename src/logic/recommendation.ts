@@ -329,6 +329,35 @@ function evaluateProgram(
  */
 export function recommendPrograms(input: RecommendationInput): RecommendationResponse {
   const warnings: string[] = []
+  let evaluationInput = input
+  let safeProfile = input.profile
+
+  const hasScoreInput = input.profile.expectedScore !== null || input.profile.scoreScale !== null
+  if (hasScoreInput) {
+    const validScale = typeof input.profile.scoreScale === 'number'
+      && Number.isFinite(input.profile.scoreScale)
+      && input.profile.scoreScale > 0
+    const validScore = typeof input.profile.expectedScore === 'number'
+      && Number.isFinite(input.profile.expectedScore)
+      && validScale
+      && input.profile.expectedScore >= 0
+      && input.profile.expectedScore <= input.profile.scoreScale!
+    if (!validScore) {
+      safeProfile = { ...safeProfile, expectedScore: null, scoreScale: null }
+      warnings.push('Điểm dự kiến hoặc thang điểm không hợp lệ (điểm phải nằm trong khoảng 0 đến thang điểm dương); đã bỏ đối chiếu điểm chuẩn.')
+    }
+  }
+
+  if (input.profile.annualBudgetVnd !== null
+    && (!Number.isFinite(input.profile.annualBudgetVnd) || input.profile.annualBudgetVnd < 0)) {
+    safeProfile = { ...safeProfile, annualBudgetVnd: null }
+    warnings.push('Ngân sách năm không hợp lệ; đã bỏ đánh giá ngân sách thay vì diễn giải thành 0.')
+  }
+
+  if (safeProfile !== input.profile) {
+    evaluationInput = { ...input, profile: safeProfile }
+  }
+
   const universityById = new Map<string, University>()
 
   for (const university of input.universities) {
@@ -359,7 +388,7 @@ export function recommendPrograms(input: RecommendationInput): RecommendationRes
       continue
     }
 
-    const evaluated = evaluateProgram(input, program, university)
+    const evaluated = evaluateProgram(evaluationInput, program, university)
     if (evaluated.exclusion) excluded.push(evaluated.exclusion)
     if (evaluated.evaluated) results.push(evaluated.evaluated)
     warnings.push(...evaluated.globalWarnings)
