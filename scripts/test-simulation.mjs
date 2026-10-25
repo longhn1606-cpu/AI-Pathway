@@ -5,15 +5,22 @@ import path from 'node:path'
 import ts from 'typescript'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-async function load(relativePath) {
+async function compile(relativePath) {
   const source = await readFile(path.join(root, relativePath), 'utf8')
-  const compiled = ts.transpileModule(source, {
+  return ts.transpileModule(source, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
   }).outputText
+}
+async function load(relativePath) {
+  const compiled = await compile(relativePath)
   return import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`)
 }
+const recommendationUrl = `data:text/javascript;base64,${Buffer.from(await compile('src/logic/recommendation.ts')).toString('base64')}`
+const simulationSource = (await compile('src/logic/simulation.ts'))
+  .replace("from './recommendation'", `from '${recommendationUrl}'`)
+const simulationUrl = `data:text/javascript;base64,${Buffer.from(simulationSource).toString('base64')}`
 const [{ simulateScenario }, { universities }, { programs }] = await Promise.all([
-  load('src/logic/simulation.ts'),
+  import(simulationUrl),
   load('src/data/universities.ts'),
   load('src/data/programs.ts'),
 ])
