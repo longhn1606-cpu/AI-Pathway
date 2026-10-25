@@ -139,6 +139,7 @@ function App() {
     setSimulationLoading(false)
     setSaved(false)
     setShowAll(false)
+    setProfileValidationErrors([])
   }
 
   function saveProfile() {
