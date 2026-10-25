@@ -19,6 +19,15 @@ export interface RuleSource {
   dataStatus: DataStatus
 }
 
+/** Optional snapshot: unknown tuition must remain null, never be inferred. */
+export interface TuitionSnapshot {
+  minVndPerYear: number | null
+  maxVndPerYear: number | null
+  appliedYear: number | null
+  dataStatus: DataStatus
+  sourceUrl: string | null
+}
+
 export interface AdmissionRuleVersion {
   id: string
   institutionId: string
@@ -28,6 +37,7 @@ export interface AdmissionRuleVersion {
   source: RuleSource
   admissionMethod: AdmissionMethod | null
   conditions: { [key: string]: RuleValue }
+  tuition?: TuitionSnapshot | null
 }
 
 export interface RuleChange {
@@ -46,6 +56,7 @@ export interface RuleComparison {
   limitations: string[]
   sources: RuleSource[]
   dataStatus: DataStatus
+  tuitionStatus: DataStatus | null
 }
 
 export type ExplanationMode = 'template'
@@ -55,6 +66,7 @@ export interface RuleExplanation {
   summary: string
   whatChanged: string[]
   potentiallyAffected: string[]
+  tuitionImpact: string[]
   nextSteps: string[]
   unknowns: string[]
   sourceDisclosure: string[]
