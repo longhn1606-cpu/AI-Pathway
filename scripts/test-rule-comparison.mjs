@@ -171,4 +171,73 @@ test('giải thích có bước tiếp theo và công khai nguồn', () => {
   assert.ok(explanation.sourceDisclosure.some((item) => item.includes('Demo source')))
 })
 
+
+test('metadata trường/ngành và nguồn thay đổi được phát hiện', () => {
+  const result = compareRules(rule(), rule({ institutionName: 'Renamed', programName: 'New major', source: source({ version: 'v2', appliedYear: 2027, url: 'https://example.edu/v2' }) }))
+  for (const field of ['institutionName', 'programName', 'source.version', 'source.appliedYear', 'source.url']) {
+    assert.ok(result.changes.some((change) => change.field === field), field)
+  }
+})
+
+test('học phí thay đổi theo số tiền và năm được phát hiện', () => {
+  const oldTuition = { minVndPerYear: 20_000_000, maxVndPerYear: 25_000_000, appliedYear: 2026, dataStatus: 'verified', sourceUrl: 'https://example.edu/tuition' }
+  const newTuition = { ...oldTuition, minVndPerYear: 22_000_000, appliedYear: 2027 }
+  const result = compareRules(rule({ tuition: oldTuition }), rule({ id: 'v2', tuition: newTuition }))
+  assert.ok(result.changes.some((change) => change.field === 'tuition.minVndPerYear'))
+  assert.ok(result.changes.some((change) => change.field === 'tuition.appliedYear'))
+  assert.equal(result.tuitionStatus, 'verified')
+  assert.ok(explainRules(result).tuitionImpact.length > 0)
+})
+
+test('không có học phí không bị hiểu là học phí bằng 0 hoặc không đổi', () => {
+  const result = compareRules(rule(), rule({ id: 'v2' }))
+  assert.equal(result.tuitionStatus, null)
+  assert.ok(explainRules(result).tuitionImpact.some((item) => item.includes('Không thể kết luận')))
+  assert.ok(result.limitations.some((item) => item.includes('Thiếu snapshot học phí')))
+})
+
+test('học phí mô phỏng luôn được gắn cảnh báo', () => {
+  const tuition = { minVndPerYear: 10_000_000, maxVndPerYear: 12_000_000, appliedYear: 2026, dataStatus: 'simulated', sourceUrl: null }
+  const result = compareRules(rule({ tuition }), rule({ id: 'v2', tuition }))
+  assert.equal(result.tuitionStatus, 'simulated')
+  assert.ok(explainRules(result).tuitionImpact.some((item) => item.includes('simulated')))
+})
+
+test('học phí thiếu một đầu khoảng không được tự ước tính', () => {
+  const tuition = { minVndPerYear: null, maxVndPerYear: 12_000_000, appliedYear: 2026, dataStatus: 'needs_review', sourceUrl: null }
+  const result = compareRules(rule({ tuition }), rule({ id: 'v2', tuition }))
+  assert.equal(result.tuitionStatus, 'needs_review')
+  assert.ok(result.limitations.some((item) => item.includes('chưa có dữ liệu')))
+})
+
+test('trạng thái nguồn thay đổi được phản ánh trong kết quả', () => {
+  const result = compareRules(rule(), rule({ source: source({ dataStatus: 'needs_review' }) }))
+  assert.ok(result.changes.some((change) => change.field === 'source.dataStatus'))
+  assert.equal(result.dataStatus, 'needs_review')
+})
+
+test('URL nguồn học phí thay đổi được phát hiện', () => {
+  const tuition = { minVndPerYear: 10, maxVndPerYear: 20, appliedYear: 2026, dataStatus: 'verified', sourceUrl: 'https://example.edu/a' }
+  const result = compareRules(rule({ tuition }), rule({ id: 'v2', tuition: { ...tuition, sourceUrl: 'https://example.edu/b' } }))
+  assert.ok(result.changes.some((change) => change.field === 'tuition.sourceUrl'))
+})
+
+test('khác trường thì không gán ngành bị ảnh hưởng', () => {
+  const result = compareRules(rule(), rule({ institutionId: 'uni-2', id: 'v2' }))
+  assert.deepEqual(result.affectedPrograms, [])
+  assert.ok(result.limitations.some((item) => item.includes('institutionId khác nhau')))
+})
+
+test('thiếu năm áp dụng được cảnh báo trong giải thích', () => {
+  const result = compareRules(rule({ source: source({ appliedYear: null }) }), rule({ id: 'v2' }))
+  assert.ok(explainRules(result).unknowns.some((item) => item.includes('Thiếu năm áp dụng')))
+})
+
+test('dữ liệu học phí null vẫn được giữ nguyên khi giải thích', () => {
+  const tuition = { minVndPerYear: null, maxVndPerYear: null, appliedYear: null, dataStatus: 'needs_review', sourceUrl: null }
+  const result = compareRules(rule({ tuition }), rule({ id: 'v2', tuition }))
+  assert.equal(result.changes.length, 0)
+  assert.ok(result.limitations.some((item) => item.includes('chưa có dữ liệu')))
+})
+
 process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
