@@ -28,6 +28,13 @@ try {
   await page.goto('http://127.0.0.1:5173', { waitUntil: 'domcontentloaded' })
   assert.match(await page.title(), /AI Pathway/i)
 
+  // The UI owns required-field validation; an empty submit must report all
+  // missing fields together and must not be mistaken for a service error.
+  await page.getByRole('button', { name: /Khám phá lựa chọn/ }).click()
+  const profileValidationAlert = page.getByRole('alert').filter({ hasText: 'Vui lòng kiểm tra lại hồ sơ' })
+  await profileValidationAlert.waitFor({ timeout: 5000 })
+  assert.equal(await profileValidationAlert.locator('li').count(), 4, 'Empty profile must report all four required fields')
+
   for (const [index, scenario] of scenarios.entries()) {
     const scoreInput = page.locator('input[type="number"]')
     const selects = page.locator('form select')
