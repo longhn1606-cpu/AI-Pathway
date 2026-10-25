@@ -42,6 +42,33 @@ function input(overrides = {}, universityRecords = universities, programRecords 
   }
 }
 
+function verifiedSourceInput(programSourceUrl) {
+  const university = {
+    ...universities[0],
+    status: 'verified',
+    sources: universities[0].sources.map((source) => ({
+      ...source,
+      url: 'https://admissions.example.edu.vn/university',
+      status: 'verified',
+    })),
+  }
+  const program = {
+    ...programs[0],
+    universityId: university.id,
+    status: 'verified',
+    sources: programs[0].sources.map((source, index) => ({
+      ...source,
+      url: index === 0 ? programSourceUrl : 'https://admissions.example.edu.vn/program',
+      status: 'verified',
+    })),
+    admissionMethods: programs[0].admissionMethods.map((method) => ({
+      ...method,
+      status: 'verified',
+    })),
+  }
+  return input({}, [university], [program])
+}
+
 let passed = 0
 function test(name, callback) {
   try {
@@ -117,6 +144,30 @@ test('dữ liệu mô phỏng được gắn trạng thái và cảnh báo rõ r
   const result = recommendPrograms(input())
   assert.ok(result.results.every((item) => item.dataStatus === 'simulated'))
   assert.ok(result.results.every((item) => item.warnings.some((warning) => warning.includes('dữ liệu mô phỏng'))))
+})
+
+test('URL nguồn rỗng hạ trạng thái verified xuống needs_review', () => {
+  const result = recommendPrograms(verifiedSourceInput(''))
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('URL nguồn dữ liệu trống hoặc không hợp lệ')))
+})
+
+test('URL nguồn sai định dạng hạ trạng thái verified xuống needs_review', () => {
+  const result = recommendPrograms(verifiedSourceInput('not-a-valid-url'))
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('URL nguồn dữ liệu trống hoặc không hợp lệ')))
+})
+
+test('URL nguồn dùng giao thức không phải HTTP(S) hạ trạng thái verified xuống needs_review', () => {
+  const result = recommendPrograms(verifiedSourceInput('ftp://admissions.example.edu.vn/source'))
+  assert.equal(result.results[0].dataStatus, 'needs_review')
+  assert.ok(result.results[0].warnings.some((warning) => warning.includes('URL nguồn dữ liệu trống hoặc không hợp lệ')))
+})
+
+test('URL nguồn HTTP(S) hợp lệ không tự làm hạ trạng thái verified', () => {
+  const result = recommendPrograms(verifiedSourceInput('https://admissions.example.edu.vn/source'))
+  assert.equal(result.results[0].dataStatus, 'verified')
+  assert.ok(!result.results[0].warnings.some((warning) => warning.includes('URL nguồn dữ liệu trống hoặc không hợp lệ')))
 })
 
 test('thiếu nguồn của chương trình hạ trạng thái verified xuống needs_review', () => {
