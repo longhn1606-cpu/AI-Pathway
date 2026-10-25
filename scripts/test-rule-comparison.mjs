@@ -240,8 +240,6 @@ test('dữ liệu học phí null vẫn được giữ nguyên khi giải thích
   assert.ok(result.limitations.some((item) => item.includes('chưa có dữ liệu')))
 })
 
-process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
-
 const scenariosPath = path.join(root, 'data/admission-rule-comparison/demo-scenarios.json')
 const scenarios = JSON.parse(await readFile(scenariosPath, 'utf8'))
 test('bộ kịch bản demo có ít nhất 7 tình huống được gắn nhãn simulated', () => {
@@ -278,6 +276,17 @@ test('metadata đơn thuần được phân loại mức ảnh hưởng thấp k
   const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' } })
   const explanation = explainRules(compareRules(oldRule, newRule))
   assert.equal(explanation.impactLevel, 'low')
+})
+
+process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
+
+test('thay đổi học phí verified được phân loại mức ảnh hưởng trung bình', () => {
+  const verifiedSource = source({ url: 'https://university.example/admissions', appliedYear: 2027, dataStatus: 'verified' })
+  const oldTuition = { minVndPerYear: 20_000_000, maxVndPerYear: 25_000_000, appliedYear: 2026, dataStatus: 'verified', sourceUrl: 'https://university.example/tuition' }
+  const newTuition = { ...oldTuition, minVndPerYear: 22_000_000, appliedYear: 2027 }
+  const oldRule = rule({ source: verifiedSource, tuition: oldTuition })
+  const newRule = rule({ id: 'rule-v2', source: { ...verifiedSource, version: 'v2' }, tuition: newTuition })
+  assert.equal(explainRules(compareRules(oldRule, newRule)).impactLevel, 'medium')
 })
 
 process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
