@@ -62,7 +62,7 @@ npm run test:recommendation
 npm run build
 ```
 
-The recommendation command runs both the existing recommendation regression suite and the independent simulation suite. GitHub Actions is configured to run this command and the production build on pushes to `feat/recommendation-logic`.
+The recommendation command runs the recommendation regression suite, independent simulation suite, and frontend-profile adapter suite. GitHub Actions is configured to run this command and the production build on pushes to `feat/recommendation-logic`.
 
 ## Limitations
 
