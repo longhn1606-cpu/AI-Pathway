@@ -51,6 +51,10 @@ ID mapping:
 
 Null tuition/cutoff stays null. A simulated record remains simulated. A result does not become verified merely because it passes through an adapter.
 
+## Historical cutoff data boundary
+
+Member 1 exposes historicalCutoffs as a separate collection. Member 3's RecommendationInput accepts only University[] and UniversityProgram[]; UniversityProgram has a single nullable historicalCutoff/cutoffYear/cutoffScale tuple. The canonical dataset can contain multiple historical cutoff records per program across year and admission method. Member 5 does not select or collapse those records into one program cutoff because no agreed target year/method selection policy exists and doing so could compare unlike methods or scales. Consequently, historical cutoff cards may be visible in the existing dataset UI, but recommendation score evaluation remains unknown when the program-level cutoff tuple is null. This is an explicit open contract item for Member 1 and Member 3, not a missing-data fill.
+
 ## Recommendation / simulation API
 
 Input: `{ profile: StudentProfile }`.
