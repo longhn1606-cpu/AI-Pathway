@@ -88,3 +88,29 @@ The tested integration flow completed 20/20 browser E2E submissions in run #4019
 Links:
 - https://github.com/longhn1606-cpu/AI-Pathway/actions/runs/40190455660
 - https://github.com/longhn1606-cpu/AI-Pathway/actions/runs/40190455663
+
+
+## Final integration audit — 2026-10-25 (Member 5 follow-up)
+
+### Live PR and owner-confirmation check
+
+- PR #7 remains **Open / Draft**, head before this follow-up: `1c4bdcf045a5406f63bee4ea2320ada7793411ac`. It has not been merged.
+- Member 3 explicitly confirmed the `RecommendationInput` shape and the `HistoricalCutoff` adapter policy in PR #4 discussion comment `6397561064`. The integration uses the three-part input (`profile`, `universities`, `programs`) and resolves history outside the raw input through exact program + single currently eligible method + unique latest record. No shared schema expansion is needed.
+- Member 4's latest rule-comparison branch is synchronized byte-for-byte for `types.ts`, `compareRules.ts`, `explainRules.ts`, and `index.ts` (matching blob SHAs checked on 2026-10-25). This includes same-institution/program scope safeguards and additive affected-entity fields. The facade signature remains compatible with PR #7.
+- No Member 2 approval/review was found on PR #7 at this audit. Presentation/wording review is still outstanding; no review submission or approval is inferred from the passing CI.
+- Member 1 has not yet confirmed reconciliation of the stale tuition regression expectation in PR #4. The PR #7 integration snapshot test accepts the six 2026 tuition fixtures only while retaining `needs_review`; cutoff tuple fields remain null where the canonical historical collection is the source of record.
+
+### Validation-failure UI edge case
+
+- Current `src/App.tsx` clears `recommendationResponse`, `simulationResult`, and `submittedProfile` when profile validation fails, so the UI returns to the initial results empty state rather than retaining a stale submitted profile.
+- Added E2E assertions in commit `8b2282fe0740ff7d0fd0968cc10109a842b67efe` to verify that an invalid submission clears the profile summary and restores the initial results empty state. CI for this new commit must complete before treating the added assertions as passed.
+
+### Current remaining blockers
+
+1. Obtain Member 2's explicit review of the integrated form validation, result empty states, and RuleComparisonPanel placement/wording.
+2. Obtain Member 1's reconciliation/confirmation for the tuition dataset regression expectation on PR #4.
+3. Re-run and record CI on the follow-up commit above.
+4. After upstream PR merges, compare dependency snapshots against the merged base and resolve any conflicts. PR #1 overlaps with recommendation/simulation content integrated in PR #7; PR #8 overlaps with frontend rule-comparison UI. Do not merge overlapping branches together without an explicit integration plan.
+5. Keep source-backed historical rule versions and verified tuition as production data requirements. The current rule pair is simulated and tuition fixtures are `needs_review`.
+
+PR #7 remains Draft until these review/coordination items and the new CI run are complete. No merge was performed.
