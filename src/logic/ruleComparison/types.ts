@@ -28,6 +28,7 @@ export interface TuitionSnapshot {
   sourceUrl: string | null
 }
 
+/** One independently sourced, time-scoped version of an institution/program rule. */
 export interface AdmissionRuleVersion {
   id: string
   institutionId: string
@@ -40,6 +41,11 @@ export interface AdmissionRuleVersion {
   tuition?: TuitionSnapshot | null
 }
 
+export interface RuleComparisonInput {
+  before: AdmissionRuleVersion
+  after: AdmissionRuleVersion
+}
+
 export interface RuleChange {
   field: string
   changeType: RuleChangeType
@@ -47,10 +53,17 @@ export interface RuleChange {
   newValue: RuleValue | undefined
 }
 
+export type ChangedField = RuleChange
+
 export interface RuleComparison {
   oldVersionId: string
   newVersionId: string
   changes: RuleChange[]
+  /** Explicitly linked only when both snapshots share the same institution ID. */
+  affectedUniversities: string[]
+  /** Explicitly linked only when both snapshots share institution and non-null program IDs. */
+  affectedMajors: string[]
+  /** Backward-compatible alias for affectedMajors. */
   affectedPrograms: string[]
   evidence: string[]
   limitations: string[]
