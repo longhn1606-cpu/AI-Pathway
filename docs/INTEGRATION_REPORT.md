@@ -46,9 +46,9 @@ The canonical historicalCutoffs collection is separate from UniversityProgram, w
 
 ## Remaining
 
-- Confirm latest CI, including Playwright browser tests.
+- Rerun CI after the newest score-scale/null-tuition test addition.
 - Rule comparison has no historical snapshot source in canonical data; panel remains empty until two authentic versioned snapshots are provided.
+- Historical cutoff records remain separate from the single nullable cutoff tuple in Member 3's input; Member 1/3 must agree on a lossless policy before cutoff history influences recommendation.
 - After upstream PRs merge, reconcile dependency snapshots with main.
-- Fix any real CI/browser failures and retain evidence.
 
-No full end-to-end completion is claimed until the latest 20-profile browser run passes.
+The tested integration flow completed 20/20 browser E2E submissions in run #66. Rule-history and historical-cutoff integration remain explicit data-contract limitations.
