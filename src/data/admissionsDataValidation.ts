@@ -135,6 +135,23 @@ export function validateAdmissionsDataset(
           !Array.isArray(method.sourceIds) || !method.sourceIds.every(isNonEmptyString) ||
           !dataStatuses.includes(method.status as DataStatus)) {
         errors.push(`Program ${item.id} admissionMethods[${methodIndex}] is invalid.`)
+        continue
+      }
+      if (method.status === 'verified') {
+        const refs = method.sourceIds as string[]
+        if (refs.length === 0) {
+          errors.push(`Program ${item.id} admissionMethods[${methodIndex}] is verified but has no sourceIds.`)
+        }
+        for (const ref of refs) {
+          const matches = Array.isArray(item.sources)
+            ? item.sources.filter((source) => isRecord(source) && source.title === ref)
+            : []
+          if (matches.length !== 1) {
+            errors.push(`Program ${item.id} admissionMethods[${methodIndex}] verified sourceId must resolve to exactly one program source.`)
+          } else if (matches[0].status !== 'verified' || matches[0].applicableYear !== method.applicableYear) {
+            errors.push(`Program ${item.id} admissionMethods[${methodIndex}] verified source must be verified and match applicableYear.`)
+          }
+        }
       }
     }
   }
