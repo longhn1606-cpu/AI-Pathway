@@ -115,3 +115,52 @@ Tại head `05a55f3cebb34843dc6c16539efab7d0fe655a62`, các yêu cầu tích h�
 PR #8 vẫn là nhánh tích hợp UI riêng có phạm vi giao nhau; không merge song song
 với PR #7. PR #3 tiếp tục là nguồn logic gốc của Member 4 và vẫn ở trạng thái
 Draft; không merge nếu chưa có yêu cầu rõ ràng và chưa hoàn tất review chung.
+
+
+## Contract nghiệp vụ đã chốt — 2026-10-25
+
+### Input và output
+
+- `AdmissionRuleVersion`: một snapshot độc lập, có ID, institution/program identity,
+  phương thức, conditions, source metadata và trạng thái dữ liệu.
+- `RuleComparisonInput`: cặp `before` / `after` của hai snapshot.
+- `RuleComparisonResult`: facade trả về `comparison` và `explanation`.
+- `RuleChange` / `ChangedField`: mỗi khác biệt có `field`, `changeType`,
+  `oldValue`, `newValue`; giá trị null khác với trường bị thiếu.
+- `affectedUniversities`: chỉ có institutionId khi hai snapshot cùng trường.
+- `affectedMajors` (và alias tương thích `affectedPrograms`): chỉ có programId
+  khi cả institutionId và programId cùng khớp.
+
+### Quy tắc so sánh an toàn
+
+1. So sánh điều kiện tuyển sinh/học phí chỉ khi hai snapshot có cùng
+   `institutionId` và cùng `programId` (hai giá trị programId null được hiểu
+   là cùng phạm vi cấp trường). Nếu identity khác, chỉ báo cáo thay đổi định danh;
+   không so sánh điều kiện giữa hai trường/ngành khác nhau.
+2. Các mảng `conditions.combinations` và
+   `conditions.subjectCombinations` được xem là tập hợp; đổi thứ tự không phải
+   thay đổi. Các đường dẫn khác giữ nguyên thứ tự trừ khi caller cấu hình thêm.
+3. Điều kiện, chỉ tiêu, công thức/thang điểm được so sánh đệ quy khi có trong cả
+   snapshot. Engine không tự tạo trường hoặc suy diễn giá trị không được cung cấp.
+4. `null` và trường vắng mặt là hai trạng thái khác nhau. Thiếu snapshot học phí
+   không đồng nghĩa học phí bằng 0 hoặc không thay đổi.
+5. Explanation lấy trực tiếp `changes`, ID ảnh hưởng, nguồn và limitations từ
+   kết quả comparison. Mức độ ảnh hưởng là nhãn ưu tiên rà soát, không phải dự báo
+   trúng tuyển hoặc kết luận pháp lý.
+
+### Trạng thái nguồn
+
+- `verified`: được đánh dấu đã xác minh trong dữ liệu đầu vào; engine không tự
+  kiểm chứng tính pháp lý của URL hoặc văn bản.
+- `needs_review`: còn cần rà soát; không được trình bày như dữ liệu xác nhận.
+- `simulated`: dữ liệu minh họa; kết quả phải nêu rõ không phải quy định chính thức.
+- Năm áp dụng, URL nguồn và trạng thái từng snapshot luôn được công khai trong
+  `sourceDisclosure`; thiếu nguồn/năm làm impact thành `requires_review`.
+
+### Giới hạn
+
+Engine hiện là bộ so sánh deterministic theo cấu trúc dữ liệu, không trích xuất
+văn bản pháp luật, không tự tìm nguồn, không xác thực chữ ký/hiệu lực văn bản và
+không tính xác suất trúng tuyển. Các trường chỉ tiêu/cách tính điểm chỉ được phát
+hiện nếu adapter cung cấp chúng dưới `conditions` với cùng schema/path ở cả hai
+snapshot. Demo scenarios hiện vẫn là simulated.
