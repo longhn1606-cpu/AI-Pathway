@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react'
 import { toStudentProfile } from './adapters/profileAdapter'
+import RuleComparisonPanel from './components/RuleComparisonPanel'
 
 type Interest = 'technology' | 'business' | 'health' | 'education' | 'arts' | 'other' | 'undecided'
 type Region = 'north' | 'central' | 'south' | 'anywhere'
@@ -142,6 +143,8 @@ function App() {
             <div className="data-note" id="data-note"><span className="data-note-icon">i</span><div><strong>Minh bạch về dữ liệu</strong><p>Bản giao diện này dùng dữ liệu minh họa để kiểm tra trải nghiệm. Khi tích hợp dữ liệu thật, mỗi chương trình cần có nguồn chính thức, năm áp dụng và trạng thái xác minh. AI Pathway không cam kết kết quả tuyển sinh.</p></div></div>
           </div>
         </section>
+
+        <RuleComparisonPanel />
 
         <section className="how-section section-wrap" id="how-it-works"><div className="how-heading"><span className="eyebrow">BƯỚC 03 <span className="eyebrow-slash">/</span> TỪ KHÁM PHÁ ĐẾN LỰA CHỌN</span><h2>Đi từng bước.<br /><span>Chọn theo cách của bạn.</span></h2><p>AI Pathway hỗ trợ bạn đặt câu hỏi tốt hơn và nhìn rõ lựa chọn — không quyết định thay bạn.</p></div><div className="steps-grid"><article className="step-card"><span className="step-index">01 <i>—</i> KHÁM PHÁ</span><div className="step-graphic graphic-explore"><span className="graphic-ring ring-one"/><span className="graphic-ring ring-two"/><span className="graphic-center">⌕</span><span className="graphic-dot dot-one"/><span className="graphic-dot dot-two"/></div><h3>Hiểu điều bạn cần</h3><p>Ghi nhận sở thích, điểm dự kiến, khu vực và ngân sách để bắt đầu hành trình.</p></article><article className="step-card"><span className="step-index">02 <i>—</i> ĐỐI CHIẾU</span><div className="step-graphic graphic-compare"><span className="compare-sheet sheet-one"><i/><i/><i/></span><span className="compare-sheet sheet-two"><i/><i/><i/></span><span className="compare-check">✓</span></div><h3>Tìm hiểu có căn cứ</h3><p>Đối chiếu chương trình, điều kiện xét tuyển và nguồn thông tin chính thức.</p></article><article className="step-card"><span className="step-index">03 <i>—</i> ĐIỀU CHỈNH</span><div className="step-graphic graphic-plan"><span className="plan-line line-one"/><span className="plan-line line-two"/><span className="plan-node node-one">01</span><span className="plan-node node-two">02</span><span className="plan-node node-three">03</span></div><h3>Chủ động lựa chọn</h3><p>So sánh ưu tiên và điều chỉnh kế hoạch khi mục tiêu hoặc điều kiện thay đổi.</p></article></div></section>
 
