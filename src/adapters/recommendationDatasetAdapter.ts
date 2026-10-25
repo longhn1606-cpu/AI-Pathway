@@ -28,6 +28,11 @@ export function toRecommendationDataset(
 
   const selectedMethod: AdmissionMethod = profile.preferredMethods[0]
   const programs = data.programs.map((program) => {
+    // Historical rows must also match a method currently declared for this program.
+    // A historical academic-record cutoff must not imply that the current program
+    // offers academic-record admission.
+    if (!program.admissionMethods.some((item) => item.method === selectedMethod)) return program
+
     const matches = data.historicalCutoffs.records.filter((record) =>
       record.programId === program.id &&
       record.method === selectedMethod &&
