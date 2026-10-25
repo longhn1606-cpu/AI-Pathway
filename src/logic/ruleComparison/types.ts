@@ -57,6 +57,7 @@ export interface RuleComparison {
   sources: RuleSource[]
   dataStatus: DataStatus
   tuitionStatus: DataStatus | null
+  tuition: { old: TuitionSnapshot | null; new: TuitionSnapshot | null }
 }
 
 export type ExplanationMode = 'template'
