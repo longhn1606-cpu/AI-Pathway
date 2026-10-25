@@ -63,7 +63,7 @@ export function explainRules(comparison: RuleComparison): RuleExplanation {
 
   const potentiallyAffected: string[] = []
   if (!comparison.affectedMajors.length) {
-    potentiallyAffected.push('Chưa đủ ID khớp để xác định ngành/chương trình cụ thể bị ảnh hưởng.')
+    potentiallyAffected.push('Chưa xác định được ngành/chương trình cụ thể bị ảnh hưởng do thiếu ID khớp.')
   } else {
     potentiallyAffected.push(`Ngành/chương trình có programId ${comparison.affectedMajors[0]} được định danh ở cả hai phiên bản.`)
   }
