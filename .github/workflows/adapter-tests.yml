@@ -3,6 +3,7 @@ name: Adapter unit tests
 on:
   pull_request:
     paths:
+      - "src/data/**"
       - "src/logic/adapters/**"
       - "tests/**"
       - "package.json"
@@ -23,6 +24,6 @@ jobs:
         with:
           node-version: 20
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Run adapter unit tests
         run: npm test
