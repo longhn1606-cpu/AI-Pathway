@@ -20,6 +20,8 @@ Canonical domain types are imported from `src/types/index.ts`; the shared schema
 - Major groups use an explicit alias dictionary; unknown labels are not fuzzy-matched.
 - A known budget excludes a program only when known minimum annual tuition exceeds the budget. If the maximum exceeds budget while the minimum does not, the program is retained with a cost-risk warning.
 - Missing tuition, score, scale, cutoff, or cutoff year is unknown—not zero.
+- Invalid tuition (negative/non-finite values or minimum above maximum) is treated as unknown for budget filtering and marks the result `needs_review`; it never becomes a free program or a budget-based exclusion.
+- Invalid historical cutoff (negative/non-finite score, non-positive/non-finite scale or year, or cutoff above its scale) is not compared and marks the result `needs_review`.
 - Scores are compared only when the student's score scale exactly matches the historical cutoff scale. No conversion is inferred between THPT, academic-record, competency-assessment, or other admission methods.
 - Historical cutoffs are contextual only. They neither guarantee admission nor independently exclude a program.
 - Preferred admission methods contribute ranking points only when a recorded method matches; missing or unmatched methods produce warnings.
