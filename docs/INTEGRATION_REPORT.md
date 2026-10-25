@@ -40,15 +40,22 @@ These are dependency snapshots on the isolated integration branch. Original memb
 - Subsequent run #47: production build and npm test completed successfully. This was before the latest taxonomy test and Playwright E2E workflow were added.
 - Latest workflow includes a taxonomy integration test and a Playwright suite that submits 20 distinct profiles through the actual frontend. Its result must be checked before reporting 20/20 E2E success.
 
-## Additional data-contract blocker
+## Historical cutoff integration update
 
-The canonical historicalCutoffs collection is separate from UniversityProgram, while Member 3's RecommendationInput accepts only University[] and UniversityProgram[]. A program can have multiple historical cutoff records by year and admission method, but the current shared UniversityProgram schema has only one nullable cutoff tuple. Member 5 does not arbitrarily choose one record or flatten the history. As a result, the recommendation engine currently receives null program-level cutoff fields where they are unknown; the frontend may still show the historical cutoff collection with its own method/year/status/source labels. Member 1 and Member 3 need to agree on a lossless input contract or an explicit selection policy before historical cutoffs can affect recommendation logic.
+Member 3 supplied the explicit method-specific selection policy and `recommendationDatasetAdapter.ts`. Member 5 synchronized the adapter and wired it into `integratedRecommendationService`:
+- A cutoff is resolved only for exactly one selected method that the current program declares.
+- Exact programId + method match; latest year must have one unique record.
+- Missing, ambiguous, multi-method, or currently unsupported methods preserve null cutoff fields.
+- DataStatus/provenance are preserved; score scale is not converted.
+- Simulation re-runs the resolver for both baseline and scenario profiles.
+
+Four integration tests were added for latest unique record, method change in simulation, unsupported current method, and multi-method ambiguity. The previous cutoff adapter contract blocker is closed; fresh CI on commit `71650fd` is pending.
 
 ## Remaining
 
 - Rerun CI after the newest score-scale/null-tuition test addition.
 - Rule comparison demo uses Member 4's simulated snapshot pair; production comparison still needs two authentic versioned snapshots from a source-backed history.
-- Historical cutoff records remain separate from the single nullable cutoff tuple in Member 3's input; Member 1/3 must agree on a lossless policy before cutoff history influences recommendation.
+- Historical cutoff history now flows through Member 3's explicit method-specific adapter; ambiguous or unavailable records remain unknown.
 - After upstream PRs merge, reconcile dependency snapshots with main.
 
 The tested integration flow completed 20/20 browser E2E submissions in run #66. Rule-history and historical-cutoff integration remain explicit data-contract limitations.

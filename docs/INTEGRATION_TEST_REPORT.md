@@ -74,3 +74,14 @@ The Playwright suite varies score, interest, region and budget through the actua
 ## Evidence policy
 
 A browser run counts only when the real app and integration path execute. Test definitions, mocks, unit tests or build success are not E2E passes. Keep failed attempts and reproduction details; reruns do not erase failures.
+
+
+## Historical cutoff integration regression coverage — commit 71650fd (pending CI)
+
+- Latest unique record is selected for exact program + single selected method.
+- Simulation re-resolves cutoff after the selected admission method changes; before and after states retain distinct source status.
+- A historical method not declared by the current program is not mapped.
+- Multiple selected methods do not choose an arbitrary cutoff.
+- Null remains null for missing/ambiguous records; original canonical arrays/profile are not mutated.
+
+The adapter used is synchronized from Member 3's PR #1 head and the integration service delegates selection to it; Member 5 does not duplicate its selection logic.

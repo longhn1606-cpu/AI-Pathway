@@ -41,7 +41,7 @@ Member 1's PR #4 files are present as an explicit dependency snapshot on this br
 
 Canonical exports are universities, programs and historicalCutoffs. Dataset validation runs before exports are exposed. Source resolution supports exact unique title matches only; sourceIds has no confirmed stable ID semantics.
 
-Member 5 added src/services/integratedRecommendationService.ts. It injects canonical exports into Member 3's existing recommendPrograms and simulateScenario functions. It clones profiles, university/program records and nested arrays at the service boundary. It does not import Member 3's demo fixture files or modify ranking/simulation algorithms.
+Member 5 added src/services/integratedRecommendationService.ts. It injects canonical exports into Member 3's existing recommendPrograms and simulateScenario functions through Member 3's unchanged recommendationDatasetAdapter. It clones profiles, university/program records and nested arrays at the service boundary. It does not import Member 3's demo fixture files or modify ranking/simulation algorithms.
 
 ID mapping:
 - University.id ↔ UniversityProgram.universityId.
@@ -53,7 +53,16 @@ Null tuition/cutoff stays null. A simulated record remains simulated. A result d
 
 ## Historical cutoff data boundary
 
-Member 1 exposes historicalCutoffs as a separate collection. Member 3's RecommendationInput accepts only University[] and UniversityProgram[]; UniversityProgram has a single nullable historicalCutoff/cutoffYear/cutoffScale tuple. The canonical dataset can contain multiple historical cutoff records per program across year and admission method. Member 5 does not select or collapse those records into one program cutoff because no agreed target year/method selection policy exists and doing so could compare unlike methods or scales. Consequently, historical cutoff cards may be visible in the existing dataset UI, but recommendation score evaluation remains unknown when the program-level cutoff tuple is null. This is an explicit open contract item for Member 1 and Member 3, not a missing-data fill.
+Member 1 exposes historicalCutoffs as a separate collection, while Member 3's engine accepts one nullable cutoff tuple on UniversityProgram. Member 3 has now specified the selection policy and supplied `src/adapters/recommendationDatasetAdapter.ts`, synchronized into this branch unchanged:
+
+- Resolve a cutoff only when the profile selects exactly one admission method.
+- The program must currently declare that exact method in `admissionMethods`.
+- Match by exact `programId` + `method`, require non-null score and scale, then select the latest year only if exactly one record exists for that year.
+- If no record exists, the method is not currently offered, multiple methods are selected, or the latest year is ambiguous, preserve the program's existing nullable cutoff tuple unchanged.
+- Merge provenance from the selected historical record and combine DataStatus without promoting simulated/needs_review data to verified.
+- Keep score scales unchanged; the recommendation engine itself warns rather than comparing unlike scales.
+
+Member 5's service now calls this adapter for every recommendation. Simulation passes a resolver callback so both baseline and scenario profiles are independently re-resolved; changing admission method therefore changes the applicable cutoff without mutating canonical data. This closes the previous integration blocker without changing Member 3's ranking logic or shared schema.
 
 ## Recommendation / simulation API
 
@@ -128,3 +137,8 @@ Important limitation: these are internal demo scenarios, not official admissions
 - No status promotion or null-value imputation without source evidence.
 
 This contract describes integration implementation on the Member 5 branch, not full product completion.
+
+
+## Historical cutoff integration update — 2026-10-25
+
+The previous historical-cutoff blocker is closed at the adapter/service boundary. The policy is owned by Member 3 and implemented by the synchronized `recommendationDatasetAdapter.ts`. Four new integration cases cover latest unique method-specific cutoff, simulation re-resolution after method change, method not currently declared, and multiple selected methods. CI for commit `71650fd` is pending; do not treat the new tests as passed until the workflow completes.
