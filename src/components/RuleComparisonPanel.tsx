@@ -34,6 +34,8 @@ export function RuleComparisonPanel() {
     if (versions.length < 2) {
       return { error: 'Cần ít nhất hai snapshot quy định hợp lệ để so sánh.' } as const
     }
+    if (!beforeId || !afterId) return { error: 'Chưa có đủ phiên bản hợp lệ để so sánh.' } as const
+    if (beforeId === afterId) return { error: 'Hãy chọn hai phiên bản khác nhau: một phiên bản trước và một phiên bản sau.' } as const
     const before = versions.find((version) => version.id === beforeId)
     const after = versions.find((version) => version.id === afterId)
     const pair = toAdmissionRuleVersionPair(before, after)
@@ -53,10 +55,12 @@ export function RuleComparisonPanel() {
           Đây không phải quy định tuyển sinh chính thức, không có nguồn pháp lý được xác minh.
         </p>
 
+        {!fixtureValidation.ok || versions.length < 2 ? <p className="no-results" role="status">Không thể mở bộ so sánh vì dữ liệu snapshot không hợp lệ hoặc chưa có đủ hai phiên bản. Cần cập nhật fixture từ nguồn dữ liệu có provenance rõ ràng.</p> : null}
+
         <div className="form-grid">
           <label className="field">
             <span className="field-label">Phiên bản trước</span>
-            <select value={beforeId} onChange={(event) => setBeforeId(event.target.value)}>
+            <select value={beforeId} disabled={!fixtureValidation.ok || versions.length < 2} onChange={(event) => setBeforeId(event.target.value)}>
               {versions.map((version) => (
                 <option key={version.id} value={version.id}>
                   {version.source.version} — {version.source.name}
@@ -66,7 +70,7 @@ export function RuleComparisonPanel() {
           </label>
           <label className="field">
             <span className="field-label">Phiên bản sau</span>
-            <select value={afterId} onChange={(event) => setAfterId(event.target.value)}>
+            <select value={afterId} disabled={!fixtureValidation.ok || versions.length < 2} onChange={(event) => setAfterId(event.target.value)}>
               {versions.map((version) => (
                 <option key={version.id} value={version.id}>
                   {version.source.version} — {version.source.name}
