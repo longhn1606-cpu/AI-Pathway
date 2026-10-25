@@ -114,3 +114,16 @@ Links:
 5. Keep source-backed historical rule versions and verified tuition as production data requirements. The current rule pair is simulated and tuition fixtures are `needs_review`.
 
 PR #7 remains Draft until these review/coordination items and the new CI run are complete. No merge was performed.
+
+
+## Member 1 dataset regression confirmation and latest CI — 2026-10-25
+
+Member 1 confirmed on PR #4 head `e983235f7073859fad42250d1fb8bd0e980d82cd` that the six 2026 tuition demo fixtures are intentional and must remain visibly `simulated`: HUST 30–45m VND/year; DUT 28–38m; HCMUT 40–80m (and the remaining three fixture records as defined in the canonical dataset). Historical cutoff fields `historicalCutoff`, `cutoffYear`, and `cutoffScale` remain null when no evidence exists; never coerce them to zero/defaults. This confirmation is limited to demo fixture correctness, not official tuition verification or PR approval.
+
+The corresponding integration regression already preserves the same boundary: it accepts structurally valid 2026 tuition fixtures while requiring `simulated` status and null historical cutoff tuple. No canonical data or Member 1 branch was modified by Member 5.
+
+**CI verified:**
+- PR #4 head `e983235f`: Demo data/app checks run #350 SUCCESS; Adapter unit tests run #58 SUCCESS.
+- PR #7 head `8708529aa8dc40280383e9933a79917a7148b9b9`: System integration run #162 SUCCESS, including build, npm tests and Chromium browser E2E; Demo data/app checks run #358 SUCCESS, including Member 4 regression ×20, preview smoke, dataset validator and Python regression.
+
+Remaining review blocker: Member 2's explicit frontend/UI review is still pending. PR #7 remains Open/Draft; no approval or merge is inferred from CI success.
