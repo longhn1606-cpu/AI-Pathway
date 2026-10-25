@@ -98,8 +98,10 @@ test('rejects verified admission methods without a valid matching program source
   }])
   assert.ok(unresolved.some((error) => error.includes('exactly one program source')))
 
+  const wrongYearSource = { ...sourceRecord, applicableYear: 2025, status: 'verified' }
   const wrongYear = validate([university], [{
     ...program,
+    sources: [wrongYearSource],
     admissionMethods: [{ ...verifiedMethod, sourceIds: [sourceRecord.title] }],
   }])
   assert.ok(wrongYear.some((error) => error.includes('match applicableYear')))
