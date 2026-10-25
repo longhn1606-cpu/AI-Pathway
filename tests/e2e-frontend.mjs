@@ -53,7 +53,7 @@ try {
 
   await page.getByLabel('Thi tốt nghiệp THPT').check()
 
-  const ruleSelects = page.locator('#recommendations select')
+  const ruleSelects = page.locator('#recommendations section[aria-labelledby="rule-comparison-title"] select')
   const firstRuleVersion = await ruleSelects.nth(0).inputValue()
   await ruleSelects.nth(1).selectOption(firstRuleVersion)
   await page.getByRole('alert').filter({ hasText: 'Hãy chọn hai phiên bản khác nhau' }).waitFor({ timeout: 5000 })
