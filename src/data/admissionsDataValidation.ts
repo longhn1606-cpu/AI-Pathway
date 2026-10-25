@@ -14,8 +14,21 @@ const isNullableNumber = (value: unknown): value is number | null =>
   value === null || (typeof value === 'number' && Number.isFinite(value))
 const isNullableYear = (value: unknown): value is number | null =>
   value === null || isYear(value)
-const isHttpUrlOrNull = (value: unknown): value is string | null =>
-  value === null || (typeof value === 'string' && /^https?:\\/\\//i.test(value.trim()))
+const isIsoDate = (value: unknown): value is string => {
+  if (typeof value !== 'string' || !/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false
+  const date = new Date(value)
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value
+}
+const isHttpUrlOrNull = (value: unknown): value is string | null => {
+  if (value === null) return true
+  if (typeof value !== 'string') return false
+  try {
+    const url = new URL(value)
+    return url.protocol === 'http:' || url.protocol === 'https:'
+  } catch {
+    return false
+  }
+}
 
 function validateSources(value: unknown, label: string, errors: string[]): void {
   if (!Array.isArray(value)) {
@@ -25,7 +38,7 @@ function validateSources(value: unknown, label: string, errors: string[]): void 
   value.forEach((source, index) => {
     if (!isRecord(source) || !isNonEmptyString(source.title) ||
         !isHttpUrlOrNull(source.url) || typeof source.url !== 'string' ||
-        !isYear(source.applicableYear) || !isNonEmptyString(source.checkedAt) ||
+        !isYear(source.applicableYear) || !isIsoDate(source.checkedAt) ||
         !dataStatuses.includes(source.status as DataStatus)) {
       errors.push(`${label}[${index}] has invalid source metadata.`)
     }
@@ -64,7 +77,7 @@ export function validateAdmissionsDataset(
       !isRecord(cutoffs) || !Array.isArray(cutoffs.records)) {
     return ['Dataset roots must be arrays for universities/programs and an object with records for cutoffs.']
   }
-  if (!isNonEmptyString(cutoffs.title) || !isNonEmptyString(cutoffs.checkedAt) ||
+  if (!isNonEmptyString(cutoffs.title) || !isIsoDate(cutoffs.checkedAt) ||
       !isNonEmptyString(cutoffs.scoringPolicy) || !Array.isArray(cutoffs.years) ||
       !cutoffs.years.every(isYear)) {
     errors.push('historicalCutoffs metadata is invalid.')
@@ -123,7 +136,7 @@ export function validateAdmissionsDataset(
         !isNonEmptyString(item.universityId) || !isYear(item.year) ||
         !admissionMethods.includes(item.method as AdmissionMethod) ||
         !isNullableNumber(item.cutoffScore) || !isNullableNumber(item.scoreScale) ||
-        !isHttpUrlOrNull(item.sourceUrl) || !isNonEmptyString(item.checkedAt) ||
+        !isHttpUrlOrNull(item.sourceUrl) || !isIsoDate(item.checkedAt) ||
         !dataStatuses.includes(item.status as DataStatus)) {
       errors.push(`historicalCutoffs.records[${index}] has invalid required fields.`)
       continue
@@ -137,6 +150,7 @@ export function validateAdmissionsDataset(
       errors.push(`Cutoff ${item.id} universityId does not match its program.`)
     }
     if (item.scoreScale !== null && item.scoreScale <= 0) errors.push(`Cutoff ${item.id} has invalid scoreScale.`)
+    if (!cutoffs.years.includes(item.year)) errors.push(`Cutoff ${item.id} year is missing from dataset years.`)
     if (item.cutoffScore !== null && item.cutoffScore < 0) errors.push(`Cutoff ${item.id} has negative cutoffScore.`)
     if (item.cutoffScore !== null && item.scoreScale !== null && item.cutoffScore > item.scoreScale) {
       errors.push(`Cutoff ${item.id} exceeds its scoreScale.`)
