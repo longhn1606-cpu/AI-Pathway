@@ -15,15 +15,22 @@ Branch: feat/system-integration
 
 CI runs npm install, npm run build, npm test, installs Playwright/Chromium, starts Vite and executes browser E2E.
 
-## Verified CI evidence
+## Latest verified CI evidence
 
-**System integration workflow run #72 — SUCCESS** on commit 3c915be7341fdebfca504e6470576f7e5d464f74:
+**System integration workflow run #96 — SUCCESS** on commit 31246f86ffa43a75307da21fe5e6f08cf2fb31f5:
 - Production build: passed.
-- npm test: **23/23 passed**.
+- npm test: **27/27 passed**.
 - Playwright Chromium browser E2E: **20/20 profile submissions passed**; log reports `Frontend E2E profiles completed: 20/20`.
 - Browser launch and server readiness checks: passed.
 
-This run includes the explicit test for unlike score scales and null tuition added after run #66. It verifies recommendation results, canonical IDs/status, profile immutability during simulation, rule comparison empty state without two snapshots, and 20 distinct submissions through the actual React form and service.
+The latest run includes the rule snapshot-pair adapter and the Member 4 demo rule panel. It verifies:
+- canonical dataset validation, IDs, statuses and provenance;
+- recommendation integration and taxonomy mapping;
+- null tuition and score-scale mismatch behavior;
+- simulation immutability;
+- rule snapshot pair validation (missing/duplicate IDs rejected);
+- frontend comparison of Member 4's explicitly simulated pair;
+- 20 distinct profile submissions through the actual React form and service.
 
 Earlier CI failures were handled:
 - Initial run failed at setup-node because npm caching expected a lockfile; cache removed.
@@ -33,28 +40,28 @@ Earlier CI failures were handled:
 
 | ID | Scenario | Implementation | Evidence |
 |---|---|---|---|
-| IT-01 | Schema compatibility | Member 1 validator tests | Passed run #72 |
-| IT-02 | Dataset → recommendation | Canonical service + ID/status assertions | Passed run #72 |
-| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates Member 4 | Passed run #72; history source unavailable |
-| IT-04 | Recommendation → frontend | App calls service and renders by programId | Passed run #72 |
-| IT-05 | Simulation → frontend | App calls simulate and renders scenario counts | Passed run #72 |
-| IT-06 | Rule comparison → frontend | RuleComparisonPanel renders Member 4's clearly labelled simulated pair | Passed run #72; rerun latest UI revision pending |
-| IT-07 | Missing data | Null tuition/cutoff preserved | Passed run #72 |
-| IT-08 | Invalid input | UI validation and engine safeguards | Passed run #72 |
-| IT-09 | Duplicate IDs | Member 1 validator | Passed run #72 |
-| IT-10 | Null tuition/cutoff | Null not coerced to zero | Passed run #72 |
-| IT-11 | Provenance | DataStatus retained in services/adapters | Passed run #72 |
-| IT-12 | Regression | Build + npm test + browser E2E | Passed run #72 |
-| IT-13 | Simulation immutability | Service test and browser baseline assertion | Passed run #72 |
-| IT-14 | Scale mismatch | Engine warns and does not compare unlike scales | Passed run #72 |
-| IT-15 | Ambiguous source mapping | Exact unique source resolver | Passed run #72 |
-| IT-16 | Missing rule evidence | Pair adapter rejects missing/duplicate snapshots; demo pair explicitly simulated | Passed run #72; rerun latest UI revision pending |
+| IT-01 | Schema compatibility | Member 1 validator tests | Passed run #96 |
+| IT-02 | Dataset → recommendation | Canonical service + ID/status assertions | Passed run #96 |
+| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates Member 4 | Passed run #96; production history source remains open |
+| IT-04 | Recommendation → frontend | App calls service and renders by programId | Passed run #96 |
+| IT-05 | Simulation → frontend | App calls simulate and renders scenario counts | Passed run #96 |
+| IT-06 | Rule comparison → frontend | RuleComparisonPanel renders simulated demo pair | Passed run #96 |
+| IT-07 | Missing data | Null tuition/cutoff preserved | Passed run #96 |
+| IT-08 | Invalid input | UI validation and engine safeguards | Passed run #96 |
+| IT-09 | Duplicate IDs | Member 1 validator | Passed run #96 |
+| IT-10 | Null tuition/cutoff | Null not coerced to zero | Passed run #96 |
+| IT-11 | Provenance | DataStatus retained in services/adapters | Passed run #96 |
+| IT-12 | Regression | Build + npm test + browser E2E | Passed run #96 |
+| IT-13 | Simulation immutability | Service test and browser baseline assertion | Passed run #96 |
+| IT-14 | Scale mismatch | Engine warns and does not compare unlike scales | Passed run #96 |
+| IT-15 | Ambiguous source mapping | Exact unique source resolver | Passed run #96 |
+| IT-16 | Missing rule evidence | Pair adapter rejects missing/duplicate snapshots | Passed run #96 |
 
 ## Browser E2E — actual results
 
-**Verified: 20/20 profile submissions passed in run #72** for the earlier rule-comparison empty-state panel. A new UI revision now renders Member 4's two simulated demo snapshots with an explicit simulated notice; its browser regression run is pending.
+**Verified: 20/20 profile submissions passed in run #96.**
 
-The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. The updated suite asserts that the rule panel clearly labels the snapshots as simulated and renders changed fields.
+The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. It also checks that the rule comparison panel clearly labels the Member 4 snapshots as simulated and renders changed fields.
 
 ## Evidence policy
 
