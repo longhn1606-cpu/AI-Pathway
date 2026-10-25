@@ -38,7 +38,7 @@ These are dependency snapshots on the isolated integration branch. Original memb
 - First CI attempt failed before install because setup-node npm cache expected a lockfile; cache removed.
 - Next attempt: build passed and npm test passed 19/19; legacy Member 3 test runner failed because its demo fixture files were not present in canonical base. That fixture-dependent runner was removed.
 - Subsequent run #47: production build and npm test completed successfully. This was before the latest taxonomy test and Playwright E2E workflow were added.
-- Latest workflow includes a taxonomy integration test and a Playwright suite that submits 20 distinct profiles through the actual frontend. Its result must be checked before reporting 20/20 E2E success.
+- Latest workflow includes taxonomy, method-specific cutoff resolver tests and a Playwright suite that submits 20 distinct profiles through the actual frontend. Final result: 20/20 E2E passed in run #40190455660.
 
 ## Historical cutoff integration update
 
@@ -49,16 +49,16 @@ Member 3 supplied the explicit method-specific selection policy and `recommendat
 - DataStatus/provenance are preserved; score scale is not converted.
 - Simulation re-runs the resolver for both baseline and scenario profiles.
 
-Four integration tests were added for latest unique record, method change in simulation, unsupported current method, and multi-method ambiguity. The previous cutoff adapter contract blocker is closed; fresh CI on commit `71650fd` is pending.
+Four integration tests were added for latest unique record, method change in simulation, unsupported current method, and multi-method ambiguity. The previous cutoff adapter contract blocker is closed; all four passed in the latest 38/38 npm test run.
 
 ## Remaining
 
-- Rerun CI after the newest score-scale/null-tuition test addition.
+- Reconcile dependency snapshots with main after upstream PRs merge.
 - Rule comparison demo uses Member 4's simulated snapshot pair; production comparison still needs two authentic versioned snapshots from a source-backed history.
 - Historical cutoff history now flows through Member 3's explicit method-specific adapter; ambiguous or unavailable records remain unknown.
 - After upstream PRs merge, reconcile dependency snapshots with main.
 
-The tested integration flow completed 20/20 browser E2E submissions in run #66. Rule-history and historical-cutoff integration remain explicit data-contract limitations.
+The tested integration flow completed 20/20 browser E2E submissions in run #40190455660. Historical cutoff integration now uses Member 3's method-specific resolver. Rule-history remains a production data limitation because the current fixture pair is simulated.
 
 
 ## Follow-up: Member 2 / Member 4 integration hardening
@@ -68,4 +68,23 @@ The tested integration flow completed 20/20 browser E2E submissions in run #66. 
 - Pair validation now checks source metadata, HTTP(S) URLs, nullable years/timestamps, admission method, nullable program metadata, recursive JSON conditions and all tuition fields/ranges.
 - Synchronized Member 4's latest `compareRules.ts` and `explainRules.ts` from `feature/member-4-rule-comparison`, including tuition provenance safeguards.
 - Rule panel presents `whatChanged`, `tuitionImpact`, `nextSteps`, source disclosure, unknowns and limitations.
-- New adapter and browser regression assertions require a fresh CI run before this follow-up can be marked verified.
+- Runtime validation, fixture-before-validation removal, explanation rendering and tuition provenance safeguards passed in the latest CI run.
+
+
+## Latest verified run — commit e7428857
+
+**System integration — run 40190455660**
+- TypeScript + production build: passed.
+- `npm test`: 38/38 passed.
+- Playwright Chromium: 20/20 profile submissions passed.
+- E2E covers criteria-based empty state when all programs are excluded by budget, simulation baseline immutability, simulated rule fixture disclosure, tuition unknown disclosure and next-step rendering.
+
+**Dataset validation — run 40190455663**
+- Production build and preview smoke test: passed.
+- Dataset structure validator: 0 errors, 16 warnings (empty method sourceIds are known schema limitation).
+- Python regression tests: 10/10 passed.
+- Regression now verifies null program-level cutoff tuple while accepting the separately sourced 2026 tuition snapshot in `needs_review`; it does not promote tuition to verified.
+
+Links:
+- https://github.com/longhn1606-cpu/AI-Pathway/actions/runs/40190455660
+- https://github.com/longhn1606-cpu/AI-Pathway/actions/runs/40190455663

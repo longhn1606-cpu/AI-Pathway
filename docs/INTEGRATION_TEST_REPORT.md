@@ -15,7 +15,7 @@ Branch: feat/system-integration
 
 CI runs npm install, npm run build, npm test, installs Playwright/Chromium, starts Vite and executes browser E2E.
 
-## Latest verified CI evidence (before deep-validation update)
+## Historical CI evidence (run #96; predates current integration hardening)
 
 **System integration workflow run #96 — SUCCESS** on commit 31246f86ffa43a75307da21fe5e6f08cf2fb31f5:
 - Production build: passed.
@@ -85,3 +85,22 @@ A browser run counts only when the real app and integration path execute. Test d
 - Null remains null for missing/ambiguous records; original canonical arrays/profile are not mutated.
 
 The adapter used is synchronized from Member 3's PR #1 head and the integration service delegates selection to it; Member 5 does not duplicate its selection logic.
+
+
+## Latest verified CI — 2026-10-25
+
+<badge>Commit `e7428857e27bdb96086e3243bfa7bda6c901333b`</badge>
+
+**System integration run #40190455660**
+- Production build / TypeScript: passed.
+- npm test: **38/38 passed**.
+- Playwright Chromium: **20/20 profile submissions passed**.
+- Includes four historical cutoff adapter/service tests, frontend criteria-based no-fit empty state, tuition unknown disclosure, rule-comparison explanations, and simulation baseline immutability.
+
+**Dataset validation run #40190455663**
+- Production build and preview smoke test: passed.
+- Dataset structural validation: **0 errors**, 16 warnings (empty method sourceIds remain a documented schema limitation).
+- Python regression tests: **10/10 passed**.
+- Updated regression keeps program-level cutoff tuple null while allowing the separate 2026 tuition snapshot to remain `needs_review`.
+
+The 2026 tuition snapshot is not verified source-level tuition advice. The demo rule snapshots remain simulated. These data limitations are not covered by a green CI result.

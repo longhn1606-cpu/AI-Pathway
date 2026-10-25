@@ -122,11 +122,11 @@ Important limitation: these are internal demo scenarios, not official admissions
 | Area | Finding | Action |
 |---|---|---|
 | PR #4 | Adapter files are copied as dependency snapshot; PR #4 remains independently owned | Reconcile by file-level diff after its merge |
-| PR #1 | Original service uses demo fixtures | Member 5 service injects canonical dataset |
+| PR #1 | Original service uses demo fixtures | Member 5 service injects canonical dataset through Member 3's method-specific adapter; simulation resolver is synchronized |
 | PR #3 | Requires two versioned snapshots | Member 4's latest `compareRules.ts` and `explainRules.ts` safeguards are synchronized into this branch; service/panel use the explicitly simulated demo pair; production source remains open |
 | PR #5/#6 | PR #6 reuses PR #5 adapter with budget ceilings | Integrated branch uses updated PR #6 version |
 | Taxonomy | UI technology vs dataset information_technology/engineering | Member 5 adapter maps observed labels; review if taxonomy changes |
-| E2E | Browser/runtime test execution pending | Run 20 real submissions in CI/browser environment |
+| E2E | 20-profile browser run completed | Run 40190455660 passed 20/20 profile submissions, including criteria-based no-fit empty state |
 
 ## Owner approval boundaries
 
@@ -141,4 +141,14 @@ This contract describes integration implementation on the Member 5 branch, not f
 
 ## Historical cutoff integration update — 2026-10-25
 
-The previous historical-cutoff blocker is closed at the adapter/service boundary. The policy is owned by Member 3 and implemented by the synchronized `recommendationDatasetAdapter.ts`. Four new integration cases cover latest unique method-specific cutoff, simulation re-resolution after method change, method not currently declared, and multiple selected methods. CI for commit `71650fd` is pending; do not treat the new tests as passed until the workflow completes.
+The previous historical-cutoff blocker is closed at the adapter/service boundary. The policy is owned by Member 3 and implemented by the synchronized `recommendationDatasetAdapter.ts`; `simulation.ts` is also synchronized to expose the resolver callback. Four integration cases cover latest unique method-specific cutoff, simulation re-resolution after method change, method not currently declared, and multiple selected methods. All four are included in the successful latest run: 38/38 npm tests passed. The latest `programs.json` snapshot from PR #1 also supplies 2026 tuition values for six programs; the overall records remain `needs_review` and are not promoted to verified.
+
+
+## Latest integration verification — 2026-10-25
+
+- Head tested: `e7428857e27bdb96086e3243bfa7bda6c901333b`.
+- System integration run: `40190455660` — build passed, npm tests 38/38 passed, Chromium E2E 20/20 passed.
+- Dataset validation run: `40190455663` — production build/preview passed, dataset structural validation passed (0 errors; 16 warnings), Python regression tests 10/10 passed.
+- Frontend empty state now distinguishes zero engine recommendations from keyword filtering; the former is a valid criteria-based no-fit state.
+- Demo rule snapshots remain simulated. Authentic source-backed historical rule versions are still required for production rule-change claims.
+- Member 2 review of presentation/wording remains requested and not yet confirmed.
