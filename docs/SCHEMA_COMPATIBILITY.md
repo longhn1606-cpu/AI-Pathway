@@ -80,7 +80,13 @@ between scales without an independently verified conversion rule.
 
 ## Known data limitations
 
-- Tuition values remain null where no sufficiently verified amount exists.
+- The six demo programs currently carry illustrative 2026 annual tuition ranges:
+  HUST 30–45 million VND, DUT 28–38 million VND, and HCMUT 40–80 million
+  VND. These are simulated placeholders for UI/demo flows only, not official
+  fee quotations or verified school/program-specific amounts. Do not use them
+  for real budgeting or advising; replace with official program-level figures
+  before any real use. The program `status` remains `needs_review` and does
+  not certify these tuition estimates.
 - Empty `sourceIds` remain empty until a specific method-to-source relationship
   is verified.
 - Simulated cutoff rows remain explicitly simulated and are not official facts.
