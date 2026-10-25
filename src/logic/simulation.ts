@@ -22,6 +22,7 @@ export interface SimulationResult {
 export function simulateScenario(
   baseline: RecommendationInput,
   changes: Partial<StudentProfile>,
+  resolveInput?: (profile: StudentProfile) => RecommendationInput,
 ): SimulationResult {
   const cloneProfile = (profile: StudentProfile): StudentProfile => ({
     ...profile,
@@ -42,16 +43,19 @@ export function simulateScenario(
       : [...baseline.profile.preferredMethods],
   }
 
-  const scenario: RecommendationInput = {
-    profile: scenarioProfile,
-    universities: baseline.universities,
-    programs: baseline.programs,
-  }
+  const beforeInput = resolveInput ? resolveInput(cloneProfile(baseline.profile)) : baseline
+  const scenario: RecommendationInput = resolveInput
+    ? resolveInput(scenarioProfile)
+    : {
+        profile: scenarioProfile,
+        universities: baseline.universities,
+        programs: baseline.programs,
+      }
 
   return {
     scenarioProfile,
-    before: recommendPrograms(baseline),
+    before: recommendPrograms(beforeInput),
     after: recommendPrograms(scenario),
-    comparison: compareRecommendations(baseline, scenario),
+    comparison: compareRecommendations(beforeInput, scenario),
   }
 }
