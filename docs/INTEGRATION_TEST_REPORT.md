@@ -10,6 +10,7 @@ Branch: feat/system-integration
 - tests/integratedRecommendationService.test.mjs
 - tests/integratedRuleComparisonService.test.mjs
 - tests/recommendationProfileAdapter.test.mjs
+- tests/admissionRuleVersionAdapter.test.mjs
 - tests/e2e-frontend.mjs
 
 CI runs npm install, npm run build, npm test, installs Playwright/Chromium, starts Vite and executes browser E2E.
@@ -37,7 +38,7 @@ Earlier CI failures were handled:
 | IT-03 | Dataset → rule comparison | Explicit snapshot service delegates Member 4 | Passed run #72; history source unavailable |
 | IT-04 | Recommendation → frontend | App calls service and renders by programId | Passed run #72 |
 | IT-05 | Simulation → frontend | App calls simulate and renders scenario counts | Passed run #72 |
-| IT-06 | Rule comparison → frontend | RuleComparisonPanel and honest empty state | Passed run #72 |
+| IT-06 | Rule comparison → frontend | RuleComparisonPanel renders Member 4's clearly labelled simulated pair | Passed run #72; rerun latest UI revision pending |
 | IT-07 | Missing data | Null tuition/cutoff preserved | Passed run #72 |
 | IT-08 | Invalid input | UI validation and engine safeguards | Passed run #72 |
 | IT-09 | Duplicate IDs | Member 1 validator | Passed run #72 |
@@ -47,13 +48,13 @@ Earlier CI failures were handled:
 | IT-13 | Simulation immutability | Service test and browser baseline assertion | Passed run #72 |
 | IT-14 | Scale mismatch | Engine warns and does not compare unlike scales | Passed run #72 |
 | IT-15 | Ambiguous source mapping | Exact unique source resolver | Passed run #72 |
-| IT-16 | Missing rule evidence | Panel requires both snapshots | Passed run #72 |
+| IT-16 | Missing rule evidence | Pair adapter rejects missing/duplicate snapshots; demo pair explicitly simulated | Passed run #72; rerun latest UI revision pending |
 
 ## Browser E2E — actual results
 
-**Verified: 20/20 profile submissions passed in run #72.**
+**Verified: 20/20 profile submissions passed in run #72** for the earlier rule-comparison empty-state panel. A new UI revision now renders Member 4's two simulated demo snapshots with an explicit simulated notice; its browser regression run is pending.
 
-The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. It also checks the honest rule-comparison empty state where two snapshots are not available.
+The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. The updated suite asserts that the rule panel clearly labels the snapshots as simulated and renders changed fields.
 
 ## Evidence policy
 
