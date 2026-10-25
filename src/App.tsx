@@ -55,6 +55,7 @@ function App() {
   const [recommendationError, setRecommendationError] = useState<string | null>(null)
   const [simulationResult, setSimulationResult] = useState<SimulationResult | null>(null)
   const [simulationLoading, setSimulationLoading] = useState(false)
+  const [profileValidationErrors, setProfileValidationErrors] = useState<string[]>([])
 
   const visiblePrograms = useMemo(() => {
     if (!submittedProfile || !recommendationResponse) return []
@@ -70,14 +71,18 @@ function App() {
 
   function updateProfile<K extends keyof Profile>(field: K, value: Profile[K]) {
     setProfile((current) => ({ ...current, [field]: value }))
+    setProfileValidationErrors([])
     setSaved(false)
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const validationErrors = validateUiProfile(profile)
+    setProfileValidationErrors(validationErrors)
     if (validationErrors.length > 0) {
-      setRecommendationError(validationErrors.join(' '))
+      setRecommendationError(null)
+      setRecommendationResponse(null)
+      setSimulationResult(null)
       return
     }
 
@@ -173,7 +178,8 @@ function App() {
           <div className="form-layout">
             <div className="form-side-note"><div className="step-bubble">01</div><h3>Hiểu mình<br />trước khi chọn ngành.</h3><p>Những lựa chọn tốt bắt đầu từ các ưu tiên của bạn, không phải từ một bảng xếp hạng chung.</p><div className="side-note-bottom"><span className="side-check">✓</span> Không có lựa chọn đúng cho tất cả mọi người</div></div>
             <div className="form-card"><div className="form-card-heading"><div><span className="form-kicker">HỒ SƠ ĐỊNH HƯỚNG</span><h3>Điều gì quan trọng với bạn?</h3></div><span className="required-note"><i /> Trường bắt buộc</span></div>
-              <form onSubmit={handleSubmit}>
+              <form noValidate onSubmit={handleSubmit}>
+                {profileValidationErrors.length > 0 && <div className="no-results" role="alert" aria-live="assertive" aria-labelledby="profile-validation-title"><h3 id="profile-validation-title">Vui lòng kiểm tra lại hồ sơ</h3><ul>{profileValidationErrors.map((error) => <li key={error}>{error}</li>)}</ul></div>}
                 <div className="form-grid">
                   <label className="field"><span className="field-label">Điểm dự kiến <span className="required-star">*</span></span><div className="input-wrap"><input type="number" min="0" max="30" step="0.1" inputMode="decimal" placeholder="Ví dụ: 24.5" value={profile.score} onChange={(event) => updateProfile('score', event.target.value)} required aria-describedby="score-hint" /><span className="input-suffix">/ 30</span></div><span className="field-hint" id="score-hint">Điểm chỉ được hiển thị trong hồ sơ demo; chưa dùng để xếp hạng hay dự đoán trúng tuyển.</span></label>
                   <label className="field"><span className="field-label">Nhóm ngành quan tâm <span className="required-star">*</span></span><select value={profile.interest} onChange={(event) => updateProfile('interest', event.target.value as Profile['interest'])} required><option value="">Chọn nhóm ngành</option><option value="technology">Công nghệ và kỹ thuật</option><option value="undecided">Chưa xác định</option></select></label>
