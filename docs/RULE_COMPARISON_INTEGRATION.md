@@ -20,6 +20,36 @@ Frontend nhận hai object thuần và có thể hiển thị:
 - `impactAssessment`: diễn giải thận trọng cho người dùng.
 - `whatChanged`, `potentiallyAffected`, `tuitionImpact`, `nextSteps`, `unknowns`.
 
+## Kết nối frontend service port (PR #5)
+
+PR #3 cung cấp facade `compareAndExplainRules(before, after)`, trả về đồng thời
+`comparison` (dữ liệu có cấu trúc) và `explanation` (nội dung hiển thị).
+Facade này tương thích với `RuleComparisonPort<Input, Output>` của PR #5:
+
+```ts
+import { createRuleService } from '../../services/ruleService'
+import {
+  compareAndExplainRules,
+  type AdmissionRuleVersion,
+  type RuleComparisonResult,
+} from '../logic/ruleComparison'
+
+const ruleService = createRuleService<AdmissionRuleVersion, RuleComparisonResult>({
+  compare: compareAndExplainRules,
+})
+
+const result = ruleService.compare(previousSnapshot, currentSnapshot)
+// result.comparison.changes
+// result.explanation.impactLevel
+// result.explanation.whatChanged
+```
+
+Trước khi gọi facade, caller phải chuyển từng snapshot sang
+`AdmissionRuleVersion` bằng adapter tương ứng; không truyền một
+`UniversityProgram` hiện tại làm cả hai phiên bản. Giữ nguyên provenance,
+`dataStatus` và các giá trị tuition null khi tạo snapshot. Không nâng
+`simulated` hoặc `needs_review` thành `verified`.
+
 ## Cách hiểu impactLevel
 
 - `requires_review`: dữ liệu không verified hoặc thiếu URL/năm áp dụng. Không kết luận mức ảnh hưởng.
