@@ -249,12 +249,12 @@ test('historical method not currently declared by a program is not mapped into i
   const response = await unavailableMethodService.recommend({
     profile: { ...methodProfile, preferredMethods: ['academic_record'] },
   })
-  assert.ok(response.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
+  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
 })
 
 test('multiple admission preferences do not make the /30 THPT score ambiguous', async () => {
   const response = await methodService.recommend({
     profile: { ...methodProfile, preferredMethods: ['high_school_exam', 'academic_record'] },
   })
-  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
+  assert.ok(response.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
 })
