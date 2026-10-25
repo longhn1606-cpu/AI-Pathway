@@ -1,4 +1,8 @@
 import { useMemo, useState, type FormEvent } from 'react'
+import type { RecommendationResponse } from './logic/recommendation'
+import { integratedRecommendationService } from './services/integratedRecommendationService'
+import { toRecommendationProfile } from './adapters/recommendationProfileAdapter'
+import { validateUiProfile } from './adapters/profileAdapter'
 import type { DataSource, DataStatus, University, UniversityProgram } from './types'
 import universitiesJson from '../data/admissions-seed-2026/universities.json'
 import programsJson from '../data/admissions-seed-2026/programs.json'
@@ -44,21 +48,19 @@ function App() {
   const [saved, setSaved] = useState(false)
   const [showAll, setShowAll] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [recommendationResponse, setRecommendationResponse] = useState<RecommendationResponse | null>(null)
+  const [recommendationLoading, setRecommendationLoading] = useState(false)
+  const [recommendationError, setRecommendationError] = useState<string | null>(null)
 
   const visiblePrograms = useMemo(() => {
-    if (!submittedProfile) return []
-    const interest = submittedProfile.interest
-    const region = submittedProfile.region
+    if (!submittedProfile || !recommendationResponse) return []
+    const recommendedIds = new Set(recommendationResponse.results.map((result) => result.programId))
     const keyword = submittedProfile.keywords.trim().toLocaleLowerCase('vi')
     return demoPrograms.filter((item) => {
-      const interestMatches = !interest || interest === 'undecided' || item.group.includes(interest)
-      const regionMatches = !region || region === 'anywhere' || item.region === region
       const searchableText = [item.school, item.program, ...item.tags].join(' ').toLocaleLowerCase('vi')
-      const keywordMatches = !keyword || searchableText.includes(keyword)
-      // Tuition is unknown for these records, so budget is context only and never excludes a program.
-      return interestMatches && regionMatches && keywordMatches
+      return recommendedIds.has(item.id) && (!keyword || searchableText.includes(keyword))
     })
-  }, [submittedProfile])
+  }, [submittedProfile, recommendationResponse])
 
   const programsToShow = showAll ? visiblePrograms : visiblePrograms.slice(0, 3)
 
@@ -67,17 +69,39 @@ function App() {
     setSaved(false)
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const validationErrors = validateUiProfile(profile)
+    if (validationErrors.length > 0) {
+      setRecommendationError(validationErrors.join(' '))
+      return
+    }
+
     setSubmittedProfile(profile)
+    setRecommendationResponse(null)
+    setRecommendationError(null)
+    setRecommendationLoading(true)
     setSaved(false)
     setShowAll(false)
     document.getElementById('recommendations')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+
+    try {
+      const domainProfile = toRecommendationProfile(profile)
+      const response = await integratedRecommendationService.recommend({ profile: domainProfile })
+      setRecommendationResponse(response)
+    } catch (error) {
+      setRecommendationError(error instanceof Error ? error.message : 'Không thể tạo gợi ý lúc này.')
+    } finally {
+      setRecommendationLoading(false)
+    }
   }
 
   function resetProfile() {
     setProfile(initialProfile)
     setSubmittedProfile(null)
+    setRecommendationResponse(null)
+    setRecommendationError(null)
+    setRecommendationLoading(false)
     setSaved(false)
     setShowAll(false)
   }
@@ -140,10 +164,11 @@ function App() {
         <section className="recommend-section" id="recommendations">
           <div className="section-wrap"><div className="section-intro results-intro"><div><span className="eyebrow">BƯỚC 02 <span className="eyebrow-slash">/</span> MỞ RỘNG LỰA CHỌN</span><h2>Những hướng đi<br className="desktop-break" /> đáng để khám phá.</h2></div><p>Đừng giới hạn bản thân quá sớm. Hãy xem nhiều hướng đi, tìm hiểu nguồn chính thức và cân nhắc điều phù hợp với bạn.</p></div>
             {!submittedProfile ? <div className="results-empty"><div className="empty-illustration"><div className="empty-paper"><span>✳</span><i /><i /><i /></div><div className="empty-search">⌕</div></div><div className="empty-copy"><span className="empty-label">KHỞI ĐẦU HÀNH TRÌNH</span><h3>Gợi ý của bạn sẽ xuất hiện ở đây</h3><p>Hoàn thành hồ sơ định hướng để xem giao diện gợi ý ngành học theo sở thích và khu vực bạn chọn.</p><a className="text-link" href="#explore">Điền hồ sơ của bạn <span aria-hidden="true">↑</span></a></div></div> : <>
-              <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>chương trình trong bộ dữ liệu demo</span></span><p>Lọc theo nhóm ngành, khu vực và từ khóa; điểm và ngân sách chưa được dùng để xếp hạng.</p></div><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div>
+              <div className="results-toolbar"><div><span className="result-count">{visiblePrograms.length} <span>chương trình được recommendation engine trả về</span></span><p>Kết quả được tính từ hồ sơ và dữ liệu canonical; không phải xác suất trúng tuyển.</p></div><button className="button button-quiet" type="button" onClick={resetProfile}>↺ Làm lại hồ sơ</button></div>
               <div className="profile-summary"><span className="summary-label">HỒ SƠ ĐANG XEM</span><span className="summary-chip">Điểm: {profile.score}/30</span>{profile.interest && <span className="summary-chip">{interestLabels[profile.interest]}</span>}{profile.region && <span className="summary-chip">{regionLabels[profile.region]}</span>}{profile.budget && <span className="summary-chip">{budgetLabels[profile.budget]}</span>}</div>
-              <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Dữ liệu demo có nguồn và trạng thái riêng.</strong> Các chương trình lấy từ tệp dữ liệu của repository. Điểm chuẩn có thể là <em>đã xác minh</em> hoặc <em>mô phỏng</em>; điểm mô phỏng không phải số liệu chính thức. Học phí hiện chưa được xác minh. Điểm cá nhân không được dùng để dự đoán đỗ/trượt.</p></div>
-              {visiblePrograms.length ? <div className="program-grid">{programsToShow.map((item, index) => <article className="program-card" key={item.id}><div className={`program-art program-art-${index % 3}`}><span className="program-art-label">HƯỚNG ĐI {String(index + 1).padStart(2, '0')}</span><span className="program-art-symbol">{index % 3 === 0 ? '✳' : index % 3 === 1 ? '↗' : '◇'}</span><span className="program-art-caption">AI PATHWAY <i>·</i> DEMO</span></div><div className="program-content"><div className="program-tags">{item.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><h3>{item.program}</h3><p className="program-school">{item.school}</p><p className="program-description">{item.description}</p><p className="program-description"><strong>Học phí:</strong> {item.tuitionMinVndPerYear == null || item.tuitionMaxVndPerYear == null ? 'Chưa có dữ liệu đã xác minh' : item.tuitionMinVndPerYear.toLocaleString('vi-VN') + '–' + item.tuitionMaxVndPerYear.toLocaleString('vi-VN') + ' đồng/năm'}</p><div className="program-description"><strong>Điểm chuẩn lịch sử (demo):</strong> {item.cutoffs.slice(0, 3).map((cutoff) => <span key={cutoff.id}>{cutoff.year} {methodLabels[cutoff.method] ?? cutoff.method}: {cutoff.cutoffScore == null ? 'chưa có điểm' : cutoff.cutoffScore + '/' + (cutoff.scoreScale ?? '?')} [{statusLabels[cutoff.status]}] <a href={cutoff.sourceUrl} target="_blank" rel="noreferrer">{cutoff.status === 'simulated' ? 'nguồn ngữ cảnh (không xác minh số liệu)' : 'nguồn'}</a>{' · '}</span>)}</div><div className="program-meta"><span>⌖ {regionLabels[item.region]}</span><span className="demo-tag">{statusLabels[item.status]}</span></div><a className="program-link" href={item.sources[0]?.url ?? '#data-note'} target="_blank" rel="noreferrer">Mở nguồn tham khảo <span aria-hidden="true">↗</span></a></div></article>)}</div> : <div className="no-results"><span>⌕</span><h3>Chưa có lựa chọn khớp với từ khóa</h3><p>Thử bỏ bớt từ khóa hoặc chọn “Toàn quốc” để mở rộng kết quả.</p><button className="button button-secondary" type="button" onClick={() => { updateProfile('keywords', ''); setSubmittedProfile({ ...profile, keywords: '' }) }}>Xóa từ khóa</button></div>}
+              <div className="demo-warning"><span aria-hidden="true">ⓘ</span><p><strong>Dữ liệu có nguồn và trạng thái riêng.</strong> Các chương trình lấy từ dataset canonical. Điểm chuẩn hoặc học phí còn thiếu sẽ tiếp tục hiển thị là chưa có dữ liệu; dữ liệu mô phỏng không phải số liệu chính thức. Kết quả gợi ý không phải dự đoán đỗ/trượt.</p></div>
+              {recommendationResponse?.warnings.map((warning, index) => <p className="field-hint" role="status" key={index}>{warning}</p>)}
+              {recommendationLoading ? <div className="no-results" role="status"><h3>Đang phân tích hồ sơ…</h3><p>Đang đối chiếu chương trình với tiêu chí bạn đã nhập.</p></div> : recommendationError ? <div className="no-results" role="alert"><h3>Chưa thể tạo gợi ý</h3><p>{recommendationError}</p></div> : visiblePrograms.length ? <div className="program-grid">{programsToShow.map((item, index) => <article className="program-card" key={item.id}><div className={`program-art program-art-${index % 3}`}><span className="program-art-label">HƯỚNG ĐI {String(index + 1).padStart(2, '0')}</span><span className="program-art-symbol">{index % 3 === 0 ? '✳' : index % 3 === 1 ? '↗' : '◇'}</span><span className="program-art-caption">AI PATHWAY <i>·</i> DEMO</span></div><div className="program-content"><div className="program-tags">{item.tags.slice(0, 2).map((tag) => <span key={tag}>{tag}</span>)}</div><h3>{item.program}</h3><p className="program-school">{item.school}</p><p className="program-description">{item.description}</p>{recommendationResponse?.results.find((result) => result.programId === item.id)?.suitabilityReasons.map((reason, reasonIndex) => <p className="program-description" key={reasonIndex}><strong>Lý do gợi ý:</strong> {reason}</p>)}{recommendationResponse?.results.find((result) => result.programId === item.id)?.warnings.map((warning, warningIndex) => <p className="program-description" key={warningIndex}><strong>Lưu ý:</strong> {warning}</p>)}<p className="program-description"><strong>Học phí:</strong> {item.tuitionMinVndPerYear == null || item.tuitionMaxVndPerYear == null ? 'Chưa có dữ liệu đã xác minh' : item.tuitionMinVndPerYear.toLocaleString('vi-VN') + '–' + item.tuitionMaxVndPerYear.toLocaleString('vi-VN') + ' đồng/năm'}</p><div className="program-description"><strong>Điểm chuẩn lịch sử (demo):</strong> {item.cutoffs.slice(0, 3).map((cutoff) => <span key={cutoff.id}>{cutoff.year} {methodLabels[cutoff.method] ?? cutoff.method}: {cutoff.cutoffScore == null ? 'chưa có điểm' : cutoff.cutoffScore + '/' + (cutoff.scoreScale ?? '?')} [{statusLabels[cutoff.status]}] <a href={cutoff.sourceUrl} target="_blank" rel="noreferrer">{cutoff.status === 'simulated' ? 'nguồn ngữ cảnh (không xác minh số liệu)' : 'nguồn'}</a>{' · '}</span>)}</div><div className="program-meta"><span>⌖ {regionLabels[item.region]}</span><span className="demo-tag">{statusLabels[recommendationResponse?.results.find((result) => result.programId === item.id)?.dataStatus ?? item.status]}</span></div><a className="program-link" href={item.sources[0]?.url ?? '#data-note'} target="_blank" rel="noreferrer">Mở nguồn tham khảo <span aria-hidden="true">↗</span></a></div></article>)}</div> : <div className="no-results"><span>⌕</span><h3>Chưa có lựa chọn khớp với từ khóa</h3><p>Thử bỏ bớt từ khóa hoặc chọn “Toàn quốc” để mở rộng kết quả.</p><button className="button button-secondary" type="button" onClick={() => { updateProfile('keywords', ''); setSubmittedProfile({ ...profile, keywords: '' }) }}>Xóa từ khóa</button></div>}
               {visiblePrograms.length > 3 && <div className="show-more-wrap"><button className="button button-secondary" type="button" onClick={() => setShowAll((current) => !current)}>{showAll ? 'Thu gọn danh sách' : `Xem thêm ${visiblePrograms.length - 3} lựa chọn`} <span aria-hidden="true">{showAll ? '↑' : '↓'}</span></button></div>}
               <div className="save-profile"><div><span className="save-icon">✓</span><span><strong>Muốn tiếp tục tinh chỉnh?</strong><small>Hồ sơ hiện chỉ được giữ trong trạng thái trang khi bạn đang mở demo.</small></span></div><button className="button button-primary" type="button" onClick={saveProfile}>{saved ? 'Đã ghi nhận ✓' : 'Ghi nhận hồ sơ'}</button></div>{saved && <p className="save-confirmation" role="status">Đã ghi nhận hồ sơ trong giao diện demo. Thông tin chưa được gửi lên máy chủ.</p>}
             </>}
