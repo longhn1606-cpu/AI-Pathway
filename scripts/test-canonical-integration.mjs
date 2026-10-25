@@ -59,7 +59,23 @@ test('historical cutoff is selected only for one explicitly preferred method', (
   assert.equal(program.historicalCutoff, expected.cutoffScore)
   assert.equal(program.cutoffYear, expected.year)
   assert.equal(program.cutoffScale, expected.scoreScale)
-  assert.equal(program.status, expected.status === 'simulated' ? 'simulated' : program.status)
+  if (expected.status === 'simulated') assert.equal(program.status, 'simulated')
+})
+
+test('academic-record cutoff is not mixed with the high-school-exam cutoff', () => {
+  const profile = {
+    expectedScore: 24, scoreScale: 30, interests: [], preferredRegions: [],
+    annualBudgetVnd: null, preferredMethods: ['academic_record'],
+  }
+  const input = toRecommendationDataset(profile, { universities, programs, historicalCutoffs: cutoffs })
+  const program = input.programs.find((item) => item.id === 'dut-cntt')
+  const expected = cutoffs.records
+    .filter((record) => record.programId === 'dut-cntt' && record.method === 'academic_record')
+    .sort((a, b) => b.year - a.year)[0]
+  assert.equal(program.historicalCutoff, expected.cutoffScore)
+  assert.equal(program.cutoffYear, expected.year)
+  assert.equal(program.cutoffScale, expected.scoreScale)
+  assert.equal(program.status, 'simulated')
 })
 
 test('no preferred method means no cross-method cutoff inference', () => {
@@ -75,4 +91,4 @@ test('no preferred method means no cross-method cutoff inference', () => {
   ))
 })
 
-process.stdout.write(`Canonical integration: ${passed}/4 tests passed.\\n`)
+process.stdout.write(`Canonical integration: ${passed}/5 tests passed.\\n`)
