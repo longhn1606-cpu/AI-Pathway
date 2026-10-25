@@ -7,7 +7,7 @@ const source = await readFile(new URL('../src/data/admissionsDataValidation.ts',
 const compiled = ts.transpileModule(source, {
   compilerOptions: { module: ts.ModuleKind.ESNext, target: ts.ScriptTarget.ES2022 },
 }).outputText
-const { validateAdmissionsDataset } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`)
+const { validateAdmissionsDataset, resolveUniqueSourceByTitle } = await import(`data:text/javascript;base64,${Buffer.from(compiled).toString('base64')}`)
 
 const sourceRecord = {
   title: 'Admission plan',
@@ -85,4 +85,12 @@ test('rejects malformed admission methods and preserves explicit null values', (
   }])
   assert.ok(errors.some((error) => error.includes('admissionMethods[0]')))
   assert.deepEqual(validate(), [])
+})
+
+test('resolves source title only when the exact match is unique', () => {
+  const first = { ...sourceRecord }
+  const second = { ...sourceRecord, title: 'Another source' }
+  assert.equal(resolveUniqueSourceByTitle([first, second], first.title), first)
+  assert.equal(resolveUniqueSourceByTitle([first], 'missing'), undefined)
+  assert.equal(resolveUniqueSourceByTitle([first, { ...first }], first.title), undefined)
 })
