@@ -3,53 +3,56 @@
 Date: 2026-10-25  
 Branch: feat/system-integration
 
-## Test implementation
+## Automated test coverage
 
-The branch includes:
 - tests/admissionsDataValidation.test.mjs
 - tests/ruleComparisonAdapter.test.mjs
 - tests/integratedRecommendationService.test.mjs
 - tests/integratedRuleComparisonService.test.mjs
 - tests/recommendationProfileAdapter.test.mjs
+- tests/e2e-frontend.mjs
 
-CI workflow .github/workflows/system-integration.yml runs npm install, npm run build and npm test.
+The CI workflow runs npm install, npm run build, npm test, installs Playwright/Chromium, starts the Vite app and runs the browser suite.
 
 ## CI evidence
 
-- Run #19 failed at setup-node because npm caching was enabled but the repository has no lockfile. No install/build/tests ran.
-- Run #21: production build passed; npm test passed 19/19; a separate legacy Member 3 test command failed because its demo fixture files were absent from the integration branch.
-- The fixture-dependent test runner was removed. The latest branch adds frontend wiring and a recommendation profile adapter test; its workflow is pending at the time of this report.
-- The previous 19/19 result applies only to the test set before the newest adapter test; it is not a pass claim for the current head.
+- Initial run failed at setup-node because the repo has no lockfile; cache was removed.
+- Follow-up run: production build passed; npm test passed 19/19. A legacy fixture-only Member 3 runner failed because its demo fixture files were absent from the integration branch; that runner was removed.
+- Run #47: build and npm test passed after frontend wiring, before the newest taxonomy test and Playwright workflow additions.
+- The latest head adds a taxonomy integration test and browser E2E runner. Its CI result is pending; prior test results do not certify the latest head.
 
-Actual browser E2E runs completed: 0 / 20.
+## Browser E2E — 20 profile submissions
+
+The Playwright suite creates 20 distinct profile submissions through the actual React form and integrated service. It varies score, interest, region and budget. It asserts:
+- the app loads;
+- recommendation cards are returned without service errors;
+- simulation is available for selected scenarios;
+- running simulation does not change the baseline score input;
+- rule comparison honestly shows an empty state without two rule snapshots.
+
+**Actual successful E2E runs: 0 / 20 until the latest CI workflow reports success.** The test code defines 20 scenarios; this is not itself evidence that they have passed.
 
 ## Integration matrix
 
-| ID | Scenario | Implementation/evidence | Status |
+| ID | Scenario | Implementation | Latest evidence |
 |---|---|---|---|
-| IT-01 | Schema compatibility | Member 1 validator tests | Previously passed in npm test; rerun latest CI |
-| IT-02 | Dataset → recommendation | Canonical service test checks IDs/status | Previously passed in npm test; rerun latest CI |
-| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates to Member 4 | Service test passed previously; history source unavailable |
-| IT-04 | Recommendation → frontend | App.tsx calls service and renders results by programId | Build pending latest head |
-| IT-05 | Simulation → frontend | App calls simulate and renders before/after counts | Build pending latest head |
-| IT-06 | Rule comparison → frontend | RuleComparisonPanel connected; empty state without snapshots | Build pending latest head |
-| IT-07 | Missing data | Null tuition/cutoff retained | Covered by validator/adapter/engine |
-| IT-08 | Invalid input | validateUiProfile and engine safeguards | Build/test pending latest head |
-| IT-09 | Duplicate IDs | Member 1 validator rejects duplicates | Previously covered; rerun latest CI |
-| IT-10 | Null tuition/cutoff | Null not coerced to zero | Previously covered; rerun latest CI |
-| IT-11 | Provenance | DataStatus retained in service and comparison | Previously covered; rerun latest CI |
-| IT-12 | Regression | Production build + npm test workflow | Pending latest head |
-| IT-13 | Simulation immutability | Integration test snapshots baseline profile | Previously covered; rerun latest CI |
-| IT-14 | Scale mismatch | Member 3 engine behavior unchanged | Existing engine contract; full test suite pending |
-| IT-15 | Ambiguous source mapping | Exact unique source resolver | Previously covered; rerun latest CI |
-| IT-16 | Missing rule evidence | Rule panel requires both snapshots; no fabricated comparison | Service/UI implementation present |
-
-## Twenty-run E2E plan
-
-When browser/runtime CI is available, submit at least 20 distinct profiles through the actual frontend-to-service path. Vary score boundaries, interest, region, budget and admission method only if the UI collects it. For each run record validation outcome, result/exclusion counts, program IDs/statuses, simulation immutability and rule comparison availability.
-
-Do not create fictitious admissions records. Profile variations are test inputs only; admissions facts must come from canonical data and retain provenance.
+| IT-01 | Schema compatibility | Member 1 validator suite | Prior npm test pass; rerun pending |
+| IT-02 | Dataset → recommendation | Canonical service + program ID/status assertions | Prior npm test pass; taxonomy test pending |
+| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates Member 4 | Prior npm test pass; history source unavailable |
+| IT-04 | Recommendation → frontend | App calls service and renders results by programId | Build passed in run #47; latest pending |
+| IT-05 | Simulation → frontend | App calls simulate and renders scenario counts | Build passed in run #47; latest pending |
+| IT-06 | Rule comparison → frontend | RuleComparisonPanel and empty state | Build passed in run #47; latest pending |
+| IT-07 | Missing data | Null tuition/cutoff preserved | Covered by validator/adapter/engine |
+| IT-08 | Invalid input | UI validation and engine safeguards | Latest CI pending |
+| IT-09 | Duplicate IDs | Member 1 validator | Prior npm test pass |
+| IT-10 | Null tuition/cutoff | Null not coerced to zero | Prior npm test pass |
+| IT-11 | Provenance | DataStatus retained in services/adapters | Prior npm test pass |
+| IT-12 | Regression | Build + npm test + browser E2E | Latest CI pending |
+| IT-13 | Simulation immutability | Service test and browser baseline assertion | Prior service test pass; browser pending |
+| IT-14 | Scale mismatch | Member 3 engine unchanged | Existing engine contract |
+| IT-15 | Ambiguous source mapping | Exact unique resolver | Prior npm test pass |
+| IT-16 | Missing rule evidence | Panel requires both snapshots | Implemented; browser pending |
 
 ## Evidence policy
 
-A run counts only when the actual app and integration path execute in a browser/runtime. Static inspection, mocks, unit tests, CI build success and PR body claims are not E2E runs. Retain failures and reproduction details; reruns do not erase failed attempts.
+A browser run counts only when the real app and integration path execute. Test definitions, mocks, unit tests or build success are not E2E passes. Keep failed attempts and reproduction details; reruns do not erase failures.
