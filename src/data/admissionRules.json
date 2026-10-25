@@ -1,0 +1,51 @@
+{
+  "scenarioNotice": "TÌNH HUỐNG GIẢ LẬP — KHÔNG PHẢI QUY ĐỊNH TUYỂN SINH THẬT. Toàn bộ trường, chương trình, năm và điều kiện dưới đây là dữ liệu mô phỏng (dataStatus = simulated), không có URL nguồn và không gắn với văn bản tuyển sinh nào. Thay bằng hai văn bản chính thức do Thành viên 1 xác minh khi có.",
+  "versions": [
+    {
+      "id": "sim-rule-v1",
+      "institutionId": "sim-institution-01",
+      "institutionName": "Trường mô phỏng A (dữ liệu giả lập)",
+      "programId": "sim-program-it-01",
+      "programName": "Chương trình Công nghệ thông tin mô phỏng (dữ liệu giả lập)",
+      "source": {
+        "name": "Kịch bản giả lập — phiên bản trước (không phải văn bản tuyển sinh chính thức)",
+        "url": null,
+        "appliedYear": 2025,
+        "version": "sim-v1",
+        "checkedAt": null,
+        "dataStatus": "simulated"
+      },
+      "admissionMethod": "academic_record",
+      "conditions": {
+        "minimumScore": 24,
+        "scoreScale": 30,
+        "subjectCombination": ["A00"],
+        "interviewRequired": true,
+        "notes": null
+      }
+    },
+    {
+      "id": "sim-rule-v2",
+      "institutionId": "sim-institution-01",
+      "institutionName": "Trường mô phỏng A (dữ liệu giả lập)",
+      "programId": "sim-program-it-01",
+      "programName": "Chương trình Công nghệ thông tin mô phỏng (dữ liệu giả lập)",
+      "source": {
+        "name": "Kịch bản giả lập — phiên bản sau (không phải văn bản tuyển sinh chính thức)",
+        "url": null,
+        "appliedYear": 2026,
+        "version": "sim-v2",
+        "checkedAt": null,
+        "dataStatus": "simulated"
+      },
+      "admissionMethod": "academic_record",
+      "conditions": {
+        "minimumScore": 25,
+        "scoreScale": 30,
+        "subjectCombination": ["A00", "D01"],
+        "foreignLanguageCertificateRequired": true,
+        "notes": null
+      }
+    }
+  ]
+}
