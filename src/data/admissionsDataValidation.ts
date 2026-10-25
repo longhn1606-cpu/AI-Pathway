@@ -77,6 +77,8 @@ export function validateAdmissionsDataset(
       !isRecord(cutoffs) || !Array.isArray(cutoffs.records)) {
     return ['Dataset roots must be arrays for universities/programs and an object with records for cutoffs.']
   }
+  if (universities.length === 0) errors.push('universities must not be empty.')
+  if (programs.length === 0) errors.push('programs must not be empty.')
   const cutoffYears: unknown[] = Array.isArray(cutoffs.years) ? cutoffs.years : []
   if (!isNonEmptyString(cutoffs.title) || !isIsoDate(cutoffs.checkedAt) ||
       !isNonEmptyString(cutoffs.scoringPolicy) || !Array.isArray(cutoffs.years) ||
@@ -123,6 +125,10 @@ export function validateAdmissionsDataset(
         item.tuitionMinVndPerYear > item.tuitionMaxVndPerYear) {
       errors.push(`Program ${item.id} has tuition minimum greater than maximum.`)
     }
+    if ((item.historicalCutoff === null) !== (item.cutoffScale === null) ||
+        (item.historicalCutoff === null) !== (item.cutoffYear === null)) {
+      errors.push(`Program ${item.id} historical cutoff, year and scale must be all present or all null.`)
+    }
     if (item.cutoffScale !== null && item.cutoffScale <= 0) errors.push(`Program ${item.id} has invalid cutoffScale.`)
     if (item.historicalCutoff !== null && item.historicalCutoff < 0) errors.push(`Program ${item.id} has negative historicalCutoff.`)
     if (item.historicalCutoff !== null && item.cutoffScale !== null && item.historicalCutoff > item.cutoffScale) {
@@ -157,6 +163,15 @@ export function validateAdmissionsDataset(
     const owningUniversityId = programUniversityIds.get(item.programId)
     if (owningUniversityId && owningUniversityId !== item.universityId) {
       errors.push(`Cutoff ${item.id} universityId does not match its program.`)
+    }
+    if ((item.cutoffScore === null) !== (item.scoreScale === null)) {
+      errors.push(`Cutoff ${item.id} cutoffScore and scoreScale must both be null or both be present.`)
+    }
+    if (item.status === 'verified' && (item.sourceUrl === null || item.sourceUrl.trim() === '')) {
+      errors.push(`Verified cutoff ${item.id} must include a source URL.`)
+    }
+    if (item.status === 'simulated' && (!isNonEmptyString(item.notes) || !/simulat/i.test(item.notes))) {
+      errors.push(`Simulated cutoff ${item.id} must include an explicit simulation note.`)
     }
     if (item.scoreScale !== null && item.scoreScale <= 0) errors.push(`Cutoff ${item.id} has invalid scoreScale.`)
     if (!cutoffYears.includes(item.year)) errors.push(`Cutoff ${item.id} year is missing from dataset years.`)
