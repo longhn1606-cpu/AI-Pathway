@@ -20,13 +20,6 @@ export interface UiStudentProfile {
   keywords: string
 }
 
-const BUDGET_MAX_VND: Record<Exclude<UiBudget, 'flexible'>, number> = {
-  under20: 20_000_000,
-  '20to40': 40_000_000,
-  '40to70': 70_000_000,
-  over70: 100_000_000,
-}
-
 /**
  * Converts the existing UI form to the shared domain contract.
  * The UI budget bands are upper bounds, not claims about exact affordability.
@@ -47,10 +40,8 @@ export function toStudentProfile(profile: UiStudentProfile): StudentProfile {
       ? ['nationwide' as const]
       : [profile.region]
 
-  const annualBudgetVnd =
-    !profile.budget || profile.budget === 'flexible'
-      ? null
-      : BUDGET_MAX_VND[profile.budget]
+  // Existing UI uses ranges, not an exact VND/year amount. Preserve unknown as null.
+  const annualBudgetVnd = null
 
   return {
     expectedScore,
