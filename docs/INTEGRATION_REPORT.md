@@ -40,6 +40,10 @@ These are dependency snapshots on the isolated integration branch. Original memb
 - Subsequent run #47: production build and npm test completed successfully. This was before the latest taxonomy test and Playwright E2E workflow were added.
 - Latest workflow includes a taxonomy integration test and a Playwright suite that submits 20 distinct profiles through the actual frontend. Its result must be checked before reporting 20/20 E2E success.
 
+## Additional data-contract blocker
+
+The canonical historicalCutoffs collection is separate from UniversityProgram, while Member 3's RecommendationInput accepts only University[] and UniversityProgram[]. A program can have multiple historical cutoff records by year and admission method, but the current shared UniversityProgram schema has only one nullable cutoff tuple. Member 5 does not arbitrarily choose one record or flatten the history. As a result, the recommendation engine currently receives null program-level cutoff fields where they are unknown; the frontend may still show the historical cutoff collection with its own method/year/status/source labels. Member 1 and Member 3 need to agree on a lossless input contract or an explicit selection policy before historical cutoffs can affect recommendation logic.
+
 ## Remaining
 
 - Confirm latest CI, including Playwright browser tests.
