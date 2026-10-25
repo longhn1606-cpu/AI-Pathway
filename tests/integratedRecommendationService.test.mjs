@@ -210,7 +210,7 @@ const methodProgram = {
 const methodProfile = {
   expectedScore: 25, scoreScale: 30, interests: ['technology'],
   preferredRegions: ['nationwide'], annualBudgetVnd: null,
-  preferredMethods: ['high_school_exam'],
+  preferredMethods: [],
 }
 const methodService = createIntegratedRecommendationService({
   getUniversities: () => [methodUniversity],
@@ -218,14 +218,14 @@ const methodService = createIntegratedRecommendationService({
   getHistoricalCutoffs: () => cutoffDataset,
 })
 
-test('historical cutoff adapter selects the latest unique record for the one selected method', async () => {
+test('historical cutoff adapter selects the latest unique THPT record for the /30 profile score without requiring a method preference', async () => {
   const response = await methodService.recommend({ profile: methodProfile })
   assert.equal(response.results.length, 1)
   assert.ok(response.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
   assert.ok(!response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
 })
 
-test('simulation re-resolves cutoff for the changed admission method in both before and after states', async () => {
+test('simulation keeps the THPT cutoff tied to the /30 score even when admission preferences change', async () => {
   const result = await methodService.simulate(
     { profile: methodProfile },
     { preferredMethods: ['academic_record'] },
@@ -233,7 +233,7 @@ test('simulation re-resolves cutoff for the changed admission method in both bef
   assert.ok(result.before.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
   assert.equal(result.before.results[0].dataStatus, 'verified')
   assert.ok(result.after.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
-  assert.equal(result.after.results[0].dataStatus, 'simulated')
+  assert.equal(result.after.results[0].dataStatus, 'verified')
   assert.equal(result.scenarioProfile.preferredMethods[0], 'academic_record')
 })
 
@@ -249,10 +249,10 @@ test('historical method not currently declared by a program is not mapped into i
   const response = await unavailableMethodService.recommend({
     profile: { ...methodProfile, preferredMethods: ['academic_record'] },
   })
-  assert.ok(response.results[0].warnings.some((warning) => warning.includes('Chưa đủ dữ liệu điểm chuẩn')))
+  assert.ok(response.results[0].suitabilityReasons.some((reason) => reason.includes('năm 2025')))
 })
 
-test('multiple selected methods leave the single cutoff slot unknown instead of choosing arbitrarily', async () => {
+test('multiple admission preferences do not make the /30 THPT score ambiguous', async () => {
   const response = await methodService.recommend({
     profile: { ...methodProfile, preferredMethods: ['high_school_exam', 'academic_record'] },
   })
