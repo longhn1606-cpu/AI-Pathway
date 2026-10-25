@@ -63,7 +63,7 @@ Earlier CI failures were handled:
 
 The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. It also checks that the rule comparison panel clearly labels the Member 4 snapshots as simulated and renders changed fields.
 
-## Added validation matrix (pending fresh CI)
+## Added validation matrix (verified in latest CI)
 - Invalid source URL protocol/type, malformed applied year, invalid checkedAt and unknown data status.
 - Invalid institution/program metadata and unsupported admission method.
 - Non-object conditions, nested non-finite numbers and non-JSON values.
@@ -76,7 +76,7 @@ The Playwright suite varies score, interest, region and budget through the actua
 A browser run counts only when the real app and integration path execute. Test definitions, mocks, unit tests or build success are not E2E passes. Keep failed attempts and reproduction details; reruns do not erase failures.
 
 
-## Historical cutoff integration regression coverage — commit 71650fd (pending CI)
+## Historical cutoff integration regression coverage — verified in latest CI
 
 - Latest unique record is selected for exact program + single selected method.
 - Simulation re-resolves cutoff after the selected admission method changes; before and after states retain distinct source status.
@@ -89,7 +89,7 @@ The adapter used is synchronized from Member 3's PR #1 head and the integration 
 
 ## Latest verified CI — 2026-10-25
 
-<badge>Commit `e7428857e27bdb96086e3243bfa7bda6c901333b`</badge>
+Commit tested: `e7428857e27bdb96086e3243bfa7bda6c901333b`
 
 **System integration run #40190455660**
 - Production build / TypeScript: passed.
