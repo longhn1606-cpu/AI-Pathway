@@ -40,8 +40,16 @@ export function toStudentProfile(profile: UiStudentProfile): StudentProfile {
       ? ['nationwide' as const]
       : [profile.region]
 
-  // Existing UI uses ranges, not an exact VND/year amount. Preserve unknown as null.
-  const annualBudgetVnd = null
+  // The recommendation contract treats this as a conservative maximum annual-budget ceiling.
+  // It is not an estimate of the user's exact spending capacity.
+  const budgetCeilings: Record<UiBudget, number | null> = {
+    under20: 20_000_000,
+    '20to40': 40_000_000,
+    '40to70': 70_000_000,
+    over70: null,
+    flexible: null,
+  }
+  const annualBudgetVnd = profile.budget ? budgetCeilings[profile.budget] : null
 
   return {
     expectedScore,
