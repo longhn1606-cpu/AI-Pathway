@@ -261,4 +261,45 @@ test('preferredRegions có nationwide nghĩa là không giới hạn khu vực',
   assert.equal(result.results.length, programs.length)
 })
 
+
+test('điểm âm hoặc vượt thang được xử lý như thiếu dữ liệu, không đối chiếu sai', () => {
+  for (const expectedScore of [-1, 31, Number.NaN, Number.POSITIVE_INFINITY]) {
+    const result = recommendPrograms(input({ expectedScore, scoreScale: 30 }))
+    assert.ok(result.warnings.some((warning) => warning.includes('không hợp lệ')))
+    assert.ok(result.results.every((item) => item.warnings.some((warning) => warning.includes('Thiếu điểm dự kiến'))))
+  }
+})
+
+test('thang điểm bằng 0 hoặc không hữu hạn không được dùng để quy đổi', () => {
+  for (const scoreScale of [0, -30, Number.NaN, Number.POSITIVE_INFINITY]) {
+    const result = recommendPrograms(input({ expectedScore: 20, scoreScale }))
+    assert.ok(result.warnings.some((warning) => warning.includes('không hợp lệ')))
+  }
+})
+
+test('ngân sách âm hoặc không hữu hạn không bị diễn giải thành ngưỡng lọc', () => {
+  for (const annualBudgetVnd of [-1, Number.NaN, Number.POSITIVE_INFINITY]) {
+    const result = recommendPrograms(input({ annualBudgetVnd }))
+    assert.ok(result.warnings.some((warning) => warning.includes('Ngân sách năm không hợp lệ')))
+    assert.ok(result.results.length > 0)
+  }
+})
+
+test('thay đổi điểm có thể làm thay đổi thứ hạng khi cutoff cùng thang', () => {
+  const before = recommendPrograms(input({ expectedScore: 24, scoreScale: 30 }))
+  const after = recommendPrograms(input({ expectedScore: 21, scoreScale: 30 }))
+  assert.notDeepEqual(
+    before.results.map((item) => item.programId),
+    after.results.map((item) => item.programId),
+  )
+})
+
+test('thay đổi ngân sách không bắt buộc làm thay đổi kết quả nếu học phí chưa có', () => {
+  const design = programs.filter((program) => program.id === 'demo-program-design-central')
+  const central = universities.filter((university) => university.id === 'demo-university-central')
+  const before = recommendPrograms(input({ annualBudgetVnd: 10000000 }, central, design))
+  const after = recommendPrograms(input({ annualBudgetVnd: 20000000 }, central, design))
+  assert.deepEqual(before.results, after.results)
+})
+
 process.stdout.write(`\nKết quả: ${passed} kiểm thử passed.\n`)
