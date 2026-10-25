@@ -177,16 +177,16 @@ function evaluateProgram(
     (tuitionComplete && tuitionMin > tuitionMax)
   const tuitionValid = tuitionComplete && !tuitionInvalid
 
-  const cutoffComplete =
+  const cutoffInvalid =
     program.historicalCutoff !== null &&
     program.cutoffYear !== null &&
-    program.cutoffScale !== null
-  const cutoffInvalid = cutoffComplete && (
-    !Number.isFinite(program.historicalCutoff) || program.historicalCutoff < 0 ||
-    !Number.isFinite(program.cutoffYear) || program.cutoffYear <= 0 ||
-    !Number.isFinite(program.cutoffScale) || program.cutoffScale <= 0 ||
-    program.historicalCutoff > program.cutoffScale
-  )
+    program.cutoffScale !== null &&
+    (
+      !Number.isFinite(program.historicalCutoff) || program.historicalCutoff < 0 ||
+      !Number.isFinite(program.cutoffYear) || program.cutoffYear <= 0 ||
+      !Number.isFinite(program.cutoffScale) || program.cutoffScale <= 0 ||
+      program.historicalCutoff > program.cutoffScale
+    )
 
   if (!regionMatches(profile.preferredRegions, university.region)) {
     exclusionReasons.push(`Trường thuộc ${REGION_LABELS[university.region]}, ngoài khu vực ưu tiên.`)
@@ -236,7 +236,11 @@ function evaluateProgram(
 
   if (profile.expectedScore === null || profile.scoreScale === null) {
     warnings.push('Thiếu điểm dự kiến hoặc thang điểm; chưa thể đối chiếu điểm chuẩn lịch sử.')
-  } else if (!cutoffComplete) {
+  } else if (
+    program.historicalCutoff === null ||
+    program.cutoffYear === null ||
+    program.cutoffScale === null
+  ) {
     warnings.push('Chưa đủ dữ liệu điểm chuẩn lịch sử, năm áp dụng hoặc thang điểm để đối chiếu.')
   } else if (cutoffInvalid) {
     warnings.push('Dữ liệu điểm chuẩn lịch sử hoặc thang điểm không hợp lệ; đã bỏ đối chiếu.')
