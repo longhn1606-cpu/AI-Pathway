@@ -102,9 +102,9 @@ test('phân biệt null với thiếu trường', () => {
   assert.equal(result.changes[0].newValue, undefined)
 })
 
-test('mảng giữ thứ tự mặc định', () => {
+test('tổ hợp môn không đổi khi chỉ thay đổi thứ tự phần tử', () => {
   const result = compareRules(rule({ conditions: { combinations: ['A00', 'D01'] } }), rule({ conditions: { combinations: ['D01', 'A00'] } }))
-  assert.equal(result.changes[0].changeType, 'modified')
+  assert.equal(result.changes.length, 0)
 })
 
 test('mảng dạng tập hợp có thể bỏ qua khác biệt thứ tự', () => {
@@ -317,3 +317,97 @@ test('thay đổi học phí đầy đủ và verified được phân loại med
 })
 
 process.stdout.write(`\nTổng kết: ${passed} kiểm thử passed.\n`)
+
+
+test('thay đổi phương thức xét tuyển được phát hiện', () => {
+  const result = compareRules(rule(), rule({ admissionMethod: 'academic_record' }))
+  assert.ok(result.changes.some((change) => change.field === 'admissionMethod' && change.oldValue === 'high_school_exam' && change.newValue === 'academic_record'))
+})
+
+test('tổ hợp môn phát hiện phần tử thêm dù thứ tự không có ý nghĩa', () => {
+  const result = compareRules(
+    rule({ conditions: { subjectCombinations: ['A00'] } }),
+    rule({ conditions: { subjectCombinations: ['D01', 'A00'] } }),
+  )
+  assert.ok(result.changes.some((change) => change.field === 'conditions.subjectCombinations'))
+})
+
+test('phát hiện thay đổi chỉ tiêu và cách tính điểm khi các trường có trong dữ liệu', () => {
+  const before = rule({ conditions: { quota: 100, scoring: { formula: 'sum', scale: 30 } } })
+  const after = rule({ conditions: { quota: 120, scoring: { formula: 'weighted', scale: 100 } } })
+  const result = compareRules(before, after)
+  for (const field of ['conditions.quota', 'conditions.scoring.formula', 'conditions.scoring.scale']) {
+    assert.ok(result.changes.some((change) => change.field === field), field)
+  }
+})
+
+test('không so sánh điều kiện giữa hai trường khác nhau', () => {
+  const before = rule({ conditions: { minimumScore: 20 } })
+  const after = rule({ institutionId: 'uni-2', conditions: { minimumScore: 28 } })
+  const result = compareRules(before, after)
+  assert.ok(result.changes.some((change) => change.field === 'institutionId'))
+  assert.equal(result.changes.some((change) => change.field.startsWith('conditions.')), false)
+  assert.equal(result.comparableScope, false)
+  assert.deepEqual(result.affectedUniversities, [])
+  assert.deepEqual(result.affectedMajors, [])
+  assert.equal(explainRules(result).impactLevel, 'requires_review')
+})
+
+test('không so sánh điều kiện giữa hai ngành khác nhau trong cùng trường', () => {
+  const before = rule({ conditions: { minimumScore: 20 } })
+  const after = rule({ programId: 'program-2', programName: 'Other major', conditions: { minimumScore: 28 } })
+  const result = compareRules(before, after)
+  assert.equal(result.changes.some((change) => change.field.startsWith('conditions.')), false)
+  assert.deepEqual(result.affectedUniversities, ['uni-1'])
+  assert.deepEqual(result.affectedMajors, [])
+  assert.equal(result.comparableScope, false)
+})
+
+test('xác định trường và ngành bị ảnh hưởng chỉ khi định danh khớp', () => {
+  const result = compareRules(rule(), rule({ id: 'v2', conditions: { minimumScore: 25 } }))
+  assert.deepEqual(result.affectedUniversities, ['uni-1'])
+  assert.deepEqual(result.affectedMajors, ['program-1'])
+  assert.deepEqual(result.affectedPrograms, ['program-1'])
+  const explanation = explainRules(result)
+  assert.ok(explanation.potentiallyAffected.some((item) => item.includes('uni-1')))
+  assert.ok(explanation.potentiallyAffected.some((item) => item.includes('program-1')))
+})
+
+test('phạm vi cấp trường với programId null có thể so sánh, nhưng không gán ngành', () => {
+  const result = compareRules(
+    rule({ programId: null, programName: null, conditions: { quota: 100 } }),
+    rule({ id: 'v2', programId: null, programName: null, conditions: { quota: 120 } }),
+  )
+  assert.equal(result.comparableScope, true)
+  assert.ok(result.changes.some((change) => change.field === 'conditions.quota'))
+  assert.deepEqual(result.affectedUniversities, ['uni-1'])
+  assert.deepEqual(result.affectedMajors, [])
+})
+
+test('khác phạm vi không tạo giải thích học phí như thể đã so sánh', () => {
+  const tuition = { minVndPerYear: 10, maxVndPerYear: 20, appliedYear: 2026, dataStatus: 'verified', sourceUrl: 'https://example.edu/tuition' }
+  const result = compareRules(rule({ tuition }), rule({ programId: 'program-2', tuition: { ...tuition, minVndPerYear: 15 } }))
+  const explanation = explainRules(result)
+  assert.ok(explanation.tuitionImpact.some((item) => item.includes('không cùng phạm vi')))
+  assert.equal(result.changes.some((change) => change.field.startsWith('tuition')), false)
+})
+
+test('giải thích mỗi thay đổi có giá trị trước và sau', () => {
+  const result = compareRules(rule({ conditions: { minimumScore: 22 } }), rule({ conditions: { minimumScore: 25 } }))
+  const explanation = explainRules(result)
+  assert.ok(explanation.whatChanged.some((item) => item.includes('22') && item.includes('25')))
+})
+
+test('thiếu nguồn/năm và simulated không được nâng thành verified', () => {
+  const oldRule = rule({ source: source({ url: null, appliedYear: null, dataStatus: 'simulated' }) })
+  const newRule = rule({ id: 'v2', source: source({ url: null, appliedYear: null, dataStatus: 'simulated', version: 'v2' }) })
+  const result = compareRules(oldRule, newRule)
+  const explanation = explainRules(result)
+  assert.equal(result.dataStatus, 'simulated')
+  assert.equal(explanation.impactLevel, 'requires_review')
+  assert.ok(explanation.sourceDisclosure.every((item) => item.includes('simulated') && item.includes('không có URL')))
+})
+
+test('đầu vào không có snapshot thứ hai được phân biệt qua contract input bắt buộc', () => {
+  assert.throws(() => compareRules(rule(), undefined), TypeError)
+})
