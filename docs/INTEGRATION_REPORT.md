@@ -52,3 +52,13 @@ The canonical historicalCutoffs collection is separate from UniversityProgram, w
 - After upstream PRs merge, reconcile dependency snapshots with main.
 
 The tested integration flow completed 20/20 browser E2E submissions in run #66. Rule-history and historical-cutoff integration remain explicit data-contract limitations.
+
+
+## Follow-up: Member 2 / Member 4 integration hardening
+
+- Fixture JSON is assigned to `unknown`; it is not asserted as `AdmissionRuleVersion[]` before runtime validation.
+- `validateAdmissionRuleVersions` validates the collection and rejects malformed records or duplicate IDs before the UI can consume them.
+- Pair validation now checks source metadata, HTTP(S) URLs, nullable years/timestamps, admission method, nullable program metadata, recursive JSON conditions and all tuition fields/ranges.
+- Synchronized Member 4's latest `compareRules.ts` and `explainRules.ts` from `feature/member-4-rule-comparison`, including tuition provenance safeguards.
+- Rule panel presents `whatChanged`, `tuitionImpact`, `nextSteps`, source disclosure, unknowns and limitations.
+- New adapter and browser regression assertions require a fresh CI run before this follow-up can be marked verified.

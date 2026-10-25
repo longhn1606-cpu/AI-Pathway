@@ -15,7 +15,7 @@ Branch: feat/system-integration
 
 CI runs npm install, npm run build, npm test, installs Playwright/Chromium, starts Vite and executes browser E2E.
 
-## Latest verified CI evidence
+## Latest verified CI evidence (before deep-validation update)
 
 **System integration workflow run #96 — SUCCESS** on commit 31246f86ffa43a75307da21fe5e6f08cf2fb31f5:
 - Production build: passed.
@@ -23,12 +23,12 @@ CI runs npm install, npm run build, npm test, installs Playwright/Chromium, star
 - Playwright Chromium browser E2E: **20/20 profile submissions passed**; log reports `Frontend E2E profiles completed: 20/20`.
 - Browser launch and server readiness checks: passed.
 
-The latest run includes the rule snapshot-pair adapter and the Member 4 demo rule panel. It verifies:
+Run #96 predates the deep-validation changes below and must not be used as evidence for them. A new workflow run is required. The updated suite adds malformed source/metadata/conditions/tuition rejection and explicit unknown-tuition UI assertions. Earlier run #96 verified:
 - canonical dataset validation, IDs, statuses and provenance;
 - recommendation integration and taxonomy mapping;
 - null tuition and score-scale mismatch behavior;
 - simulation immutability;
-- rule snapshot pair validation (missing/duplicate IDs rejected);
+- rule snapshot pair validation (missing/duplicate IDs rejected; deeper validation added after run #96);
 - frontend comparison of Member 4's explicitly simulated pair;
 - 20 distinct profile submissions through the actual React form and service.
 
@@ -62,6 +62,14 @@ Earlier CI failures were handled:
 **Verified: 20/20 profile submissions passed in run #96.**
 
 The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. It also checks that the rule comparison panel clearly labels the Member 4 snapshots as simulated and renders changed fields.
+
+## Added validation matrix (pending fresh CI)
+- Invalid source URL protocol/type, malformed applied year, invalid checkedAt and unknown data status.
+- Invalid institution/program metadata and unsupported admission method.
+- Non-object conditions, nested non-finite numbers and non-JSON values.
+- Tuition wrong types, negative amounts, inverted min/max range, invalid year/status/source URL.
+- Null tuition/source fields remain valid unknowns; they are not coerced to zero.
+- Browser assertions cover the tuition unknown-state message and next-step section.
 
 ## Evidence policy
 

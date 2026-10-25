@@ -1,10 +1,14 @@
 import { useMemo, useState } from 'react'
 import demoRules from '../../data/admission-rule-comparison/demo-rules.json'
-import { toAdmissionRuleVersionPair } from '../adapters/admissionRuleVersionAdapter'
+import {
+  toAdmissionRuleVersionPair,
+  validateAdmissionRuleVersions,
+} from '../adapters/admissionRuleVersionAdapter'
 import { integratedRuleComparisonService } from '../services/integratedRuleComparisonService'
-import type { AdmissionRuleVersion } from '../logic/ruleComparison'
 
-const versions = demoRules.versions as AdmissionRuleVersion[]
+const rawVersions: unknown = demoRules.versions
+const fixtureValidation = validateAdmissionRuleVersions(rawVersions)
+const versions = fixtureValidation.ok ? fixtureValidation.value : []
 
 function ResultList({ title, items, emptyMessage }: {
   title: string
@@ -26,6 +30,10 @@ export function RuleComparisonPanel() {
   const [afterId, setAfterId] = useState(versions[1]?.id ?? '')
 
   const result = useMemo(() => {
+    if (!fixtureValidation.ok) return { error: fixtureValidation.error } as const
+    if (versions.length < 2) {
+      return { error: 'Cần ít nhất hai snapshot quy định hợp lệ để so sánh.' } as const
+    }
     const before = versions.find((version) => version.id === beforeId)
     const after = versions.find((version) => version.id === afterId)
     const pair = toAdmissionRuleVersionPair(before, after)

@@ -62,6 +62,9 @@ try {
     assert.equal(await simulatedNotice.count(), 1, 'Rule comparison fixture must be explicitly labelled simulated')
     assert.equal(await page.getByText(/Mức độ ảnh hưởng:/).count(), 1)
     assert.ok(await page.getByText(/conditions.minimumScore/).count() > 0, 'Rule comparison should render changed fields')
+    assert.equal(await page.getByRole('region', { name: 'Tác động học phí' }).count(), 1)
+    assert.equal(await page.getByRole('region', { name: 'Việc học sinh nên làm tiếp theo' }).count(), 1)
+    assert.ok(await page.getByText(/Chưa có snapshot học phí/).count() > 0, 'Unknown tuition must be disclosed')
   }
 
   process.stdout.write('Frontend E2E profiles completed: 20/20\n')

@@ -95,9 +95,9 @@ Member 4 public implementation is present on this branch:
 
 Member 5 added src/services/integratedRuleComparisonService.ts. Its compare(before, after) delegates to Member 4's compareAndExplainRules and returns { comparison, explanation }.
 
-Member 2's frontend is connected through src/components/RuleComparisonPanel.tsx. It uses the two explicitly simulated snapshots already supplied by Member 4 in data/admission-rule-comparison/demo-rules.json. Both are visibly labelled simulated and the panel renders changed fields, impact level, limitations and data status. The pair adapter rejects missing snapshots and identical IDs.
+Member 2's frontend is connected through src/components/RuleComparisonPanel.tsx. It uses the two explicitly simulated snapshots already supplied by Member 4 in data/admission-rule-comparison/demo-rules.json. Both are visibly labelled simulated and the panel renders changed fields, impact level, limitations and data status. The pair adapter runtime-validates both snapshots and rejects missing snapshots, malformed metadata/conditions/tuition, duplicate collection IDs and identical pair IDs. Fixture JSON remains `unknown` until validation succeeds. It preserves nullable source and tuition fields.
 
-Important limitation: these are internal demo scenarios, not official admissions rules. Canonical current-state UniversityProgram records do not encode two historical rule versions. Production comparison still requires two source-backed AdmissionRuleVersion snapshots with distinct IDs and provenance. The panel does not derive or fabricate an old version from the current dataset.
+Important limitation: these are internal demo scenarios, not official admissions rules. Canonical current-state UniversityProgram records do not encode two historical rule versions. Production comparison still requires two source-backed AdmissionRuleVersion snapshots with distinct IDs and provenance. The panel does not derive or fabricate an old version from the current dataset. It renders Member 4's `whatChanged`, `tuitionImpact`, `nextSteps`, affected-program guidance, source disclosure, unknowns and limitations.
 
 ## Rule and provenance safeguards
 
@@ -114,7 +114,7 @@ Important limitation: these are internal demo scenarios, not official admissions
 |---|---|---|
 | PR #4 | Adapter files are copied as dependency snapshot; PR #4 remains independently owned | Reconcile by file-level diff after its merge |
 | PR #1 | Original service uses demo fixtures | Member 5 service injects canonical dataset |
-| PR #3 | Requires two versioned snapshots | Service/panel use Member 4's explicitly simulated demo pair; production source remains open |
+| PR #3 | Requires two versioned snapshots | Member 4's latest `compareRules.ts` and `explainRules.ts` safeguards are synchronized into this branch; service/panel use the explicitly simulated demo pair; production source remains open |
 | PR #5/#6 | PR #6 reuses PR #5 adapter with budget ceilings | Integrated branch uses updated PR #6 version |
 | Taxonomy | UI technology vs dataset information_technology/engineering | Member 5 adapter maps observed labels; review if taxonomy changes |
 | E2E | Browser/runtime test execution pending | Run 20 real submissions in CI/browser environment |
