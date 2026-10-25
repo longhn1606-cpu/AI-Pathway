@@ -18,7 +18,7 @@ const [before, after] = fixture.versions
 const clone = (value) => structuredClone(value)
 
 test('validates fixture collection from unknown and preserves null provenance', () => {
-  const raw: unknown = fixture.versions
+  const raw = fixture.versions
   const result = validateAdmissionRuleVersions(raw)
   assert.equal(result.ok, true)
   if (!result.ok) return
