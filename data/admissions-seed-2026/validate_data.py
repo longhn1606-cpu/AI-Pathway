@@ -129,8 +129,16 @@ for i, program in enumerate(programs):
             errors.append(f"{mw}: invalid status")
         if not isinstance(method.get("sourceIds"), list) or not all(isinstance(x, str) for x in method["sourceIds"]):
             errors.append(f"{mw}: sourceIds must be string array")
-        if method.get("status") == "verified" and not method.get("sourceIds"):
-            errors.append(f"{mw}: verified method needs sourceIds")
+        if method.get("status") == "verified":
+            refs = method.get("sourceIds", [])
+            if not refs:
+                errors.append(f"{mw}: verified method needs sourceIds")
+            for ref in refs if isinstance(refs, list) else []:
+                matches = [s for s in program.get("sources", []) if isinstance(s, dict) and s.get("title") == ref]
+                if len(matches) != 1:
+                    errors.append(f"{mw}: verified sourceId must resolve to exactly one program source")
+                elif matches[0].get("status") != "verified" or matches[0].get("applicableYear") != method.get("applicableYear"):
+                    errors.append(f"{mw}: verified source must be verified and match applicableYear")
         if not method.get("sourceIds"):
             warnings.append(f"{mw}: empty sourceIds; shared DataSource schema has no id")
 
