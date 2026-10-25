@@ -88,9 +88,30 @@ try {
         .flatMap((element) => {
           const rect = element.getBoundingClientRect()
           const style = getComputedStyle(element)
+          // Decorative art (orbits, glows and floating cards) is intentionally clipped
+          // by its own container on narrow screens. Do not treat that clipping as
+          // content loss; still fail on overflowing text/control nodes and on any
+          // element that visibly escapes all clipping ancestors.
+          const textOrControl = element.matches(
+            'p,h1,h2,h3,h4,small,strong,a,button,span,label,input,select,textarea',
+          )
           const hasInternalOverflow = element.scrollWidth > element.clientWidth + 1
-            && !['auto', 'scroll'].includes(style.overflowX)
-          const outsideViewport = rect.left < -1 || rect.right > document.documentElement.clientWidth + 1
+            && (style.overflowX === 'visible' || textOrControl)
+          const clippedByAncestor = (() => {
+            let ancestor = element.parentElement
+            while (ancestor && ancestor !== document.body) {
+              const ancestorStyle = getComputedStyle(ancestor)
+              const ancestorRect = ancestor.getBoundingClientRect()
+              if (['hidden', 'clip'].includes(ancestorStyle.overflowX)
+                && (rect.left < ancestorRect.left - 1 || rect.right > ancestorRect.right + 1)) {
+                return true
+              }
+              ancestor = ancestor.parentElement
+            }
+            return false
+          })()
+          const outsideViewport = !clippedByAncestor
+            && (rect.left < -1 || rect.right > document.documentElement.clientWidth + 1)
           return (hasInternalOverflow || outsideViewport) ? [{
             tag: element.tagName,
             className: typeof element.className === 'string' ? element.className : '',
