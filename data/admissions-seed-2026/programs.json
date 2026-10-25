@@ -4,9 +4,9 @@
     "universityId": "hust",
     "name": "CNTT: Khoa học Máy tính",
     "majorGroup": "information_technology",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 30000000,
+    "tuitionMaxVndPerYear": 45000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "other",
@@ -56,9 +56,9 @@
     "universityId": "hust",
     "name": "Kỹ thuật Điều khiển - Tự động hóa",
     "majorGroup": "engineering",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 30000000,
+    "tuitionMaxVndPerYear": 45000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "other",
@@ -108,9 +108,9 @@
     "universityId": "dut",
     "name": "Công nghệ thông tin",
     "majorGroup": "information_technology",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 28000000,
+    "tuitionMaxVndPerYear": 38000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "direct_admission",
@@ -174,9 +174,9 @@
     "universityId": "dut",
     "name": "Kỹ thuật máy tính (mã ngành 7480106)",
     "majorGroup": "information_technology",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 28000000,
+    "tuitionMaxVndPerYear": 38000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "direct_admission",
@@ -233,9 +233,9 @@
     "universityId": "hcmut",
     "name": "Khoa học Máy tính",
     "majorGroup": "information_technology",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 40000000,
+    "tuitionMaxVndPerYear": 80000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "direct_admission",
@@ -278,9 +278,9 @@
     "universityId": "hcmut",
     "name": "Kỹ thuật Máy tính (mã tuyển sinh 107; mã ngành 7480106)",
     "majorGroup": "engineering",
-    "tuitionMinVndPerYear": null,
-    "tuitionMaxVndPerYear": null,
-    "tuitionYear": null,
+    "tuitionMinVndPerYear": 40000000,
+    "tuitionMaxVndPerYear": 80000000,
+    "tuitionYear": 2026,
     "admissionMethods": [
       {
         "method": "direct_admission",
