@@ -36,7 +36,7 @@ export function toRecommendationDataset(
       record.scoreScale === 30 &&
       record.status === 'verified' &&
       typeof record.sourceUrl === 'string' &&
-      /^https?:\\/\\//i.test(record.sourceUrl),
+      (record.sourceUrl.startsWith('https://') || record.sourceUrl.startsWith('http://')),
     )
     if (matches.length === 0) return program
 
