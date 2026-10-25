@@ -65,7 +65,48 @@ values. The rule snapshot itself may retain its nullable metadata.
 
 The rule snapshot's `version` has no equivalent in `DataSource` and remains
 local to PR #3. `TuitionSnapshot.sourceUrl` also remains local metadata; it
-must not be silently converted into a verified `DataSource`.
+must not be silently converted into a verified `DataSource`. The adapter
+returns tuition values separately from `provenance`; callers must retain both
+parts and must not pass only the three tuition fields into comparison logic.
+
+### Confirmed Recommendation contract (Member 3)
+
+Member 3 confirmed on PR #4 that `RecommendationInput` contains only
+`profile`, `universities` and `programs`. The historical cutoff collection is
+kept separately and passed through `toRecommendationDataset(profile, data)`.
+That adapter may populate the three nullable cutoff fields on a program only
+when the profile selects exactly one currently eligible method and there is
+one unique latest record matching exact `programId + method`, with score and
+scale present. Missing, ambiguous, duplicate-latest or ineligible cases remain
+unknown; no nearest-year fallback or scale conversion is allowed. Simulation
+must resolve again for each scenario. This confirms the intended contract; it
+does not mean PR #4 itself implements or owns Member 3's adapter.
+
+### Member 4 contract — confirmed shape, mapping still bounded
+
+Member 4 confirmed the local shapes in `src/logic/ruleComparison/types.ts`:
+`AdmissionRuleVersion` requires a complete version snapshot (`id`, institution
+identity/name, nullable program identity/name, `source`, `admissionMethod`,
+`conditions`, optional tuition); `RuleSource` includes name, nullable URL,
+year, version, nullable checked date and status; `TuitionSnapshot` includes
+nullable VND range/year plus status and source URL.
+
+The current PR #4 adapter can losslessly map the representable `RuleSource`
+fields to/from `DataSource` only when URL, year and checked date are present.
+It preserves the local version separately. It maps tuition amount/year and
+returns status/source URL in a separate provenance object. Callers must retain
+both. The shared schema does not contain publication date, currency, or
+versioned historical rule conditions.
+
+**Important boundary:** a current `UniversityProgram` plus its `DataSource`
+records is not enough to manufacture two `AdmissionRuleVersion` snapshots.
+PR #4 does not contain a verified historical rule-version dataset or complete
+`conditions` payload. Therefore the adapter must not invent before/after
+versions, `publishedAt`, rule conditions, or official tuition provenance.
+Member 4's own PR #3 types remain local; Member 4/Member 1 must validate a
+separate explicit mapping once genuine versioned source records are supplied.
+The contract confirmation is not a claim that every field is already mapped
+or that real-world data has been verified.
 
 ## Recommendation boundary (PR #1)
 
