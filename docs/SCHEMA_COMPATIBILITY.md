@@ -7,7 +7,10 @@ remove, or add fields to its interfaces. JSON under
 `data/admissions-seed-2026/` remains the canonical demo dataset.
 
 Use `src/data/admissionsData.ts` to import typed universities, programs and
-historical cutoffs. Do not create a second in-code fixture for the same records.
+historical cutoffs. The JSON is checked at runtime by
+`src/data/admissionsDataValidation.ts` for required fields, enums, nullability,
+source metadata, duplicate IDs and cross-record references. Do not create a
+second in-code fixture for the same records.
 
 ## Source linking
 
@@ -18,8 +21,9 @@ source reference by exact `DataSource.title` match.
 
 Do not populate empty `sourceIds` merely because a source exists on the
 program: that would assert evidence coverage that has not been established.
-If no exact match exists, keep the reference unresolved and expose
-`needs_review`/a warning. Do not add a synthetic source ID.
+If no exact match exists, or more than one match exists, keep the reference
+unresolved and expose `needs_review`/a warning. The resolver is covered for
+unique, missing and ambiguous matches. Do not add a synthetic source ID.
 
 ## Member 4 rule-comparison boundary (PR #3)
 
@@ -69,3 +73,14 @@ between scales without an independently verified conversion rule.
 - Simulated cutoff rows remain explicitly simulated and are not official facts.
 - A successful TypeScript build validates types, not the factual accuracy of
   source documents or the applicability of a rule version.
+
+## Test boundaries
+
+- `npm test` runs adapter mapping and dataset-validator/resolver unit tests.
+- The existing application workflow separately checks TypeScript/build, preview
+  smoke test and canonical JSON regression checks.
+- These checks establish structural compatibility, not factual verification
+  of admissions claims or cross-module integration.
+- PR #1 and PR #3 still need their owners to wire the canonical exports and
+  rule-comparison adapter at their own module boundaries, followed by combined
+  tests on the integrated branch.
