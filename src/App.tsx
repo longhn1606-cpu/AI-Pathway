@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react'
-import { toStudentProfile } from './adapters/frontendProfileAdapter'
+import { toStudentProfile } from './adapters/profileAdapter'
 
 type Interest = 'technology' | 'business' | 'health' | 'education' | 'arts' | 'other' | 'undecided'
 type Region = 'north' | 'central' | 'south' | 'anywhere'
