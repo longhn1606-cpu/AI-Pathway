@@ -189,7 +189,7 @@ try {
   const firstRuleVersion = await ruleSelects.nth(0).inputValue()
   await ruleSelects.nth(1).selectOption(firstRuleVersion)
   await page.getByRole('alert').filter({ hasText: 'Hãy chọn hai phiên bản khác nhau' }).waitFor({ timeout: 5000 })
-  assert.equal(await page.getByRole('region', { name: 'Tác động học phí' }).count(), 0, 'Same-version comparison must not render a misleading impact report')
+  assert.equal(await page.locator('.comparison-detail').count(), 0, 'Same-version comparison must not render misleading collapsible impact details')
   await ruleSelects.nth(1).selectOption({ index: 1 })
 
   for (const [index, scenario] of scenarios.entries()) {
@@ -240,11 +240,25 @@ try {
     assert.equal(await simulatedNotice.count(), 1, 'Rule comparison fixture must be explicitly labelled simulated')
     assert.equal(await page.getByText(/Mức độ ảnh hưởng:/).count(), 1)
     assert.ok(await page.getByText(/conditions.minimumScore/).count() > 0, 'Rule comparison should render changed fields')
-    assert.equal(await page.getByRole('region', { name: 'Tác động học phí' }).count(), 1)
-    assert.equal(await page.getByRole('region', { name: 'Việc học sinh nên làm tiếp theo' }).count(), 1)
-    const tuitionDisclosure = await page.getByRole('region', { name: 'Tác động học phí' }).innerText()
-    assert.match(tuitionDisclosure, /chưa có dữ liệu|needs_review|cần được rà soát/i, 'Null tuition amounts must remain visibly unknown')
-    assert.doesNotMatch(tuitionDisclosure, /0 đồng\/năm/, 'Null tuition must never be rendered as zero')
+    const tuitionDisclosure = page.locator('.comparison-detail').filter({ has: page.locator('summary', { hasText: 'Tác động học phí' }) })
+    const nextStepsDisclosure = page.locator('.comparison-detail').filter({ has: page.locator('summary', { hasText: 'Việc học sinh nên làm tiếp theo' }) })
+    assert.equal(await tuitionDisclosure.count(), 1, 'Tuition impact must be available as a collapsible detail')
+    assert.equal(await nextStepsDisclosure.count(), 1, 'Next steps must be available as a collapsible detail')
+    const tuitionSummary = tuitionDisclosure.locator(':scope > summary')
+    // Keep the disclosure open across recommendation scenarios only when needed.
+    const tuitionAlreadyOpen = await tuitionDisclosure.evaluate((item) => item.open)
+    if (!tuitionAlreadyOpen) await tuitionSummary.click()
+    assert.equal(await tuitionDisclosure.evaluate((item) => item.open), true, 'Clicking the tuition summary should open its native details disclosure')
+    const tuitionDisclosureText = await tuitionDisclosure.locator('.comparison-detail-content').innerText()
+    assert.match(tuitionDisclosureText, /chưa có dữ liệu|needs_review|cần được rà soát/i, 'Null tuition amounts must remain visibly unknown')
+    assert.doesNotMatch(tuitionDisclosureText, /0 đồng\/năm/, 'Null tuition must never be rendered as zero')
+
+    // Native details must toggle with pointer and keyboard interaction.
+    await tuitionSummary.click()
+    assert.equal(await tuitionDisclosure.evaluate((item) => item.open), false, 'Clicking an open detail must close it')
+    await tuitionSummary.focus()
+    await page.keyboard.press('Enter')
+    assert.equal(await tuitionDisclosure.evaluate((item) => item.open), true, 'Keyboard Enter must open a focused detail')
   }
 
   process.stdout.write('Frontend E2E profiles completed: 20/20\n')
