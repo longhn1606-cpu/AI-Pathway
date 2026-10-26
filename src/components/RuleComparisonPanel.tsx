@@ -16,12 +16,14 @@ function ResultList({ title, items, emptyMessage }: {
   emptyMessage: string
 }) {
   return (
-    <section aria-label={title}>
-      <h4>{title}</h4>
-      {items.length > 0 ? (
-        <ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul>
-      ) : <p>{emptyMessage}</p>}
-    </section>
+    <details className="comparison-detail">
+      <summary>{title}</summary>
+      <div className="comparison-detail-content">
+        {items.length > 0 ? (
+          <ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul>
+        ) : <p>{emptyMessage}</p>}
+      </div>
+    </details>
   )
 }
 
