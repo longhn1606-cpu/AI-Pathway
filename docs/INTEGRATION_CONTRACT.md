@@ -166,3 +166,38 @@ The previous historical-cutoff blocker is closed at the adapter/service boundary
 ## Member 1 confirmation — 2026-10-25
 
 Member 1 confirms that the six 2026 tuition values in the canonical demo fixtures are intentional simulated values. Keep their `simulated` provenance/status; do not present them as official tuition. If historical cutoff evidence is absent, `historicalCutoff`, `cutoffYear`, and `cutoffScale` must remain null, never zero or a default. This confirms the fixture/regression contract only, not real-world tuition accuracy or PR approval.
+
+## Contract and edge-case audit — 2026-10-26
+
+This audit is performed on `feat/system-integration`; PR #7 remains the integration source of truth. It does not merge sibling PRs or change Member 3/4 business logic.
+
+### Confirmed boundaries
+
+- UI submission uses `validateUiProfile` before `toRecommendationProfile`; the latter delegates to `toStudentProfile` and then maps the UI taxonomy `technology` to the observed canonical labels `information_technology` and `engineering`.
+- `anywhere` maps to `preferredRegions: ['nationwide']`; `undecided` maps to an empty interests array.
+- Budget mapping is a conservative maximum annual-budget ceiling: under20 → 20,000,000 VND; 20to40 → 40,000,000; 40to70 → 70,000,000; over70/flexible → null. A tuition interval crossing the ceiling is retained with a risk warning; it is not silently represented as affordable.
+- Recommendation output IDs are joined to canonical programs by exact `programId`; unknown IDs are not used to fabricate cards.
+- Historical cutoff mapping requires exact program/method match, a currently offered method, a non-null / scale-30 verified record with an HTTP(S) source, and one unique record in the latest year. Missing or ambiguous matches stay unknown.
+- Simulation resolves the baseline and scenario independently and clones profile arrays; it must not mutate the baseline profile.
+- Rule comparison requires two distinct, runtime-validated snapshots. The demo pair is explicitly simulated; null tuition remains unknown, not zero.
+- Invalid form submission clears recommendation response, submitted profile and simulation result. The E2E checks empty profile, score 31, excess decimal precision and same-version rule comparison.
+
+### Edge case fixed in this audit
+
+Previously, `validateUiProfile` rejected scores such as `24.55`, but a direct caller of `toStudentProfile` could still receive `expectedScore: 24.55` because conversion checked numeric range but not the UI precision contract. The shared boundary now independently validates the score format; invalid, out-of-range, non-finite, blank or over-precision values map to `expectedScore: null` and `scoreScale: null`. A regression test covers these direct-call cases. Form validation remains the user-facing error path.
+
+### Remaining review items (not silently changed)
+
+| Risk / edge case | Current contract | Follow-up |
+|---|---|---|
+| Budget band is an estimate, not exact affordability | Upper-bound filter plus explicit risk warning when max tuition crosses ceiling | Keep wording conservative; do not promise affordability |
+| Empty `preferredMethods` | No method preference; cutoff resolution remains unknown unless exactly one method is selected | Keep UI selection optional only if that behavior is intended |
+| Duplicate or stale source metadata | Structural URL checks do not prove a source is official/current | Data owner must verify source ownership, date and provenance |
+| Simulated rule fixtures / tuition `needs_review` | Clearly disclosed; not official advice | Replace only when two source-backed, versioned snapshots are available |
+| Dataset taxonomy drift | Adapter maps the currently observed labels | Re-run taxonomy tests whenever canonical `majorGroup` values change |
+| Validation after prior successful submit | Invalid submission clears stale results and submitted profile | Keep E2E regression assertion |
+
+### Validation status
+
+The adapter change and regression test are committed to `feat/system-integration`. CI must run on the latest head before declaring the branch fully green. This audit does not claim that official admissions data has been verified.
+
