@@ -244,11 +244,14 @@ try {
     const nextStepsDisclosure = page.locator('.comparison-detail').filter({ has: page.locator('summary', { hasText: 'Việc học sinh nên làm tiếp theo' }) })
     assert.equal(await tuitionDisclosure.count(), 1, 'Tuition impact must be available as a collapsible detail')
     assert.equal(await nextStepsDisclosure.count(), 1, 'Next steps must be available as a collapsible detail')
-    await tuitionDisclosure.locator('summary').click()
-    await page.waitForFunction(() => {
-      const details = [...document.querySelectorAll('.comparison-detail')]
-      return details.some((item) => item.querySelector('summary')?.textContent?.includes('Tác động học phí') && item.open)
-    }, { timeout: 3000 })
+    const tuitionSummary = tuitionDisclosure.locator(':scope > summary')
+    await tuitionSummary.click()
+    const tuitionDetailsOpen = await tuitionDisclosure.evaluate((item) => item.open)
+    assert.equal(
+      tuitionDetailsOpen,
+      true,
+      `Clicking the tuition summary should open its native details disclosure: ${await tuitionDisclosure.evaluate((item) => item.outerHTML)}`,
+    )
     const tuitionDisclosureText = await tuitionDisclosure.locator('.comparison-detail-content').innerText()
     assert.match(tuitionDisclosureText, /chưa có dữ liệu|needs_review|cần được rà soát/i, 'Null tuition amounts must remain visibly unknown')
     assert.doesNotMatch(tuitionDisclosureText, /0 đồng\/năm/, 'Null tuition must never be rendered as zero')
