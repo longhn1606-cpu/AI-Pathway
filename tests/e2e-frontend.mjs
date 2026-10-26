@@ -245,7 +245,10 @@ try {
     assert.equal(await tuitionDisclosure.count(), 1, 'Tuition impact must be available as a collapsible detail')
     assert.equal(await nextStepsDisclosure.count(), 1, 'Next steps must be available as a collapsible detail')
     const tuitionSummary = tuitionDisclosure.locator(':scope > summary')
-    await tuitionSummary.click()
+    // The disclosure stays open across recommendation scenarios. Only click it
+    // when closed; clicking an already-open native <details> would close it.
+    const tuitionAlreadyOpen = await tuitionDisclosure.evaluate((item) => item.open)
+    if (!tuitionAlreadyOpen) await tuitionSummary.click()
     const tuitionDetailsOpen = await tuitionDisclosure.evaluate((item) => item.open)
     assert.equal(
       tuitionDetailsOpen,
