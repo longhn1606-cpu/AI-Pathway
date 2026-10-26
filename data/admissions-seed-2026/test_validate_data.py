@@ -34,10 +34,27 @@ class SeedDataTests(unittest.TestCase):
             self.assertIn(row["programId"], programs_by_id)
             self.assertEqual(row["universityId"], programs_by_id[row["programId"]]["universityId"])
 
-    def test_unknown_numbers_are_null(self):
+    def test_unknown_cutoffs_remain_null_and_tuition_snapshot_needs_review(self):
         for program in self.programs:
-            for key in ("tuitionMinVndPerYear", "tuitionMaxVndPerYear", "tuitionYear", "historicalCutoff", "cutoffYear", "cutoffScale"):
+            # Historical cutoff rows remain a separate collection. Do not flatten
+            # an arbitrary year/method into the single program-level cutoff tuple.
+            for key in ("historicalCutoff", "cutoffYear", "cutoffScale"):
                 self.assertIsNone(program[key])
+
+            # The current 2026 tuition snapshot is populated but the program data
+            # remains needs_review. Do not promote it to verified in the adapter.
+            self.assertEqual(program["status"], "needs_review")
+            minimum = program["tuitionMinVndPerYear"]
+            maximum = program["tuitionMaxVndPerYear"]
+            year = program["tuitionYear"]
+            if minimum is not None:
+                self.assertGreaterEqual(minimum, 0)
+            if maximum is not None:
+                self.assertGreaterEqual(maximum, 0)
+            if minimum is not None and maximum is not None:
+                self.assertLessEqual(minimum, maximum)
+            if year is not None:
+                self.assertEqual(year, 2026)
 
     def test_program_records_need_review(self):
         self.assertTrue(all(p["status"] == "needs_review" for p in self.programs))
@@ -54,6 +71,24 @@ class SeedDataTests(unittest.TestCase):
             for source in item["sources"]:
                 self.assertIn(source["status"], STATUSES)
                 self.assertTrue(source["url"].startswith("https://"))
+
+    def test_verified_method_requires_exact_verified_program_source(self):
+        program = dict(self.programs[0])
+        method = dict(program["admissionMethods"][0])
+        method["status"] = "verified"
+        method["sourceIds"] = [program["sources"][0]["title"]]
+        program["admissionMethods"] = [method]
+        source = dict(program["sources"][0])
+        source["status"] = "verified"
+        source["applicableYear"] = method["applicableYear"]
+        program["sources"] = [source]
+        self.assertEqual(method["status"], "verified")
+        self.assertEqual(len([s for s in program["sources"] if s["title"] == method["sourceIds"][0] and s["status"] == "verified" and s["applicableYear"] == method["applicableYear"]]), 1)
+
+        method["sourceIds"] = []
+        self.assertFalse(method["sourceIds"], "verified method without source must be rejected")
+        method["sourceIds"] = ["not-an-existing-source"]
+        self.assertFalse(any(s["title"] == method["sourceIds"][0] for s in program["sources"]), "unresolved source must be rejected")
 
     def test_cutoff_score_scales_and_statuses(self):
         for row in self.cutoffs["records"]:

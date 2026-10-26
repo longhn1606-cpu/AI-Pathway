@@ -1,0 +1,42 @@
+name: System integration checks
+
+on:
+  pull_request:
+    branches: [main, feat/system-integration]
+    paths:
+      - 'src/**'
+      - 'data/admissions-seed-2026/**'
+      - 'tests/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/system-integration.yml'
+  push:
+    branches: [feat/system-integration, feat/member2-responsive-demo]
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run build
+      - run: npm test
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Run browser E2E
+        run: |
+          npm run dev -- --host 127.0.0.1 > /tmp/ai-pathway-vite.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID' EXIT
+          npm run test:e2e
+      - name: Upload responsive screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-pathway-responsive-screenshots
+          path: artifacts/responsive/*.png
+          if-no-files-found: warn

@@ -1,0 +1,378 @@
+{
+  "notice": "Toàn bộ tình huống trong tệp này là kịch bản mô phỏng nội bộ để kiểm thử phần mềm, không phải quy định tuyển sinh chính thức. Không sử dụng để tư vấn tuyển sinh thực tế.",
+  "scenarios": [
+    {
+      "id": "method-change",
+      "title": "Thay đổi phương thức xét tuyển",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "admissionMethod"
+      ],
+      "oldRule": {
+        "id": "demo-method-change-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "academic_record",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      },
+      "newRule": {
+        "id": "demo-method-change-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      }
+    },
+    {
+      "id": "subject-combination",
+      "title": "Thay đổi tổ hợp môn",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "conditions.subjectCombinations"
+      ],
+      "oldRule": {
+        "id": "demo-subject-combination-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      },
+      "newRule": {
+        "id": "demo-subject-combination-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00",
+            "D01"
+          ]
+        }
+      }
+    },
+    {
+      "id": "minimum-score",
+      "title": "Thay đổi điểm tối thiểu",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "conditions.minimumScore"
+      ],
+      "oldRule": {
+        "id": "demo-minimum-score-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22
+        }
+      },
+      "newRule": {
+        "id": "demo-minimum-score-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 24
+        }
+      }
+    },
+    {
+      "id": "priority-rule",
+      "title": "Thay đổi quy tắc ưu tiên",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "conditions.priorityRules.regionalBonus"
+      ],
+      "oldRule": {
+        "id": "demo-priority-rule-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "priorityRules": {
+            "regionalBonus": 0.25
+          }
+        }
+      },
+      "newRule": {
+        "id": "demo-priority-rule-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "priorityRules": {
+            "regionalBonus": 0.5
+          }
+        }
+      }
+    },
+    {
+      "id": "tuition-change",
+      "title": "Thay đổi snapshot học phí minh họa",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "tuition.minVndPerYear"
+      ],
+      "oldRule": {
+        "id": "demo-tuition-change-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        },
+        "tuition": {
+          "minVndPerYear": 18000000,
+          "maxVndPerYear": 22000000,
+          "appliedYear": 2026,
+          "dataStatus": "simulated",
+          "sourceUrl": null
+        }
+      },
+      "newRule": {
+        "id": "demo-tuition-change-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        },
+        "tuition": {
+          "minVndPerYear": 20000000,
+          "maxVndPerYear": 24000000,
+          "appliedYear": 2027,
+          "dataStatus": "simulated",
+          "sourceUrl": null
+        }
+      }
+    },
+    {
+      "id": "unchanged",
+      "title": "Không có thay đổi",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "source.version"
+      ],
+      "oldRule": {
+        "id": "demo-unchanged-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng A",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      },
+      "newRule": {
+        "id": "demo-unchanged-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Kịch bản mô phỏng B",
+          "url": null,
+          "appliedYear": 2026,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      }
+    },
+    {
+      "id": "missing-provenance",
+      "title": "Thiếu nguồn và năm áp dụng",
+      "notice": "Kịch bản mô phỏng — không phải quy định chính thức.",
+      "expectedChangedFields": [
+        "source.version"
+      ],
+      "oldRule": {
+        "id": "demo-missing-provenance-A",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Fixture cũ",
+          "url": null,
+          "appliedYear": null,
+          "version": "A",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      },
+      "newRule": {
+        "id": "demo-missing-provenance-B",
+        "institutionId": "demo-university",
+        "institutionName": "Trường đại học minh họa",
+        "programId": "demo-program",
+        "programName": "Chương trình minh họa",
+        "source": {
+          "name": "Fixture mới",
+          "url": null,
+          "appliedYear": null,
+          "version": "B",
+          "checkedAt": null,
+          "dataStatus": "simulated"
+        },
+        "admissionMethod": "high_school_exam",
+        "conditions": {
+          "minimumScore": 22,
+          "subjectCombinations": [
+            "A00"
+          ]
+        }
+      }
+    }
+  ]
+}

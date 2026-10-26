@@ -1,0 +1,158 @@
+# AI Pathway — Integration Test Report
+
+Date: 2026-10-25  
+Branch: feat/system-integration
+
+## Automated test coverage
+
+- tests/admissionsDataValidation.test.mjs
+- tests/ruleComparisonAdapter.test.mjs
+- tests/integratedRecommendationService.test.mjs
+- tests/integratedRuleComparisonService.test.mjs
+- tests/recommendationProfileAdapter.test.mjs
+- tests/admissionRuleVersionAdapter.test.mjs
+- tests/e2e-frontend.mjs
+
+CI runs npm install, npm run build, npm test, installs Playwright/Chromium, starts Vite and executes browser E2E.
+
+## Historical CI evidence (run #96; predates current integration hardening)
+
+**System integration workflow run #96 — SUCCESS** on commit 31246f86ffa43a75307da21fe5e6f08cf2fb31f5:
+- Production build: passed.
+- npm test: **27/27 passed**.
+- Playwright Chromium browser E2E: **20/20 profile submissions passed**; log reports `Frontend E2E profiles completed: 20/20`.
+- Browser launch and server readiness checks: passed.
+
+Run #96 predates the deep-validation changes below and must not be used as evidence for them. A new workflow run is required. The updated suite adds malformed source/metadata/conditions/tuition rejection and explicit unknown-tuition UI assertions. Earlier run #96 verified:
+- canonical dataset validation, IDs, statuses and provenance;
+- recommendation integration and taxonomy mapping;
+- null tuition and score-scale mismatch behavior;
+- simulation immutability;
+- rule snapshot pair validation (missing/duplicate IDs rejected; deeper validation added after run #96);
+- frontend comparison of Member 4's explicitly simulated pair;
+- 20 distinct profile submissions through the actual React form and service.
+
+Earlier CI failures were handled:
+- Initial run failed at setup-node because npm caching expected a lockfile; cache removed.
+- A legacy Member 3 runner failed because it required demo fixture files absent from canonical base; that fixture-dependent runner was removed.
+
+## Integration matrix
+
+| ID | Scenario | Implementation | Evidence |
+|---|---|---|---|
+| IT-01 | Schema compatibility | Member 1 validator tests | Passed run #96 |
+| IT-02 | Dataset → recommendation | Canonical service + ID/status assertions | Passed run #96 |
+| IT-03 | Dataset → rule comparison | Explicit snapshot service delegates Member 4 | Passed run #96; production history source remains open |
+| IT-04 | Recommendation → frontend | App calls service and renders by programId | Passed run #96 |
+| IT-05 | Simulation → frontend | App calls simulate and renders scenario counts | Passed run #96 |
+| IT-06 | Rule comparison → frontend | RuleComparisonPanel renders simulated demo pair | Passed run #96 |
+| IT-07 | Missing data | Null tuition/cutoff preserved | Passed run #96 |
+| IT-08 | Invalid input | UI validation and engine safeguards | Passed run #96 |
+| IT-09 | Duplicate IDs | Member 1 validator | Passed run #96 |
+| IT-10 | Null tuition/cutoff | Null not coerced to zero | Passed run #96 |
+| IT-11 | Provenance | DataStatus retained in services/adapters | Passed run #96 |
+| IT-12 | Regression | Build + npm test + browser E2E | Passed run #96 |
+| IT-13 | Simulation immutability | Service test and browser baseline assertion | Passed run #96 |
+| IT-14 | Scale mismatch | Engine warns and does not compare unlike scales | Passed run #96 |
+| IT-15 | Ambiguous source mapping | Exact unique source resolver | Passed run #96 |
+| IT-16 | Missing rule evidence | Pair adapter rejects missing/duplicate snapshots | Passed run #96 |
+
+## Browser E2E — actual results
+
+**Verified: 20/20 profile submissions passed in run #96.**
+
+The Playwright suite varies score, interest, region and budget through the actual UI form. For selected profiles it runs the +1 score simulation and verifies that the baseline score input remains unchanged. It also checks that the rule comparison panel clearly labels the Member 4 snapshots as simulated and renders changed fields.
+
+## Added validation matrix (verified in latest CI)
+- Invalid source URL protocol/type, malformed applied year, invalid checkedAt and unknown data status.
+- Invalid institution/program metadata and unsupported admission method.
+- Non-object conditions, nested non-finite numbers and non-JSON values.
+- Tuition wrong types, negative amounts, inverted min/max range, invalid year/status/source URL.
+- Null tuition/source fields remain valid unknowns; they are not coerced to zero.
+- Browser assertions cover the tuition unknown-state message and next-step section.
+
+## Evidence policy
+
+A browser run counts only when the real app and integration path execute. Test definitions, mocks, unit tests or build success are not E2E passes. Keep failed attempts and reproduction details; reruns do not erase failures.
+
+
+## Historical cutoff integration regression coverage — verified in latest CI
+
+- Latest unique record is selected for exact program + single selected method.
+- Simulation re-resolves cutoff after the selected admission method changes; before and after states retain distinct source status.
+- A historical method not declared by the current program is not mapped.
+- Multiple selected methods do not choose an arbitrary cutoff.
+- Null remains null for missing/ambiguous records; original canonical arrays/profile are not mutated.
+
+The adapter used is synchronized from Member 3's PR #1 head and the integration service delegates selection to it; Member 5 does not duplicate its selection logic.
+
+
+## Latest verified CI — 2026-10-25
+
+Commit tested: `e7428857e27bdb96086e3243bfa7bda6c901333b`
+
+**System integration run #40190455660**
+- Production build / TypeScript: passed.
+- npm test: **38/38 passed**.
+- Playwright Chromium: **20/20 profile submissions passed**.
+- Includes four historical cutoff adapter/service tests, frontend criteria-based no-fit empty state, tuition unknown disclosure, rule-comparison explanations, and simulation baseline immutability.
+
+**Dataset validation run #40190455663**
+- Production build and preview smoke test: passed.
+- Dataset structural validation: **0 errors**, 16 warnings (empty method sourceIds remain a documented schema limitation).
+- Python regression tests: **10/10 passed**.
+- Updated regression keeps program-level cutoff tuple null while allowing the separate 2026 tuition snapshot to remain `needs_review`.
+
+The 2026 tuition snapshot is not verified source-level tuition advice. The demo rule snapshots remain simulated. These data limitations are not covered by a green CI result.
+
+
+## Follow-up browser regression — 2026-10-25
+
+The existing invalid-profile flow already clears `submittedProfile`, recommendation output and simulation output in `src/App.tsx`. The Playwright E2E now explicitly asserts all three user-visible consequences after an invalid score submission:
+
+- no stale recommendation cards remain;
+- no previously submitted profile summary remains;
+- the initial results empty state is restored.
+
+Test change commit: `8b2282fe0740ff7d0fd0968cc10109a842b67efe`. **Pending CI verification**: do not count these new assertions as passed until the workflow run for the updated branch head completes successfully. Existing verified baseline on head `1c4bdcf045a5406f63bee4ea2320ada7793411ac`: system integration build/unit/E2E workflow SUCCESS; demo-data workflow SUCCESS, including Member 4 regression 20 repeated runs, preview smoke, structural validator and Python regression.
+
+
+## Latest follow-up verification — 2026-10-25
+
+On PR #7 head `8708529aa8dc40280383e9933a79917a7148b9b9`:
+- System integration run #162: SUCCESS — production build, npm test, Chromium E2E including the new invalid-profile stale-state assertions.
+- Demo data/app run #358: SUCCESS — Member 4 rule regression repeated 20 times, production preview smoke, dataset validation and Python regression.
+
+On PR #4 head `e983235f7073859fad42250d1fb8bd0e980d82cd`:
+- Demo data/app run #350: SUCCESS.
+- Adapter unit tests run #58: SUCCESS.
+
+Member 1 confirmed the six 2026 tuition fixtures are simulated demo data and historical cutoff tuple fields remain null when unsupported. CI success validates code and fixture structure, not official tuition facts.
+
+
+## Latest acceptance on PR #7 head 8ef9a99 — 2026-10-25
+
+The live branch head was re-read from GitHub as `8ef9a99a0caad38d4663d9f68756a8ca9ed234b0`.
+
+**System integration**
+- Run #192 (`40195320245`): SUCCESS.
+- Run #191 (`40195315594`): SUCCESS.
+- Both runs completed production build, `npm test`, Playwright installation, Chromium setup and browser E2E successfully.
+
+**Demo data and app validation**
+- Run #388 (`40195320251`): SUCCESS.
+- Run #387 (`40195315549`): SUCCESS.
+- Both completed TypeScript/production build, Member 4 rule-comparison regression repeated 20 times, production preview smoke test, dataset structure validation and Python regression tests.
+
+**Correction of earlier failed attempt**
+- Earlier integration run #178 (`40194278083`) failed at `npm test`; the browser E2E steps were skipped.
+- The current branch head includes the subsequent fixture correction (commit message: `test: correct mismatched source year fixture`). The two later integration runs above pass on the corrected head.
+- The earlier failure is retained in this report; it is not represented as a pass.
+
+**Data interpretation**
+- Dataset validation workflow passed, but its pass status does not mean source accuracy is verified. The previously reported 16 warnings remain review/provenance caveats.
+- Demo rule snapshots remain simulated; 2026 tuition data must retain its non-verified demo status. Missing historical cutoff values remain null.
+
+**Acceptance boundary**
+- CI Chromium E2E is verified on this exact head. A separate manual browser/device review is not evidenced by these workflow runs and must not be claimed.
+- PR #7 remains Open / Draft; CI success alone does not approve or merge the PR.
