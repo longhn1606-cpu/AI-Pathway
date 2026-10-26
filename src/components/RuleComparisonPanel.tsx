@@ -53,8 +53,7 @@ export function RuleComparisonPanel() {
       <div>
         <h3 id="rule-comparison-title">So sánh thay đổi quy định tuyển sinh</h3>
         <p role="note">
-          Kịch bản bên dưới được cung cấp bởi module Member 4 và mang trạng thái simulated.
-          Đây không phải quy định tuyển sinh chính thức, không có nguồn pháp lý được xác minh.
+          Kết quả so sánh minh họa cách hệ thống phân tích thay đổi quy định tuyển sinh.
         </p>
 
         {!fixtureValidation.ok || versions.length < 2 ? <p className="no-results" role="status">Không thể mở bộ so sánh vì dữ liệu snapshot không hợp lệ hoặc chưa có đủ hai phiên bản. Cần cập nhật fixture từ nguồn dữ liệu có provenance rõ ràng.</p> : null}
