@@ -28,8 +28,12 @@ export interface UiStudentProfile {
 export function toStudentProfile(profile: UiStudentProfile): StudentProfile {
   const scoreText = profile.score.trim()
   const parsedScore = scoreText === '' ? null : Number(scoreText)
+  // Keep the shared profile contract safe even when a caller bypasses form validation.
+  // The UI accepts at most one decimal place on the 0–30 scale.
+  const validScoreFormat = /^\\d+(?:\\.\\d)?$/.test(scoreText)
   const expectedScore =
-    parsedScore !== null && Number.isFinite(parsedScore) && parsedScore >= 0 && parsedScore <= 30
+    parsedScore !== null && validScoreFormat && Number.isFinite(parsedScore)
+      && parsedScore >= 0 && parsedScore <= 30
       ? parsedScore
       : null
 
