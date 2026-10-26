@@ -58,3 +58,12 @@ test('rejects scores with more than one decimal place', () => {
   }
   assert.deepEqual(validateUiProfile({ ...validProfile, score: '24.5' }), [])
 })
+
+test('shared profile mapping rejects invalid scores even when form validation is bypassed', () => {
+  for (const score of ['31', '-1', '24.55', 'Infinity', 'NaN', '']) {
+    const mapped = toStudentProfile({ ...validProfile, score })
+    assert.equal(mapped.expectedScore, null, score)
+    assert.equal(mapped.scoreScale, null, score)
+  }
+  assert.equal(toStudentProfile({ ...validProfile, score: '30.0' }).expectedScore, 30)
+})
