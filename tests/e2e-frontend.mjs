@@ -258,6 +258,13 @@ try {
     const tuitionDisclosureText = await tuitionDisclosure.locator('.comparison-detail-content').innerText()
     assert.match(tuitionDisclosureText, /chưa có dữ liệu|needs_review|cần được rà soát/i, 'Null tuition amounts must remain visibly unknown')
     assert.doesNotMatch(tuitionDisclosureText, /0 đồng\/năm/, 'Null tuition must never be rendered as zero')
+
+    // Native details must toggle normally with pointer and keyboard interaction.
+    await tuitionSummary.click()
+    assert.equal(await tuitionDisclosure.evaluate((item) => item.open), false, 'Clicking an open detail must close it')
+    await tuitionSummary.focus()
+    await page.keyboard.press('Enter')
+    assert.equal(await tuitionDisclosure.evaluate((item) => item.open), true, 'Keyboard Enter must open a focused detail')
   }
 
   process.stdout.write('Frontend E2E profiles completed: 20/20\n')
