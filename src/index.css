@@ -164,3 +164,49 @@ button, input, select, textarea { max-width: 100%; }
 @media (min-width: 761px) {
   .data-note p, .data-note li, .program-description { font-size: 13px; }
 }
+
+
+/* Collapsible comparison details keep the summary scannable on narrow screens. */
+.comparison-detail {
+  margin-top: 12px;
+  border: 1px solid #e2e8f1;
+  border-radius: 10px;
+  background: #fff;
+  overflow: clip;
+}
+.comparison-detail > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 13px 15px;
+  color: #29415d;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  list-style: none;
+}
+.comparison-detail > summary::-webkit-details-marker { display: none; }
+.comparison-detail > summary::after {
+  content: '+';
+  flex: 0 0 auto;
+  color: var(--blue);
+  font-size: 20px;
+  line-height: 1;
+}
+.comparison-detail[open] > summary {
+  border-bottom: 1px solid #e8edf4;
+  background: #f8faff;
+}
+.comparison-detail[open] > summary::after { content: '−'; }
+.comparison-detail-content { padding: 12px 15px 4px; }
+.comparison-detail-content ul { margin-top: 4px; }
+.comparison-detail-content li { margin-bottom: 8px; }
+.comparison-detail > summary:focus-visible { outline-offset: -3px; }
+@media (max-width: 760px) {
+  .comparison-detail { margin-top: 10px; }
+  .comparison-detail > summary { min-height: 50px; padding: 13px 12px; font-size: 14px; }
+  .comparison-detail-content { padding: 12px 12px 3px; }
+}
