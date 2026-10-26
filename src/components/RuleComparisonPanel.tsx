@@ -17,7 +17,17 @@ function ResultList({ title, items, emptyMessage }: {
 }) {
   return (
     <details className="comparison-detail">
-      <summary>{title}</summary>
+      <summary
+        onClick={(event) => {
+          // Explicitly toggle the disclosure; this also keeps the behavior
+          // reliable in the Chromium E2E environment used for the demo.
+          event.preventDefault()
+          const details = event.currentTarget.parentElement
+          if (details instanceof HTMLDetailsElement) details.open = !details.open
+        }}
+      >
+        {title}
+      </summary>
       <div className="comparison-detail-content">
         {items.length > 0 ? (
           <ul>{items.map((item, index) => <li key={index}>{item}</li>)}</ul>
